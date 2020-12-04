@@ -1,0 +1,486 @@
+
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+ <channel>
+   <title>Tags on Wisdoom</title>
+   <link>http://Scoobi-wisdoom.github.io/tags/</link>
+   <description>Recent content in Tags on Wisdoom</description>
+   <generator>Hugo -- gohugo.io</generator>
+   <language>en-us</language>
+   
+       <atom:link href="http://Scoobi-wisdoom.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+   
+   
+     <item>
+       <title>Docker와 AWS (EC2)</title>
+       <link>http://Scoobi-wisdoom.github.io/posts/docker%EC%99%80-aws-ec2/</link>
+       <pubDate>Sun, 29 Nov 2020 21:54:44 +0900</pubDate>
+       
+       <guid>http://Scoobi-wisdoom.github.io/posts/docker%EC%99%80-aws-ec2/</guid>
+       <description>&lt;blockquote&gt;
+&lt;h3 id=&#34;목차&#34;&gt;목차&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Docker 설치하기&lt;/li&gt;
+&lt;li&gt;예제를 통한 Dockerfile, image 생성&lt;/li&gt;
+&lt;li&gt;Docker Hub 에 Docker Image 등록&lt;/li&gt;
+&lt;li&gt;AWS EC2 에서 instance 생성&lt;/li&gt;
+&lt;li&gt;AWS EC2 접속&lt;/li&gt;
+&lt;li&gt;AWS EC2 에서 Docker 사용&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;1-docker-설치하기&#34;&gt;1. Docker 설치하기&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.docker.com/products/docker-desktop&#34;&gt;Docker 공식홈페이지에서 Docker desktop 을 찾는다.&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;여기서 OS 에 맞는 Docker를 다운받는다. Stable 버전으로 받자. 나는 windows 버전으로 받았다. Default 로 설치한다.&lt;/p&gt;
+&lt;p&gt;나의 경우 Linux를 설치하지 않았기 때문에 docker 를 실행할 수 없었다. 이 경우 &lt;a href=&#34;https://docs.microsoft.com/en-us/windows/wsl/wsl2-kernel&#34;&gt;WSL 2 Linux 커널 업데이트&lt;/a&gt;를 하면 해결된다.&lt;/p&gt;
+&lt;p&gt;이제 Docker 가 제대로 설치됐는지 확인해보자. 
+CMD를 실행해 docker 라고 입력했을 때 제대로 실행이 되면 설치가 정상적으로 된 것이다.&lt;br&gt;
+만약 정상적으로 설치되지 않았다면 시작 버튼을 누르고 Edit the system environment variables 시스템 환경 변수 편집을 검색, 실행을 통해 해결한다.&lt;/p&gt;
+&lt;p&gt;Environment Variables 환경 변수를 클릭하고, System variables 시스템 변수에서 Path를 편집한다. 정상적으로 docker 가 실행되기 위해서는 다음 두 가지가 이 목록에 있어야 한다: C:\Program Files\Docker\Docker\resources\bin 와 C:\ProgramData\DockerDesktop\version-bin . 없으면 등록하자.&lt;/p&gt;
+&lt;h3 id=&#34;reference&#34;&gt;Reference&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=rZbzvKMPFsY&#34;&gt;How to Install Docker on Windows, Be A Better Dev - Youtube&lt;/a&gt;&lt;br&gt;
+&lt;!-- raw HTML omitted --&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;2-예제를-통한-dockerfile-image-생성&#34;&gt;2. 예제를 통한 Dockerfile, image 생성&lt;/h2&gt;
+&lt;p&gt;간단한 예제를 통해 Dockerfile 을 통해 Image 를 생성해보자. 먼저 아래와 같은 index.php 를 만든다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;?php
+
+echo &amp;quot;Hello, World&amp;quot;;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;해당 디렉토리에 config 와 src 폴더를 만든다. src 폴더에는 index.php 를 넣고 config 폴더에는 php.ini 파일을 넣는다. php.ini 파일은 &lt;a href=&#34;https://stackoverflow.com/questions/34708753/run-docker-php-apache-forbidden-you-dont-have-permission-to-access-on-this-s&#34;&gt;여기&lt;/a&gt; 에서 구할 수 있다.&lt;/p&gt;
+&lt;p&gt;와 같은 디렉토리에 아래와 같은 Dockerfile 을 생성한다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;FROM php:7.0-apache
+COPY src/ /var/www/html
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;그 다음 cmd 에서 해당 디렉토리로 이동한 후에, 아래와 같은 명령어를 실행해 image 를 생성한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;C:&lt;span style=&#34;color:#ae81ff&#34;&gt;\f&lt;/span&gt;older&amp;gt;docker build -t hello-world .
+&lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt;+&lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt; Building 1.1s &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;7/7&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; FINISHED
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;정상적으로 실행이 된 다음에는 아래와 같은 명령어를 실행해 container 를 만들자.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;docker run -p 80:80 hello-world
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이제 웹브라우저에서 localhost 에 접속해, php 파일이 실행되는 것을 확인하자.&lt;/p&gt;
+&lt;p&gt;참고로 Docker image 가 생성된 후에는 index.php 파일을 변경해도, 반영되지 않는다. 왜냐하면, 기존에 생성된 image 파일로 Docker 가 구동되기 때문이다. 물론 개발 단계에서는 변경 사항을 반영하는 방법이 있다고는 한다.&lt;/p&gt;
+&lt;h3 id=&#34;reference-1&#34;&gt;Reference&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=YFl2mCHdv24&#34;&gt;Learn Docker in 12 Minutes, Jake Wright - Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://stackoverflow.com/questions/34708753/run-docker-php-apache-forbidden-you-dont-have-permission-to-access-on-this-s&#34;&gt;StackOverflow&lt;/a&gt;&lt;br&gt;
+&lt;!-- raw HTML omitted --&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;3-docker-hub-에-docker-image-등록&#34;&gt;3. Docker Hub 에 Docker Image 등록&lt;/h2&gt;
+&lt;p&gt;Docker hub 에 docker image 를 등록하자. 여기에 등록된 이미지를 AWS 서버에서 가져와서 사용하게 된다.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://hub.docker.com/&#34;&gt;Docker Hub&lt;/a&gt; 에 가입한 후 repository 를 만들자. 필자는 hellow-world 라고 이름을 지었다.&lt;/p&gt;
+&lt;p&gt;먼저 아래와 같은 명령어를 실행해 docker image 가 local 에 있는지 확인한다. docker hub 에 등록할 image id 를 복사해놓는다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;C:&lt;span style=&#34;color:#ae81ff&#34;&gt;\U&lt;/span&gt;sers&amp;gt;docker images
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;해당 image 를 docker hub 에 등록하기 위해서 cmd 에서 docker hub 에 로그인 해야 한다. 아래 명령어를 입력한 후에 username 과 password 로 로그인 하자.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;C:&lt;span style=&#34;color:#ae81ff&#34;&gt;\U&lt;/span&gt;sers&amp;gt;docker login
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위에서 복사해놓은 docker image id 를 사용해 docker tag &lt;!-- raw HTML omitted --&gt; &lt;!-- raw HTML omitted --&gt;/&lt;!-- raw HTML omitted --&gt;:&amp;lt;태그&amp;gt; 을 입력한다. 태그는 구분을 위해 사용하는 것이기 때문에 아무렇게나 입력해도 된다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;C:&lt;span style=&#34;color:#ae81ff&#34;&gt;\U&lt;/span&gt;sers&amp;gt;docker tag IMAGE_ID_HERE! USERNAME_HERE!/REPOSITORY_HERE!:base
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이제 tag 한 docker image 를 docker hub 에 등록하자. 아래와 같이 명령어를 입력하면 된다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;C:&lt;span style=&#34;color:#ae81ff&#34;&gt;\U&lt;/span&gt;sers&amp;gt;docker push USERNAME_HERE!/REPOSITORY_HERE!:base
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;reference-2&#34;&gt;Reference&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://m-learn.tistory.com/7&#34;&gt;Docker 기반에서 실행가능한 이미지 파일을 도커허브에 업로드하기&lt;/a&gt;&lt;br&gt;
+&lt;!-- raw HTML omitted --&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;4-aws-ec2-에서-instance-생성&#34;&gt;4. AWS EC2 에서 instance 생성&lt;/h2&gt;
+&lt;p&gt;이제 instance 를 생성하자. AWS dashboard 에서 EC2 에 접속한다. 여기서 Instance 라는 항목을 선택한다. 그리고 Launch instances 를 클릭한다. 그러면 7 단계의 과정을 거쳐서 instance 를 생성하게 된다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Choose AMI&lt;br&gt;
+Ubuntu Server 18.04 LTS (HVM) 를 선택한다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Choose Instance Type&lt;br&gt;
+t2.micro 를 선택한다. Free tier eligible 이기 때문에 테스트용으로 선택하는 것이다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Configure Instance&lt;br&gt;
+&lt;strong&gt;Subnet&lt;/strong&gt; 은 No preference 를 선택한다. 필자의 경우 No preference 외에 다른 것을 선택했을 때 instance 가 생성되지 않았다.
+&lt;strong&gt;Auto-assign Public IP&lt;/strong&gt; 는 Enable 을 선택한다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Add Storage&lt;br&gt;
+그냥 넘긴다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Add Tags&lt;br&gt;
+그냥 넘긴다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Configure Security Group&lt;br&gt;
+&lt;strong&gt;Add Rule&lt;/strong&gt; 을 클릭하여 Type 을 HTTP 로 선택한다. 이때 Port Range 가 80 으로 선택이 된다. 이 포트 번호를 기억하자. docker container 를 AWS 에서 생성하기 위해 필요하다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Review&lt;br&gt;
+Launch 버튼을 클릭하자. 그러면 &lt;strong&gt;Select an existing key pair or create a new key pair&lt;/strong&gt; 라고 modal 이 뜬다. 이미 key pair 를 만들었으면 만들어 둔 것을 사용할 수 있지만, 지금 이 글은 tutorial 이므로 key pair 가 없다고 가정한다. Create a new key pair 를 선택하고 key pair name 을 임의로 입력한다. 필자는 seoul 이라고 입력했다. 그 다음 Launch Instances 를 클릭한다. key pair 파일이 다운로드될 path 를 고르면 이제 instance 가 생성된다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;이제 생성된 instance 를 클릭한다. &lt;strong&gt;Public IPv4 DNS&lt;/strong&gt; 를 복사해놓자.&lt;/p&gt;
+&lt;h3 id=&#34;reference-3&#34;&gt;Reference&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://supdev.tistory.com/22&#34;&gt;AWS EC2 인스턴스 생성 및 Putty로 접속하기&lt;/a&gt;&lt;br&gt;
+&lt;!-- raw HTML omitted --&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;5-aws-ec2-접속&#34;&gt;5. AWS EC2 접속&lt;/h2&gt;
+&lt;p&gt;이제 key pair 를 이용해 AWS EC2에 접속해보자. OS 에 따라 방법이 다르다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Linux&lt;br&gt;
+Key pair 가 있는 경로로 이동하여 다음과 같은 명령어를 사용한다. 이 때 위에서 복사한 &lt;strong&gt;Public IPv4 DNS&lt;/strong&gt; 를 사용한다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;$ ssh -i KEYPAIR_FILENAME! ubuntu@PUBLIC_IPV4_DNS!
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;Windows (Putty 사용)&lt;br&gt;
+먼저 &lt;a href=&#34;https://www.chiark.greenend.org.uk/~sgtatham/putty/&#34;&gt;Putty 를 다운로드&lt;/a&gt; 하자. 다운로드가 완료된 후 default 로 설치한다. 그러면 C:\Program Files\PuTTY 에 puty 가 설치가 된다. 여기서 puttygen.exe 를 실행한다.&lt;br&gt;
+&lt;br&gt;
+Load 를 클릭해 위에서 다운로드 받은 key pair 파일을 선택한다. 그 다음 Save private key 를 눌러 Putty private key 를 저장한다.&lt;br&gt;
+&lt;br&gt;
+이제 C:\Program Files\PuTTY 에서 putty.exe 를 실행한다. Connection &amp;gt; SSH &amp;gt; Auth 를 선택한다. Browse 버튼을 눌러 바로 위 문단에서 생성한 Private key file을 선택한다.&lt;br&gt;
+&lt;br&gt;
+Session 탭으로 이동한다. &lt;strong&gt;4. AWS EC2 에서 instance 생성&lt;/strong&gt; 단계에서 복사한 &lt;strong&gt;Public IPv4 DNS&lt;/strong&gt; 를 Host Name에 입력한다.&lt;br&gt;
+&lt;br&gt;
+이제 open 을 눌러 AWS EC2에 접속해도 되지만 한 가지 더 설정하자. putty 는 실행될 때마다 초기화된다. 앞으로 귀찮지 않기 위해서는 putty.exe 에서 설정한 환경을 저장하자. Saved Sessions 부분에 임의의 이름으로 현재 설정을 저장한다. 그 다음 open 을 눌러 AWS EC2에 접속하자.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;EC2 에 접속하면 login as 라는 말이 나온다. 필자는 instance 를 만들 때 ubuntu 로 만들었으니, ubuntu 라고 입력한다. 그러면 접속이 완료된다.&lt;/p&gt;
+&lt;h3 id=&#34;reference-4&#34;&gt;Reference&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://supdev.tistory.com/22&#34;&gt;AWS EC2 인스턴스 생성 및 Putty로 접속하기&lt;/a&gt;&lt;br&gt;
+&lt;!-- raw HTML omitted --&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;6-aws-ec2-에서-docker-사용&#34;&gt;6. AWS EC2 에서 Docker 사용&lt;/h2&gt;
+&lt;p&gt;EC2 에 접속한 후에, 아래와 같은 명령어를 사용해 Linux 를 업데이트 한다. 업데이트를 해야 docker 를 사용할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;$ sudo apt update
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그 다음에 아래와 같은 명령어를 실행해 docker 를 설치한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;$ sudo apt install docker.io
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;참고로 build 는 이미 docker hub 에 돼 있기 때문에 여기서 필요 없다. 이제 아래의 명령어를 시행해 docker container 를 생성한다. username 과 repository 를 정확하게 입력하자.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;$ sudo docker run -p 80:80 USERNAME_HERE!/REPOSITORY_HERE!
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;-p 80:80&lt;/strong&gt; 의 의미를 알아보자. 앞의 80 은 host machine 의 port 번호, 뒤의 80 은 docker container 의 port 다. &lt;strong&gt;4. AWS EC2 에서 instance 생성&lt;/strong&gt; 의 &lt;strong&gt;6. Configure Security Group&lt;/strong&gt; 에서 instance 의 Port Range 가 80 으로 선택이 되었으니 host machine 의 port 를 80 으로 해야 한다.&lt;/p&gt;
+&lt;p&gt;이제 접속해서 웹사이트가 제대로 돌아가는지 확인하자. AWS EC2 에 접속한 후 instances 를 클릭한다. 이번 프로젝트에 해당하는 instance ID 를 클릭한다. &lt;strong&gt;Public IPv4 DNS&lt;/strong&gt; 에서 open address 를 새로운 탭에서 열자.&lt;/p&gt;
+&lt;p&gt;이때 페이지가 열리지 않는 경우가 있는데, 그 이유는 https 로 주소가 자동으로 입력됐기 때문이다. &lt;strong&gt;4. AWS EC2 에서 instance 생성&lt;/strong&gt; 의 &lt;strong&gt;6. Configure Security Group&lt;/strong&gt; 에서 필자는 &lt;strong&gt;Type&lt;/strong&gt; 으로 HTTP 를 선택했다. 그렇기 때문에 URL 에서 https 를 http 로 수정해서 입력하면 &lt;strong&gt;Public IPv4 DNS&lt;/strong&gt; 에 접속이 된다.&lt;/p&gt;
+&lt;h3 id=&#34;reference-5&#34;&gt;Reference&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.docker.com/engine/reference/commandline/run/&#34;&gt;Docker Docs&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+     </item>
+   
+     <item>
+       <title>Hugo로 블로그 만들기 2</title>
+       <link>http://Scoobi-wisdoom.github.io/posts/hugo%EB%A1%9C-%EB%B8%94%EB%A1%9C%EA%B7%B8-%EB%A7%8C%EB%93%A4%EA%B8%B0-2/</link>
+       <pubDate>Thu, 26 Nov 2020 16:54:58 +0900</pubDate>
+       
+       <guid>http://Scoobi-wisdoom.github.io/posts/hugo%EB%A1%9C-%EB%B8%94%EB%A1%9C%EA%B7%B8-%EB%A7%8C%EB%93%A4%EA%B8%B0-2/</guid>
+       <description>&lt;p&gt;이제 로컬에서 작성한 글을 Hugo 를 이용해 git blog 에 업로드하는 방법을 알아보자.&lt;/p&gt;
+&lt;p&gt;이 글에서 설명한 것을 실행하기 전에, 반드시 이 글 맨 아래에 있는 Reference 의 두 번째를 참조하여 두 개의 repository 를 만들고 submodule 처리를 해야 한다.&lt;/p&gt;
+&lt;p&gt;먼저 프로젝트 폴더로 cmd 에서 이동한다. 그 다음에 hugo new 명령어를 이용해 작성할 글 파일을 생성한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;hugo new posts/Hugo로-블로그-만들기-2.md
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이제 이 파일을 열어 글을 작성한다. 작성 완료 후 배포하기 전에 localhost 에서 미리보기를 한다. cmd 에서 아래와 같은 명령어를 입력한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;hugo server -D
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그러면 &lt;a href=&#34;http://localhost:1313&#34;&gt;http://localhost:1313&lt;/a&gt; 에서 블로그를 확인할 수 있다. 1313 port 가 default 지만, 이미 사용 중일 경우 hugo 는 자동으로 다른 port 를 할당한다.&lt;/p&gt;
+&lt;p&gt;이제 작성한 글을 빌드해줘야 한다. 빌드 하기 전에 &amp;ldquo;draft = true&amp;rdquo; 를 삭제한다. 빌드를 하기 위해 &lt;em&gt;&lt;strong&gt;hugo -t 테마 이름&lt;/strong&gt;&lt;/em&gt; 을 입력한다. 필자는 테마로 kiera 를 사용하기 때문에 아래와 같은 명령어를 입력했다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;hugo -t kiera
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이제 public 폴더의 posts 폴더에 이번에 작성한 글이 등록된 것을 볼 수 있다.&lt;/p&gt;
+&lt;p&gt;이제 public 폴더로 이동해서 git 명령어를 이용해 이것을 add, commit, push 를 하도록 하자. 그 다음에 프로젝트 폴더로 돌아가서 add, commit, push 를 하자.&lt;/p&gt;
+&lt;h3 id=&#34;reference&#34;&gt;Reference&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://medium.com/@bjs1616/hugo%EC%99%80-github-page%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EB%B8%94%EB%A1%9C%EA%B7%B8-%EB%A7%8C%EB%93%A4%EA%B8%B0-9eb1a5b50d91&#34;&gt;hugo와 github page를 이용한 블로그 만들기&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://ialy1595.github.io/post/blog-construct-1/&#34;&gt;블로그 구축기 1 (Hugo + github.io)&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+     </item>
+   
+     <item>
+       <title>Aws에서 domain 생성</title>
+       <link>http://Scoobi-wisdoom.github.io/posts/aws%EC%97%90%EC%84%9C-domain-%EC%83%9D%EC%84%B1/</link>
+       <pubDate>Fri, 16 Oct 2020 22:59:42 +0900</pubDate>
+       
+       <guid>http://Scoobi-wisdoom.github.io/posts/aws%EC%97%90%EC%84%9C-domain-%EC%83%9D%EC%84%B1/</guid>
+       <description>&lt;ol start=&#34;0&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;aws에 가입한다. 이때 1달러가 계좌에서 출금된다. 이는 계좌가 유효한지를 검사하는 수단으로, 추후에 환불이 된다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;aws에서 로그인을 한 후에 Route 53에 들어간다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Route 53 Dashboard 메뉴에서 Domain Registration 을 클릭한다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;원하는 domain을 입력한 후에 continue를 누른다. 참고로 domain registration 이 만료되기 전에 연장이 가능하니, 걱정하지 말자.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Privacy Protection 은 사생활 보호를 위해서 웬만하면 체크를 하자.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;reference&#34;&gt;Reference&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=zNZOgZvMGUA&amp;amp;t=88s&#34;&gt;How to register a domain with Route 53 | Amazon Web Services | AWS, deeplizard Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+     </item>
+   
+     <item>
+       <title>Throw와 throws</title>
+       <link>http://Scoobi-wisdoom.github.io/posts/throw%EC%99%80-throws/</link>
+       <pubDate>Wed, 05 Aug 2020 23:03:44 +0900</pubDate>
+       
+       <guid>http://Scoobi-wisdoom.github.io/posts/throw%EC%99%80-throws/</guid>
+       <description>&lt;p&gt;Java에 Exception을 처리하는 방법이 있다. 이 중 throw와 throws가 헷갈려서 차이점을 정리하고자 한다.&lt;/p&gt;
+&lt;h4 id=&#34;1-기능&#34;&gt;1. 기능&lt;/h4&gt;
+&lt;p&gt;Throw는 exception을 발생시키는 데 사용되고, Throws는 method 내에서 발생할 수 있는 exceptions를 선언하는 역할을 한다.&lt;/p&gt;
+&lt;p&gt;또한 throws는 해당 method를 사용하는 다른 Class에서 예외 처리할 의무를 부여한다. 이때 어떤 exception을 처리해야 하는지도 명시하는 역할도 한다.&lt;/p&gt;
+&lt;h4 id=&#34;2-사용되는-위치&#34;&gt;2. 사용되는 위치&lt;/h4&gt;
+&lt;p&gt;Throw는 method 내부에서 Exception class의 instance varaible 앞에서 사용되고, throws는 method의 선언부(signature) 안의 Exception class 앞에서 사용된다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;// 1. 기능, 2. 사용되는 위치에 대한 예시
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Throw&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+	&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;String args&lt;span style=&#34;color:#f92672&#34;&gt;[])&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+		&lt;span style=&#34;color:#66d9ef&#34;&gt;throw&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; Exception&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+	&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; java.util.Random&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Throws&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+	&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;String args&lt;span style=&#34;color:#f92672&#34;&gt;[])&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; IOException&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; ClassNotFoundException &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+		Random r &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; Random&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+		&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;r&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;nextInt&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;2&lt;span style=&#34;color:#f92672&#34;&gt;)&amp;lt;&lt;/span&gt;1&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+			&lt;span style=&#34;color:#66d9ef&#34;&gt;throw&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; IOException&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+		&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+			&lt;span style=&#34;color:#66d9ef&#34;&gt;throw&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; ClassNotFoundException&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;	
+		&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+		
+	&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;3-unchecked-exception과의-관계&#34;&gt;3. (Un)checked Exception과의 관계&lt;/h4&gt;
+&lt;p&gt;Checked exception은 반드시 throws로 예외 처리해야 합니다.&lt;/p&gt;
+&lt;p&gt;참고로, checked exception은 unchecked exception과 반의어입니다. unchecked exception은 RuntimeException class와 그 children을 의미합니다. Checked exception은 unchecked exception을 제외한 exception classd와 그 children을 의미합니다.&lt;/p&gt;
+&lt;p&gt;Checked exception은 예외 처리를 해주지 않으면 컴파일이 안 되는 반면, unchecked exception은 컴파일이 됩니다.&lt;/p&gt;
+&lt;h3 id=&#34;reference&#34;&gt;Reference&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;남궁성, Java의 정석, 도우출판, 2019&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.geeksforgeeks.org/difference-between-throw-and-throws-in-java/&#34;&gt;GeeksforGeeks, Accessed on 5th August 2020&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://beginnersbook.com/2013/12/throws-keyword-example-in-java/&#34;&gt;CHAITANYA SINGH, Throws Keyword Example in Java, Accessed on 5th August 2020&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+     </item>
+   
+     <item>
+       <title>ORACLE SQL 중요 기능</title>
+       <link>http://Scoobi-wisdoom.github.io/posts/oracle-sql-%EC%A4%91%EC%9A%94-%EA%B8%B0%EB%8A%A5/</link>
+       <pubDate>Tue, 04 Aug 2020 23:41:35 +0900</pubDate>
+       
+       <guid>http://Scoobi-wisdoom.github.io/posts/oracle-sql-%EC%A4%91%EC%9A%94-%EA%B8%B0%EB%8A%A5/</guid>
+       <description>&lt;p&gt;Oracle SQL에서 중요한 기능들에 대해 알아보겠습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-dos&#34; data-lang=&#34;dos&#34;&gt;1. Sequence
+2. Alter
+3. Constraint
+3-1. Foreign key: Primary key of another
+4. Disable &amp;amp; enable
+5. Transaction
+&lt;/code&gt;&lt;/pre&gt;&lt;h1 id=&#34;1-sequence&#34;&gt;1. Sequence&lt;/h1&gt;
+&lt;p&gt;아래와 같은 product table이 있다고 하겠습니다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;CREATE&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;TABLE&lt;/span&gt; PRODUCT (
+ID NUMBER(&lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;),
+NAME VARCHAR2(&lt;span style=&#34;color:#ae81ff&#34;&gt;20&lt;/span&gt;),
+PRICE NUMBER(&lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;),
+REGDATE DATE);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이제 아래와 같이 데이터를 입력하겠습니다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;INSERT&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;INTO&lt;/span&gt; PRODUCT &lt;span style=&#34;color:#66d9ef&#34;&gt;VALUES&lt;/span&gt; (&lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;pants&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;15000&lt;/span&gt;, SYSDATE);
+&lt;span style=&#34;color:#66d9ef&#34;&gt;INSERT&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;INTO&lt;/span&gt; PRODUCT &lt;span style=&#34;color:#66d9ef&#34;&gt;VALUES&lt;/span&gt; (&lt;span style=&#34;color:#ae81ff&#34;&gt;101&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;shirts&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;20000&lt;/span&gt;, SYSDATE);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이때 첫 번째 column의 변수인 ID는 입력횟수에 비례해서 숫자를 증가시키고 싶을 수 있습니다. 재고를 관리하기 위해서는 어떤 품목이 먼저 들어왔는지 알 필요가 있을 경우가 있습니다. 그럴 경우에 위의 경우처럼 일일이 입력하게 된다면, 매우 비효율적일 것입니다. 이전에 입력한 값을 까먹을 수 있기 때문입니다.&lt;/p&gt;
+&lt;p&gt;이때 유용한 것이 sequence입니다. 아래와 같이 sequence를 생성한 후에 데이터를 간편하게 입력할 수 있습니다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;-- Sequence
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;CREATE&lt;/span&gt; SEQUENCE PRODUCT_SEQ
+&lt;span style=&#34;color:#66d9ef&#34;&gt;INCREMENT&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;BY&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;-- 증가량
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;START&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;WITH&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;-- 출발점
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;-- Insert values
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;INSERT&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;INTO&lt;/span&gt; PRODUCT &lt;span style=&#34;color:#66d9ef&#34;&gt;VALUES&lt;/span&gt; (PRODUCT_SEQ.NEXTVAL, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;pants&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;15000&lt;/span&gt;, SYSDATE);
+&lt;span style=&#34;color:#66d9ef&#34;&gt;INSERT&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;INTO&lt;/span&gt; PRODUCT &lt;span style=&#34;color:#66d9ef&#34;&gt;VALUES&lt;/span&gt; (PRODUCT_SEQ.NEXTVAL, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;shirts&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;20000&lt;/span&gt;, SYSDATE);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Sequence에 대해 더 자세히 알아보겠습니다. Sequence는 Oracle SQL내에서 연속된 번호를 생성하는 객체입니다.
+구성 요소는 아래와 같습니다. 구성요소가 많지만, 위에서처럼 간단히 사용하는 경우도 많습니다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;CREATE&lt;/span&gt; SEQUENCE PRODUCT_SEQ
+&lt;span style=&#34;color:#66d9ef&#34;&gt;INCREMENT&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;BY&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;-- 증가량
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;START&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;WITH&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;-- 출발점. ALTER SEQUENCE로 변경 불가능함.
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;MAXVALUE&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1000&lt;/span&gt;  &lt;span style=&#34;color:#75715e&#34;&gt;-- 최댓값
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;MINVALUE&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;   &lt;span style=&#34;color:#75715e&#34;&gt;-- 최솟값
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;NOCYCLE &lt;span style=&#34;color:#75715e&#34;&gt;-- 최댓값을 넘어서 최솟값에서 다시 시작하고 싶으면 CYCLE, 그게 아니면 NOCYCLE 입력
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;CACHE&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;30&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;-- Default는 20. 연속된 번호를 미리 메모리에 할당하고 싶으면 CACHE, 그게 아니면 NOCACHE 입력
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;2-alter-table&#34;&gt;2. Alter table&lt;/h1&gt;
+&lt;p&gt;명령어 alter는 이미 생성된 데이터베이스를 수정합니다. Table에 새로운 column을 추가/삭제하거나 column의 data type 이나 길이를 변경할 수 있습니다. 예시는 아래와 같습니다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ALTER&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;TABLE&lt;/span&gt; CUSTOM &lt;span style=&#34;color:#66d9ef&#34;&gt;ADD&lt;/span&gt; GRADE NUMBER(&lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;); &lt;span style=&#34;color:#75715e&#34;&gt;-- Column 추가
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ALTER&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;TABLE&lt;/span&gt; CUSTOM &lt;span style=&#34;color:#66d9ef&#34;&gt;DROP&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;COLUMN&lt;/span&gt; LEVELS; &lt;span style=&#34;color:#75715e&#34;&gt;-- Column 삭제
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ALTER&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;TABLE&lt;/span&gt; CUSTOM &lt;span style=&#34;color:#66d9ef&#34;&gt;MODIFY&lt;/span&gt; LEVELS NUMBER(&lt;span style=&#34;color:#ae81ff&#34;&gt;5&lt;/span&gt;); &lt;span style=&#34;color:#75715e&#34;&gt;-- Column data type 변경: Not recommended
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ALTER&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;TABLE&lt;/span&gt; CUSTOM &lt;span style=&#34;color:#66d9ef&#34;&gt;RENAME&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;COLUMN&lt;/span&gt; GRADE &lt;span style=&#34;color:#66d9ef&#34;&gt;TO&lt;/span&gt; LEVELS; &lt;span style=&#34;color:#75715e&#34;&gt;-- Column 이름 변경
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위의 코드에서 세 번째는 Not recommended라 했습니다. 왜냐하면 data type 이나 길이의 변경은 가능하지 않은 경우가 많습니다. 위의 예시에서는 처음 GRADE의 길이는 10 자리 수였습니다. 그 후에 5 자리 수로 변경이 되었습니다. 이전에 이미 10 자리 수가 데이터베이스에 입력이 되었다면, 5 자리 수로 data 길이를 변경할 수 없습니다.&lt;/p&gt;
+&lt;h1 id=&#34;3-constraints&#34;&gt;3. Constraints&lt;/h1&gt;
+&lt;p&gt;Constraints는 data integrity를 위해 사용됩니다. Data integrity란 데이터의 일관성과 정확성이 유지되는 것을 의미합니다.&lt;/p&gt;
+&lt;p&gt;예를 들어 웹사이트에 회원 가입을 할 때, id와 passwords를 입력합니다. 이 때 id가 다른 회원의 id와 중복되거나 passwords를 입력하지 않는다면 데이터베이스에 저장할 수 없어야 합니다. 이는 UNIQUE와 NOT NULL 제약 조건을 통해 구현할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;제약 조건의 종류는 다음과 같습니다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;CREATE&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;TABLE&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;USER&lt;/span&gt; (
+ID VARCHAR2(&lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;) &lt;span style=&#34;color:#66d9ef&#34;&gt;CONSTRAINT&lt;/span&gt; id_unique &lt;span style=&#34;color:#66d9ef&#34;&gt;UNIQUE&lt;/span&gt;, &lt;span style=&#34;color:#75715e&#34;&gt;-- ID의 경우 UNIQUE 대신 PRIMARY KEY를 써도 됨
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;PWD VARCHAR2(&lt;span style=&#34;color:#ae81ff&#34;&gt;20&lt;/span&gt;) &lt;span style=&#34;color:#66d9ef&#34;&gt;CONSTRAINT&lt;/span&gt; pwd_nn &lt;span style=&#34;color:#66d9ef&#34;&gt;NOT&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;NULL&lt;/span&gt;,
+NAME VARCHAR2(&lt;span style=&#34;color:#ae81ff&#34;&gt;30&lt;/span&gt;) &lt;span style=&#34;color:#66d9ef&#34;&gt;CONSTRAINT&lt;/span&gt; name_length &lt;span style=&#34;color:#66d9ef&#34;&gt;CHECK&lt;/span&gt;(&lt;span style=&#34;color:#66d9ef&#34;&gt;LENGTH&lt;/span&gt;(NAME) &lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;) &lt;span style=&#34;color:#75715e&#34;&gt;-- CHECK를 사용해 제약 조건 추가
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위의 code에서는 data table을 생성하면서 constraints를 부여했습니다. 아래의 code에서는 data table 생성 후에 contraints를 부여합니다. 이때 Alter 를 사용합니다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ALTER&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;TABLE&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;USER&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;ADD&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;CONSTRAINT&lt;/span&gt; user_pwd_nn &lt;span style=&#34;color:#66d9ef&#34;&gt;CHECK&lt;/span&gt; (PWD &lt;span style=&#34;color:#66d9ef&#34;&gt;IS&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;NOT&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;NULL&lt;/span&gt;); &lt;span style=&#34;color:#75715e&#34;&gt;-- 아래와 동일 
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ALTER&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;TABLE&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;USER&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;ADD&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;MODIFY&lt;/span&gt;(PWD &lt;span style=&#34;color:#66d9ef&#34;&gt;CONSTRAINT&lt;/span&gt; user_pwd_nn &lt;span style=&#34;color:#66d9ef&#34;&gt;NOT&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;NULL&lt;/span&gt;); 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;3-1-foreign-key-primary-key-of-another&#34;&gt;3-1. Foreign key: Primary key of another&lt;/h1&gt;
+&lt;p&gt;Foreign key는 relational data table의 column으로서, 해당 data table을 다른 data table과 연결해줍니다. 아래와 같은 형식으로 사용합니다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;CREATE&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;TABLE&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;USER&lt;/span&gt; (
+ID VARCHAR2(&lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;),
+PWD VARCHAR2(&lt;span style=&#34;color:#ae81ff&#34;&gt;20&lt;/span&gt;),
+NAME VARCHAR2(&lt;span style=&#34;color:#ae81ff&#34;&gt;30&lt;/span&gt;),
+PRODUCTID VARCHAR2(&lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;) &lt;span style=&#34;color:#66d9ef&#34;&gt;CONSTRAINT&lt;/span&gt; product_fk &lt;span style=&#34;color:#66d9ef&#34;&gt;FOREIGN&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;KEY&lt;/span&gt;(ID) &lt;span style=&#34;color:#66d9ef&#34;&gt;REFERENCES&lt;/span&gt; PRODUCT
+&lt;span style=&#34;color:#75715e&#34;&gt;-- product table의 id를 FOREIGN KEY로 사용. FOREIGN KEY는 RDMS를 위해 사용되고, 
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;-- 해당 데이터의 FOREIGN KEY는 다른 데이터의 PRIMARY KEY여야 한다.
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위에서 USER를 주문자 데이터, PRODUCT를 품목 데이터라고 하겠습니다. USER table에서 PRODUCTID는 주문한 상품으로서, 데이터베이스에 등록된 상품만 주문할 수 있을 것입니다. 즉, PRODUCT table의 id여야 합니다. 다르게 말하면, USER table에서 PRODUCTID는 foreign key이며, PRODUCT table의 id를 참조합니다.&lt;/p&gt;
+&lt;p&gt;Data table을 생성한 후에 foreign key를 지정하고 싶으면 아래와 같이 alter를 사용합니다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ALTER&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;TABLE&lt;/span&gt; CORDER &lt;span style=&#34;color:#66d9ef&#34;&gt;ADD&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;CONSTRAINT&lt;/span&gt; order_fk1 &lt;span style=&#34;color:#66d9ef&#34;&gt;FOREIGN&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;KEY&lt;/span&gt; (USERID) &lt;span style=&#34;color:#66d9ef&#34;&gt;REFERENCES&lt;/span&gt; CUSTOMER (ID); 
+&lt;span style=&#34;color:#75715e&#34;&gt;-- USERID는 CORDER의 column, (ID)는 CUSTOMER의 column
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;기억해야 할 것이 한 가지 더 있습니다. Foreign key는 reference table에서 primary key라는 것입니다.&lt;/p&gt;
+&lt;h1 id=&#34;4-disable--enable&#34;&gt;4. Disable &amp;amp; enable&lt;/h1&gt;
+&lt;p&gt;데이터베이스를 이용해 서비스를 하기 전에는 테스트가 필수입니다. 이 때 constraints가 테스트를 방해하기도 합니다. Foreign key 조건 때문에 데이터를 삭제할 수 없는 경우가 대표적인 예입니다. 이 경우, constraints를 비활성화 한 후에 테스트를 완료한 후 다시 활성화 할 수 있어야 합니다. 아래와 같이 말이죠.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ALTER&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;TABLE&lt;/span&gt; GAME_USER DISABLE &lt;span style=&#34;color:#66d9ef&#34;&gt;CONSTRAINT&lt;/span&gt; user_pwd_nn;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;ALTER&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;TABLE&lt;/span&gt; GAME_USER ENABLE &lt;span style=&#34;color:#66d9ef&#34;&gt;CONSTRAINT&lt;/span&gt; user_pwd_nn;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;5-transaction&#34;&gt;5. Transaction&lt;/h1&gt;
+&lt;p&gt;Transaction은 최소 수행 단위를 뜻합니다. 예를 들어, 쇼핑몰에서는 사용자가 상품을 구입하면, 판매자가 구입 정보를 받습니다. 그런데 상품 구입이 확정되었는데, 정전으로 인해 판매자가 구입 정보를 받지 못 했다고 해봅시다. 이렇게 되면 사용자는 돈을 냈지만 상품을 받을 수 없습니다.&lt;/p&gt;
+&lt;p&gt;Transaction은 이런 상황을 막습니다. 두 작업 중 하나라도 완료가 되지 않으면, 모든 작업이 취소됩니다. 그렇기 때문에 transaction을 all or nothing이라고도 부릅니다. Transaction을 위해 사용하는 명령어를 TCL(Transaction Control Language)라고 하며, 아래와 같이 사용합니다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ROLLBACK&lt;/span&gt;; &lt;span style=&#34;color:#75715e&#34;&gt;--transaction 취소
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;COMMIT&lt;/span&gt;; &lt;span style=&#34;color:#75715e&#34;&gt;-- transaction 반영
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;참고로 TCL 외에도 DDL이나 DCL을 사용하는 경우에도 transaction이 종료되고 새로운 transaction이 실행됩니다.&lt;/p&gt;
+&lt;p&gt;Transaction은 session간 읽기 일관성(read consistency)을 보장합니다. Session은 데이터베이스의 접속 상태를 의미합니다. 정확한 정의는 &lt;a href=&#34;https://docs.oracle.com/cd/E28271_01/server.1111/e25789/glossary.htm#CBAHEBIG&#34;&gt;여기&lt;/a&gt;를 참조하세요. 데이터베이스의 특성 상, 동시에 여러 session이 존재할 수 있습니다. 즉, 데이터베이스에 동시에 접속할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;여러 session이 존재하고, 이 중 한 session에서 데이터베이스를 수정하더라도, transaction이 끝나기 전에는 다른 session에 반영이 되지 않습니다. 이를 통해 session간 읽기 일관성(read consistency)가 보장됩니다.&lt;/p&gt;
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;이지훈, 오라클로 배우는 데이터베이스 입문, 이지스퍼블리싱, 2020&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.techopedia.com/definition/7272/foreign-key#:~:text=A%20foreign%20key%20is%20a,establishing%20a%20link%20between%20them.&#34;&gt;Technopedia, Accessed on 4th August 2020&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+     </item>
+   
+     <item>
+       <title>Java의 Constructor 주의 사항2</title>
+       <link>http://Scoobi-wisdoom.github.io/posts/java%EC%9D%98-constructor-%EC%A3%BC%EC%9D%98-%EC%82%AC%ED%95%AD2/</link>
+       <pubDate>Wed, 29 Jul 2020 21:35:45 +0900</pubDate>
+       
+       <guid>http://Scoobi-wisdoom.github.io/posts/java%EC%9D%98-constructor-%EC%A3%BC%EC%9D%98-%EC%82%AC%ED%95%AD2/</guid>
+       <description>&lt;p&gt;Constructor는 정말 중요하다.&lt;/p&gt;
+&lt;p&gt;Class App은 java awt를 이용해서 만든 데모 버전의 ui다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;App&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+
+	Db&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;String&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; User&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; userDb&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+	ArrayList&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;User&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; ulist&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+
+	&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;App&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{}&lt;/span&gt;
+
+	&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;App&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;Db&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;String&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; User&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; userDb&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+		&lt;span style=&#34;color:#66d9ef&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;userDb&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; userDb&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+		makeUi&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+		eventProcess&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+	&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+	&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;makeUi&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+		&lt;span style=&#34;color:#75715e&#34;&gt;// UI 생성
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;	&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+	&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;eventProcess&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+		&lt;span style=&#34;color:#75715e&#34;&gt;// 이벤트 관리
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;	&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+	
+
+	&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;String&lt;span style=&#34;color:#f92672&#34;&gt;[]&lt;/span&gt; args&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+		App app &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; App&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+	&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;필자는 이 class 가 잘 작동하는지 실험하고 싶었다. 그래서 constructor를 수정해 userDb 를 없앴다. 아래와 같이 말이다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;	&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;App&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{}&lt;/span&gt;
+
+	&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;App&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+		makeUi&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+		eventProcess&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;내가 의도한 것은, Class App이 main method에 의해 실행되는 것이다. 다시 말해서, 두 번째 Constructor가 실행되면서 makeUi() method가 실행돼야 한다.
+하지만 아래 코드는 Class App을 실행하지 않는다.&lt;/p&gt;
+&lt;p&gt;그 비밀은 constructor에 있다. 결론적으로 constructor를 아래와 같이 수정해야 한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;	&lt;span style=&#34;color:#75715e&#34;&gt;// public App() {}
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
+	&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;App&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+		makeUi&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+		eventProcess&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위의 코드에서는 default constructor 형식의 constructor를 삭제했다. 그렇게 하니 제대로 작동된다.
+내가 실수를 한 이유는, default constructor의 성질을 잘못 이해했기 때문이다.&lt;/p&gt;
+&lt;p&gt;본래 default constructor는 class가 constructor를 갖고 있지 않으면, compiler가 알아서 추가하는 것이다.&lt;/p&gt;
+&lt;p&gt;그렇기 때문에 내가 생각하기에는, 다른 constructor가 있다면 default constructor 형식의 constructor를 선언하더라도 default constructor는 실행되지 않을 거라는 것이다.
+이는 반은 맞는 말이지만, 위의 코드에서는 틀렸다. 위의 코드에서는 두 constructors 모두 argument가 없다.&lt;/p&gt;
+&lt;p&gt;Java compiler는 코드를 위에서부터 읽어나가기 때문에 argument가 없는 두 constructor 중에서 위에 있는 default constructor 형식의 constructor를 선택한 것이다. 실제로 default constructor 형식의 constructor를 삭제하지 않고 순서를 바꾸어 보아도 실행이 되는 것을 알 수 있다. 아래 코드와 같이 말이다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;	&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;App&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+		makeUi&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+		eventProcess&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+
+	&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;App&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+     </item>
+   
+     <item>
+       <title>Java의 Constructor 주의 사항</title>
+       <link>http://Scoobi-wisdoom.github.io/posts/java%EC%9D%98-constructor-%EC%A3%BC%EC%9D%98-%EC%82%AC%ED%95%AD/</link>
+       <pubDate>Tue, 28 Jul 2020 22:31:33 +0900</pubDate>
+       
+       <guid>http://Scoobi-wisdoom.github.io/posts/java%EC%9D%98-constructor-%EC%A3%BC%EC%9D%98-%EC%82%AC%ED%95%AD/</guid>
+       <description>&lt;p&gt;고용노동부의 지원을 받아 IT 교육을 받고 있다. 지금은 Java를 배우고 있는데, 코딩을 하다가 constructor에 대해 알게 된 것을 쓴다.&lt;/p&gt;
+&lt;p&gt;혹자는 constructor는 method가 아니라고 하고, 또 다른 사람들은 constructor는 &amp;lsquo;인스턴스 초기화 메서드&amp;rsquo;라고 한다. 즉 method라고 한다.&lt;/p&gt;
+&lt;p&gt;constructor가 method가 아니더라도, method와 비슷한 결과를 낼 때가 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Login&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+	
+
+	
+	Frame frame&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+	TextField txtid&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt;txtpwd&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+	Label label&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+	Button btnlogin&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+	Button btnsignup&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+	Db&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;String&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; User&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; userDb&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+	
+	&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Login&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+		&lt;span style=&#34;color:#75715e&#34;&gt;// Caution below
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;		Db&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;String&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; User&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; userDb &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; UserDb&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;127.0. 0.1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;db&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;db&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+		makeUi&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+	&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위의 코드에서 Caution below라고 쓴 부분을 보자. userDb를 Db&amp;lt;String, User&amp;gt;로 초기화 하기 때문에 언뜻 보면 맞는 코드로 보인다.&lt;/p&gt;
+&lt;p&gt;물론 필자가 이제 막 Java를 배우기 시작했기 때문에 필자만 헷갈렸을 수도 있다. 하지만 위의 코드는 틀렸으며, 아래와 같이 고쳐야 한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Login&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+		&lt;span style=&#34;color:#75715e&#34;&gt;// Caution below
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;//		Db&amp;lt;String, User&amp;gt; userDb = new UserDb(&amp;#34;192.168.0.31&amp;#34;, &amp;#34;db&amp;#34;, &amp;#34;db&amp;#34;);
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;		userDb &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; UserDb&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;127.0. 0.1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;db&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;db&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+		makeUi&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+	&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그 이유는 Db&amp;lt;String, User&amp;gt;를 사용해서 userDb를 초기화할 경우, userDb는 local variable이 되기 때문이다. 그렇게 되면, global에서는 사용할 수 없다.&lt;/p&gt;
+&lt;p&gt;이는 constructor를 method라고 생각하면 쉽게 이해할 수 있다. Method 내의 local variable은 method 안에서만 사용 가능하다는 것은 모두가 알 것이다.&lt;/p&gt;
+&lt;h3 id=&#34;reference&#34;&gt;Reference&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;남궁성, Java의 정석, 도우출판, 2019&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://beginnersbook.com/2013/03/constructors-in-java/#:~:text=Constructors%20in%20Java%20%E2%80%93%20A%20complete%20study!!&amp;amp;text=Constructor%20is%20a%20block%20of,the%20end%20of%20this%20guide&#34;&gt;BeginnersBook.com&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+     </item>
+   
+     <item>
+       <title>Hugo로 블로그 만들기 1</title>
+       <link>http://Scoobi-wisdoom.github.io/posts/hugo1/</link>
+       <pubDate>Tue, 28 Jul 2020 20:55:35 +0900</pubDate>
+       
+       <guid>http://Scoobi-wisdoom.github.io/posts/hugo1/</guid>
+       <description>&lt;p&gt;hugo로 웹사이트를 만들기 위해 씨름 중이다.
+아직은 &lt;a href=&#34;https://gohugo.io/getting-started/quick-start/&#34;&gt;hugo 홈페이지의 QuickStart&lt;/a&gt;를 따라하는 중인데, 처음부터 오류가 걸려서 고생했다.&lt;/p&gt;
+&lt;p&gt;문제는 아래의 단계에서 발생했다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;echo &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;theme = &amp;#34;ananke&amp;#34;&amp;#39;&lt;/span&gt; &amp;gt;&amp;gt; config.toml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Hugo 공식 홈페이지를 그대로 따라하는데도 아래와 같은 오류가 발생한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;config.toml:4:1&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;: unmarshal failed:
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;해결방법은 간단하다. config.toml 파일을 열자. 열면 아래와 같이 나올 것이다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;theme = &amp;#34;kiera&amp;#34;&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이를 아래와 같이 수정하자.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;theme &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;kiera&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그러면 오류가 발생하지 않을 것이다. 신나게 QuickStart의 다음 단계를 진행하면 된다.&lt;/p&gt;
+</description>
+     </item>
+   
+ </channel>
+</rss>

@@ -1,0 +1,142 @@
+<!doctype html>
+
+<html lang="en-us">
+
+<head>
+  <title>Wisdoom</title>
+  <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="The HTML5 Herald" />
+<meta name="author" content="" /><meta property="og:title" content="Hugo로 블로그 만들기 1" />
+<meta property="og:description" content="hugo로 웹사이트를 만들기 위해 씨름 중이다. 아직은 hugo 홈페이지의 QuickStart를 따라하는 중인데, 처음부터 오류가 걸려서 고생했다.
+문제는 아래의 단계에서 발생했다.
+echo &#39;theme = &#34;ananke&#34;&#39; &gt;&gt; config.toml Hugo 공식 홈페이지를 그대로 따라하는데도 아래와 같은 오류가 발생한다.
+config.toml:4:1&#34;: unmarshal failed: 해결방법은 간단하다. config.toml 파일을 열자. 열면 아래와 같이 나올 것이다.
+&#39;theme = &#34;kiera&#34;&#39; 이를 아래와 같이 수정하자.
+theme = &#34;kiera&#34; 그러면 오류가 발생하지 않을 것이다. 신나게 QuickStart의 다음 단계를 진행하면 된다." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://Scoobi-wisdoom.github.io/posts/hugo1/" />
+<meta property="article:published_time" content="2020-07-28T20:55:35+09:00" />
+<meta property="article:modified_time" content="2020-07-28T20:55:35+09:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Hugo로 블로그 만들기 1"/>
+<meta name="twitter:description" content="hugo로 웹사이트를 만들기 위해 씨름 중이다. 아직은 hugo 홈페이지의 QuickStart를 따라하는 중인데, 처음부터 오류가 걸려서 고생했다.
+문제는 아래의 단계에서 발생했다.
+echo &#39;theme = &#34;ananke&#34;&#39; &gt;&gt; config.toml Hugo 공식 홈페이지를 그대로 따라하는데도 아래와 같은 오류가 발생한다.
+config.toml:4:1&#34;: unmarshal failed: 해결방법은 간단하다. config.toml 파일을 열자. 열면 아래와 같이 나올 것이다.
+&#39;theme = &#34;kiera&#34;&#39; 이를 아래와 같이 수정하자.
+theme = &#34;kiera&#34; 그러면 오류가 발생하지 않을 것이다. 신나게 QuickStart의 다음 단계를 진행하면 된다."/>
+
+<meta name="generator" content="Hugo 0.74.3" />
+    
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin="anonymous" />
+  <link rel="stylesheet" href="http://Scoobi-wisdoom.github.io/fontawesome/css/all.min.css" />
+  
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
+  
+  <link rel="stylesheet" type="text/css" href="/css/styles.css" /></head>
+
+<body>
+  <div id="container">
+    <header>
+      <h1>
+                <a href="/">Wisdoom</a>
+            </h1>
+
+      <ul id="social-media">
+      </ul>
+      
+    </header>
+
+    
+<nav>
+    <ul>
+        
+    </ul>
+</nav>
+
+
+    <main>
+
+
+
+
+<article>
+
+    <h1>Hugo로 블로그 만들기 1</h1>
+
+    
+      <aside>
+    <ul>
+        <li>
+            <time class="post-date" datetime="2020-07-28T20:55:35&#43;09:00">Jul 28, 2020</time>
+        </li>
+        
+
+        
+
+        <li>One minute read</li>
+    </ul>
+</aside>
+
+    
+
+    
+<div class="featured_image">
+    <a href="http://Scoobi-wisdoom.github.io/posts/hugo1/" title="Hugo로 블로그 만들기 1">
+        <img src="">
+    </a>
+</div>
+
+
+
+    <p>hugo로 웹사이트를 만들기 위해 씨름 중이다.
+아직은 <a href="https://gohugo.io/getting-started/quick-start/">hugo 홈페이지의 QuickStart</a>를 따라하는 중인데, 처음부터 오류가 걸려서 고생했다.</p>
+<p>문제는 아래의 단계에서 발생했다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">echo <span style="color:#e6db74">&#39;theme = &#34;ananke&#34;&#39;</span> &gt;&gt; config.toml
+</code></pre></div><p>Hugo 공식 홈페이지를 그대로 따라하는데도 아래와 같은 오류가 발생한다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">config.toml:4:1<span style="color:#e6db74">&#34;: unmarshal failed:
+</span></code></pre></div><p>해결방법은 간단하다. config.toml 파일을 열자. 열면 아래와 같이 나올 것이다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#e6db74">&#39;theme = &#34;kiera&#34;&#39;</span>
+</code></pre></div><p>이를 아래와 같이 수정하자.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">theme <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kiera&#34;</span>
+</code></pre></div><p>그러면 오류가 발생하지 않을 것이다. 신나게 QuickStart의 다음 단계를 진행하면 된다.</p>
+
+
+</article>
+
+
+<section class="post-nav">
+    <ul>
+        
+        
+        <li>
+            <a href="http://Scoobi-wisdoom.github.io/posts/java%EC%9D%98-constructor-%EC%A3%BC%EC%9D%98-%EC%82%AC%ED%95%AD/">Java의 Constructor 주의 사항 <i class="fa fa-chevron-circle-right"></i> </a>
+        </li>
+        
+    </ul>
+</section>
+  
+    
+    
+  
+
+
+
+
+
+</main>
+    <footer>
+        <h6> |
+            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
+            <a href="http://Scoobi-wisdoom.github.ioindex.xml">Subscribe </a></h6>
+    </footer>
+</div>
+<script src="/js/scripts.js"></script>
+
+</body>
+
+</html>
+

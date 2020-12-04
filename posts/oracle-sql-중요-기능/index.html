@@ -1,0 +1,212 @@
+<!doctype html>
+
+<html lang="en-us">
+
+<head>
+  <title>Wisdoom</title>
+  <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="The HTML5 Herald" />
+<meta name="author" content="" /><meta property="og:title" content="ORACLE SQL 중요 기능" />
+<meta property="og:description" content="Oracle SQL에서 중요한 기능들에 대해 알아보겠습니다.
+1. Sequence 2. Alter 3. Constraint 3-1. Foreign key: Primary key of another 4. Disable &amp; enable 5. Transaction 1. Sequence 아래와 같은 product table이 있다고 하겠습니다.
+CREATE TABLE PRODUCT ( ID NUMBER(10), NAME VARCHAR2(20), PRICE NUMBER(10), REGDATE DATE); 이제 아래와 같이 데이터를 입력하겠습니다.
+INSERT INTO PRODUCT VALUES (100, &#39;pants&#39;, 15000, SYSDATE); INSERT INTO PRODUCT VALUES (101, &#39;shirts&#39;, 20000, SYSDATE); 이때 첫 번째 column의 변수인 ID는 입력횟수에 비례해서 숫자를 증가시키고 싶을 수 있습니다." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://Scoobi-wisdoom.github.io/posts/oracle-sql-%EC%A4%91%EC%9A%94-%EA%B8%B0%EB%8A%A5/" />
+<meta property="article:published_time" content="2020-08-04T23:41:35+09:00" />
+<meta property="article:modified_time" content="2020-08-04T23:41:35+09:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="ORACLE SQL 중요 기능"/>
+<meta name="twitter:description" content="Oracle SQL에서 중요한 기능들에 대해 알아보겠습니다.
+1. Sequence 2. Alter 3. Constraint 3-1. Foreign key: Primary key of another 4. Disable &amp; enable 5. Transaction 1. Sequence 아래와 같은 product table이 있다고 하겠습니다.
+CREATE TABLE PRODUCT ( ID NUMBER(10), NAME VARCHAR2(20), PRICE NUMBER(10), REGDATE DATE); 이제 아래와 같이 데이터를 입력하겠습니다.
+INSERT INTO PRODUCT VALUES (100, &#39;pants&#39;, 15000, SYSDATE); INSERT INTO PRODUCT VALUES (101, &#39;shirts&#39;, 20000, SYSDATE); 이때 첫 번째 column의 변수인 ID는 입력횟수에 비례해서 숫자를 증가시키고 싶을 수 있습니다."/>
+
+<meta name="generator" content="Hugo 0.74.3" />
+    
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin="anonymous" />
+  <link rel="stylesheet" href="http://Scoobi-wisdoom.github.io/fontawesome/css/all.min.css" />
+  
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
+  
+  <link rel="stylesheet" type="text/css" href="/css/styles.css" /></head>
+
+<body>
+  <div id="container">
+    <header>
+      <h1>
+                <a href="/">Wisdoom</a>
+            </h1>
+
+      <ul id="social-media">
+      </ul>
+      
+    </header>
+
+    
+<nav>
+    <ul>
+        
+    </ul>
+</nav>
+
+
+    <main>
+
+
+
+
+<article>
+
+    <h1>ORACLE SQL 중요 기능</h1>
+
+    
+      <aside>
+    <ul>
+        <li>
+            <time class="post-date" datetime="2020-08-04T23:41:35&#43;09:00">Aug 4, 2020</time>
+        </li>
+        
+
+        
+
+        <li>4 minutes read</li>
+    </ul>
+</aside>
+
+    
+
+    
+
+
+    <p>Oracle SQL에서 중요한 기능들에 대해 알아보겠습니다.</p>
+<pre><code class="language-dos" data-lang="dos">1. Sequence
+2. Alter
+3. Constraint
+3-1. Foreign key: Primary key of another
+4. Disable &amp; enable
+5. Transaction
+</code></pre><h1 id="1-sequence">1. Sequence</h1>
+<p>아래와 같은 product table이 있다고 하겠습니다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> PRODUCT (
+ID NUMBER(<span style="color:#ae81ff">10</span>),
+NAME VARCHAR2(<span style="color:#ae81ff">20</span>),
+PRICE NUMBER(<span style="color:#ae81ff">10</span>),
+REGDATE DATE);
+</code></pre></div><p>이제 아래와 같이 데이터를 입력하겠습니다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> PRODUCT <span style="color:#66d9ef">VALUES</span> (<span style="color:#ae81ff">100</span>, <span style="color:#e6db74">&#39;pants&#39;</span>, <span style="color:#ae81ff">15000</span>, SYSDATE);
+<span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> PRODUCT <span style="color:#66d9ef">VALUES</span> (<span style="color:#ae81ff">101</span>, <span style="color:#e6db74">&#39;shirts&#39;</span>, <span style="color:#ae81ff">20000</span>, SYSDATE);
+</code></pre></div><p>이때 첫 번째 column의 변수인 ID는 입력횟수에 비례해서 숫자를 증가시키고 싶을 수 있습니다. 재고를 관리하기 위해서는 어떤 품목이 먼저 들어왔는지 알 필요가 있을 경우가 있습니다. 그럴 경우에 위의 경우처럼 일일이 입력하게 된다면, 매우 비효율적일 것입니다. 이전에 입력한 값을 까먹을 수 있기 때문입니다.</p>
+<p>이때 유용한 것이 sequence입니다. 아래와 같이 sequence를 생성한 후에 데이터를 간편하게 입력할 수 있습니다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#75715e">-- Sequence
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">CREATE</span> SEQUENCE PRODUCT_SEQ
+<span style="color:#66d9ef">INCREMENT</span> <span style="color:#66d9ef">BY</span> <span style="color:#ae81ff">1</span> <span style="color:#75715e">-- 증가량
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">START</span> <span style="color:#66d9ef">WITH</span> <span style="color:#ae81ff">100</span> <span style="color:#75715e">-- 출발점
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">-- Insert values
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> PRODUCT <span style="color:#66d9ef">VALUES</span> (PRODUCT_SEQ.NEXTVAL, <span style="color:#e6db74">&#39;pants&#39;</span>, <span style="color:#ae81ff">15000</span>, SYSDATE);
+<span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> PRODUCT <span style="color:#66d9ef">VALUES</span> (PRODUCT_SEQ.NEXTVAL, <span style="color:#e6db74">&#39;shirts&#39;</span>, <span style="color:#ae81ff">20000</span>, SYSDATE);
+</code></pre></div><p>Sequence에 대해 더 자세히 알아보겠습니다. Sequence는 Oracle SQL내에서 연속된 번호를 생성하는 객체입니다.
+구성 요소는 아래와 같습니다. 구성요소가 많지만, 위에서처럼 간단히 사용하는 경우도 많습니다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">CREATE</span> SEQUENCE PRODUCT_SEQ
+<span style="color:#66d9ef">INCREMENT</span> <span style="color:#66d9ef">BY</span> <span style="color:#ae81ff">1</span> <span style="color:#75715e">-- 증가량
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">START</span> <span style="color:#66d9ef">WITH</span> <span style="color:#ae81ff">100</span> <span style="color:#75715e">-- 출발점. ALTER SEQUENCE로 변경 불가능함.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">MAXVALUE</span> <span style="color:#ae81ff">1000</span>  <span style="color:#75715e">-- 최댓값
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">MINVALUE</span> <span style="color:#ae81ff">100</span>   <span style="color:#75715e">-- 최솟값
+</span><span style="color:#75715e"></span>NOCYCLE <span style="color:#75715e">-- 최댓값을 넘어서 최솟값에서 다시 시작하고 싶으면 CYCLE, 그게 아니면 NOCYCLE 입력
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">CACHE</span> <span style="color:#ae81ff">30</span> <span style="color:#75715e">-- Default는 20. 연속된 번호를 미리 메모리에 할당하고 싶으면 CACHE, 그게 아니면 NOCACHE 입력
+</span></code></pre></div><h1 id="2-alter-table">2. Alter table</h1>
+<p>명령어 alter는 이미 생성된 데이터베이스를 수정합니다. Table에 새로운 column을 추가/삭제하거나 column의 data type 이나 길이를 변경할 수 있습니다. 예시는 아래와 같습니다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">ALTER</span> <span style="color:#66d9ef">TABLE</span> CUSTOM <span style="color:#66d9ef">ADD</span> GRADE NUMBER(<span style="color:#ae81ff">10</span>); <span style="color:#75715e">-- Column 추가
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">ALTER</span> <span style="color:#66d9ef">TABLE</span> CUSTOM <span style="color:#66d9ef">DROP</span> <span style="color:#66d9ef">COLUMN</span> LEVELS; <span style="color:#75715e">-- Column 삭제
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">ALTER</span> <span style="color:#66d9ef">TABLE</span> CUSTOM <span style="color:#66d9ef">MODIFY</span> LEVELS NUMBER(<span style="color:#ae81ff">5</span>); <span style="color:#75715e">-- Column data type 변경: Not recommended
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">ALTER</span> <span style="color:#66d9ef">TABLE</span> CUSTOM <span style="color:#66d9ef">RENAME</span> <span style="color:#66d9ef">COLUMN</span> GRADE <span style="color:#66d9ef">TO</span> LEVELS; <span style="color:#75715e">-- Column 이름 변경
+</span></code></pre></div><p>위의 코드에서 세 번째는 Not recommended라 했습니다. 왜냐하면 data type 이나 길이의 변경은 가능하지 않은 경우가 많습니다. 위의 예시에서는 처음 GRADE의 길이는 10 자리 수였습니다. 그 후에 5 자리 수로 변경이 되었습니다. 이전에 이미 10 자리 수가 데이터베이스에 입력이 되었다면, 5 자리 수로 data 길이를 변경할 수 없습니다.</p>
+<h1 id="3-constraints">3. Constraints</h1>
+<p>Constraints는 data integrity를 위해 사용됩니다. Data integrity란 데이터의 일관성과 정확성이 유지되는 것을 의미합니다.</p>
+<p>예를 들어 웹사이트에 회원 가입을 할 때, id와 passwords를 입력합니다. 이 때 id가 다른 회원의 id와 중복되거나 passwords를 입력하지 않는다면 데이터베이스에 저장할 수 없어야 합니다. 이는 UNIQUE와 NOT NULL 제약 조건을 통해 구현할 수 있습니다.</p>
+<p>제약 조건의 종류는 다음과 같습니다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#66d9ef">USER</span> (
+ID VARCHAR2(<span style="color:#ae81ff">10</span>) <span style="color:#66d9ef">CONSTRAINT</span> id_unique <span style="color:#66d9ef">UNIQUE</span>, <span style="color:#75715e">-- ID의 경우 UNIQUE 대신 PRIMARY KEY를 써도 됨
+</span><span style="color:#75715e"></span>PWD VARCHAR2(<span style="color:#ae81ff">20</span>) <span style="color:#66d9ef">CONSTRAINT</span> pwd_nn <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>,
+NAME VARCHAR2(<span style="color:#ae81ff">30</span>) <span style="color:#66d9ef">CONSTRAINT</span> name_length <span style="color:#66d9ef">CHECK</span>(<span style="color:#66d9ef">LENGTH</span>(NAME) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">3</span>) <span style="color:#75715e">-- CHECK를 사용해 제약 조건 추가
+</span><span style="color:#75715e"></span>);
+</code></pre></div><p>위의 code에서는 data table을 생성하면서 constraints를 부여했습니다. 아래의 code에서는 data table 생성 후에 contraints를 부여합니다. 이때 Alter 를 사용합니다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">ALTER</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#66d9ef">USER</span> <span style="color:#66d9ef">ADD</span> <span style="color:#66d9ef">CONSTRAINT</span> user_pwd_nn <span style="color:#66d9ef">CHECK</span> (PWD <span style="color:#66d9ef">IS</span> <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>); <span style="color:#75715e">-- 아래와 동일 
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">ALTER</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#66d9ef">USER</span> <span style="color:#66d9ef">ADD</span> <span style="color:#66d9ef">MODIFY</span>(PWD <span style="color:#66d9ef">CONSTRAINT</span> user_pwd_nn <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>); 
+</code></pre></div><h1 id="3-1-foreign-key-primary-key-of-another">3-1. Foreign key: Primary key of another</h1>
+<p>Foreign key는 relational data table의 column으로서, 해당 data table을 다른 data table과 연결해줍니다. 아래와 같은 형식으로 사용합니다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#66d9ef">USER</span> (
+ID VARCHAR2(<span style="color:#ae81ff">10</span>),
+PWD VARCHAR2(<span style="color:#ae81ff">20</span>),
+NAME VARCHAR2(<span style="color:#ae81ff">30</span>),
+PRODUCTID VARCHAR2(<span style="color:#ae81ff">10</span>) <span style="color:#66d9ef">CONSTRAINT</span> product_fk <span style="color:#66d9ef">FOREIGN</span> <span style="color:#66d9ef">KEY</span>(ID) <span style="color:#66d9ef">REFERENCES</span> PRODUCT
+<span style="color:#75715e">-- product table의 id를 FOREIGN KEY로 사용. FOREIGN KEY는 RDMS를 위해 사용되고, 
+</span><span style="color:#75715e">-- 해당 데이터의 FOREIGN KEY는 다른 데이터의 PRIMARY KEY여야 한다.
+</span><span style="color:#75715e"></span>);
+</code></pre></div><p>위에서 USER를 주문자 데이터, PRODUCT를 품목 데이터라고 하겠습니다. USER table에서 PRODUCTID는 주문한 상품으로서, 데이터베이스에 등록된 상품만 주문할 수 있을 것입니다. 즉, PRODUCT table의 id여야 합니다. 다르게 말하면, USER table에서 PRODUCTID는 foreign key이며, PRODUCT table의 id를 참조합니다.</p>
+<p>Data table을 생성한 후에 foreign key를 지정하고 싶으면 아래와 같이 alter를 사용합니다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">ALTER</span> <span style="color:#66d9ef">TABLE</span> CORDER <span style="color:#66d9ef">ADD</span> <span style="color:#66d9ef">CONSTRAINT</span> order_fk1 <span style="color:#66d9ef">FOREIGN</span> <span style="color:#66d9ef">KEY</span> (USERID) <span style="color:#66d9ef">REFERENCES</span> CUSTOMER (ID); 
+<span style="color:#75715e">-- USERID는 CORDER의 column, (ID)는 CUSTOMER의 column
+</span></code></pre></div><p>기억해야 할 것이 한 가지 더 있습니다. Foreign key는 reference table에서 primary key라는 것입니다.</p>
+<h1 id="4-disable--enable">4. Disable &amp; enable</h1>
+<p>데이터베이스를 이용해 서비스를 하기 전에는 테스트가 필수입니다. 이 때 constraints가 테스트를 방해하기도 합니다. Foreign key 조건 때문에 데이터를 삭제할 수 없는 경우가 대표적인 예입니다. 이 경우, constraints를 비활성화 한 후에 테스트를 완료한 후 다시 활성화 할 수 있어야 합니다. 아래와 같이 말이죠.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">ALTER</span> <span style="color:#66d9ef">TABLE</span> GAME_USER DISABLE <span style="color:#66d9ef">CONSTRAINT</span> user_pwd_nn;
+<span style="color:#66d9ef">ALTER</span> <span style="color:#66d9ef">TABLE</span> GAME_USER ENABLE <span style="color:#66d9ef">CONSTRAINT</span> user_pwd_nn;
+</code></pre></div><h1 id="5-transaction">5. Transaction</h1>
+<p>Transaction은 최소 수행 단위를 뜻합니다. 예를 들어, 쇼핑몰에서는 사용자가 상품을 구입하면, 판매자가 구입 정보를 받습니다. 그런데 상품 구입이 확정되었는데, 정전으로 인해 판매자가 구입 정보를 받지 못 했다고 해봅시다. 이렇게 되면 사용자는 돈을 냈지만 상품을 받을 수 없습니다.</p>
+<p>Transaction은 이런 상황을 막습니다. 두 작업 중 하나라도 완료가 되지 않으면, 모든 작업이 취소됩니다. 그렇기 때문에 transaction을 all or nothing이라고도 부릅니다. Transaction을 위해 사용하는 명령어를 TCL(Transaction Control Language)라고 하며, 아래와 같이 사용합니다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">ROLLBACK</span>; <span style="color:#75715e">--transaction 취소
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">COMMIT</span>; <span style="color:#75715e">-- transaction 반영
+</span></code></pre></div><p>참고로 TCL 외에도 DDL이나 DCL을 사용하는 경우에도 transaction이 종료되고 새로운 transaction이 실행됩니다.</p>
+<p>Transaction은 session간 읽기 일관성(read consistency)을 보장합니다. Session은 데이터베이스의 접속 상태를 의미합니다. 정확한 정의는 <a href="https://docs.oracle.com/cd/E28271_01/server.1111/e25789/glossary.htm#CBAHEBIG">여기</a>를 참조하세요. 데이터베이스의 특성 상, 동시에 여러 session이 존재할 수 있습니다. 즉, 데이터베이스에 동시에 접속할 수 있습니다.</p>
+<p>여러 session이 존재하고, 이 중 한 session에서 데이터베이스를 수정하더라도, transaction이 끝나기 전에는 다른 session에 반영이 되지 않습니다. 이를 통해 session간 읽기 일관성(read consistency)가 보장됩니다.</p>
+<h2 id="references">References</h2>
+<ul>
+<li>이지훈, 오라클로 배우는 데이터베이스 입문, 이지스퍼블리싱, 2020</li>
+<li><a href="https://www.techopedia.com/definition/7272/foreign-key#:~:text=A%20foreign%20key%20is%20a,establishing%20a%20link%20between%20them.">Technopedia, Accessed on 4th August 2020</a></li>
+</ul>
+
+
+</article>
+
+
+<section class="post-nav">
+    <ul>
+        
+        <li>
+            <a href="http://Scoobi-wisdoom.github.io/posts/java%EC%9D%98-constructor-%EC%A3%BC%EC%9D%98-%EC%82%AC%ED%95%AD2/"><i class="fa fa-chevron-circle-left"></i> Java의 Constructor 주의 사항2</a>
+        </li>
+        
+        
+        <li>
+            <a href="http://Scoobi-wisdoom.github.io/posts/throw%EC%99%80-throws/">Throw와 throws <i class="fa fa-chevron-circle-right"></i> </a>
+        </li>
+        
+    </ul>
+</section>
+  
+    
+    
+  
+
+
+
+
+
+</main>
+    <footer>
+        <h6> |
+            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
+            <a href="http://Scoobi-wisdoom.github.ioindex.xml">Subscribe </a></h6>
+    </footer>
+</div>
+<script src="/js/scripts.js"></script>
+
+</body>
+
+</html>
+
