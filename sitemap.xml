@@ -3,17 +3,22 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://Scoobi-wisdoom.github.io/posts/docker%EC%99%80-aws-ec2/</loc>
-    <lastmod>2020-11-29T21:54:44+09:00</lastmod>
+    <loc>http://Scoobi-wisdoom.github.io/posts/</loc>
+    <lastmod>2020-12-15T16:23:22+09:00</lastmod>
   </url>
   
   <url>
-    <loc>http://Scoobi-wisdoom.github.io/posts/</loc>
-    <lastmod>2020-11-29T21:54:44+09:00</lastmod>
+    <loc>http://Scoobi-wisdoom.github.io/posts/web-with-spring/</loc>
+    <lastmod>2020-12-15T16:23:22+09:00</lastmod>
   </url>
   
   <url>
     <loc>http://Scoobi-wisdoom.github.io/</loc>
+    <lastmod>2020-12-15T16:23:22+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://Scoobi-wisdoom.github.io/posts/docker%EC%99%80-aws-ec2/</loc>
     <lastmod>2020-11-29T21:54:44+09:00</lastmod>
   </url>
   

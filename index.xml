@@ -6,10 +6,817 @@
    <description>Recent content on Wisdoom</description>
    <generator>Hugo -- gohugo.io</generator>
    <language>en-us</language>
-   <lastBuildDate>Sun, 29 Nov 2020 21:54:44 +0900</lastBuildDate>
+   <lastBuildDate>Tue, 15 Dec 2020 16:23:22 +0900</lastBuildDate>
    
        <atom:link href="http://Scoobi-wisdoom.github.io/index.xml" rel="self" type="application/rss+xml" />
    
+   
+     <item>
+       <title>Spring으로 게시판 만들기: 기본</title>
+       <link>http://Scoobi-wisdoom.github.io/posts/web-with-spring/</link>
+       <pubDate>Tue, 15 Dec 2020 16:23:22 +0900</pubDate>
+       
+       <guid>http://Scoobi-wisdoom.github.io/posts/web-with-spring/</guid>
+       <description>&lt;p&gt;먼저 여기서 서술된 java project 코드는 &lt;a href=&#34;https://youtube.com/playlist?list=PLE5Oosh5zKQfFh7BWBrebDYRxeCRYPvY_&#34;&gt;Webjjang 무조건 Spring , 웹짱이영환쌤 - YouTube&lt;/a&gt; 을 가공한 것임을 밝힌다.&lt;/p&gt;
+&lt;h2 id=&#34;1-project-생성-및-서버-구동---pomxml-ojdbc-사용자-정의-파일&#34;&gt;1. Project 생성 및 서버 구동 - pom.xml, ojdbc, 사용자 정의 파일&lt;/h2&gt;
+&lt;p&gt;Spring Legacy Project 를 생성할 때 Spring MVC Project 를 선택한다. Project 가 생성이 된 후에는 &lt;strong&gt;pom.xml&lt;/strong&gt; 파일을 설정한다. 필자는 &lt;a href=&#34;https://cafe.naver.com/webjjangma&#34;&gt;웹짱매니아&lt;/a&gt;에서 제공한 &lt;strong&gt;pom.xml&lt;/strong&gt; 파일을 수정해 사용했다. &lt;strong&gt;pom.xml&lt;/strong&gt; 은 코드가 길기 때문에 글 맨 아래에 두었다. 복사 붙여넣기 할 때는 version 태그 아래부터 하자.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ojdbc6.jar&lt;/strong&gt; 와 &lt;strong&gt;사용자 정의 파일 pageObject.jar&lt;/strong&gt; 을 src/main/webapp/WEB-INF/lib 에 넣어준다. lib 가 없으면 폴더를 생성한다. 이렇게 파일을 디렉토리에 추가한다고 Spring 에서 인식하는 것은 아니다. &lt;strong&gt;pom.xml&lt;/strong&gt; 에서 아래와 같이 설정해야 한다. &amp;lt;systemPath&amp;gt; 를 보면 디렉토리를 알 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;pom.xml&lt;/strong&gt; 설정&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;net.webjjang&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;util.pageObject&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.0.0&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;system&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;systemPath&amp;gt;&lt;/span&gt;${project.basedir}/src/main/webapp/WEB-INF/lib/pageObject.jar&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/systemPath&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;oracle&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;ojdbc6&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;11.2.0&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;system&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;systemPath&amp;gt;&lt;/span&gt;${project.basedir}/src/main/webapp/WEB-INF/lib/ojdbc6.jar&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/systemPath&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;성공적으로 반영되면 Maven Dependencies 에 &lt;strong&gt;ojdbc&lt;/strong&gt; 와 &lt;strong&gt;사용자 정의 파일&lt;/strong&gt;이 등록된 것을 알 수 있다.&lt;/p&gt;
+&lt;p&gt;그리고 java version 을 맞춰야 한다. 기존의 &lt;strong&gt;pom.xml&lt;/strong&gt;파일을 복사 붙여넣기 할 경우, &amp;lt;java-version&amp;gt; 를 보면 1.8 이라고 된 경우가 있다. Project 의 버전 역시 이것으로 맞춰야 한다. 실제로 Eclipse 에서 해당 project 의 Properties 에서 Project Facets 를 확인해보면 java 1.6 이라고 돼 있을 있다. 이것을 변환하기 위해 해당 project 의 Maven 에서 Update project 를 실행한다. 여기서 Update project configuration from &lt;strong&gt;pom.xml&lt;/strong&gt; 을 체크한 후에 ok 를 클릭한다. 이제 다시 Project Facets 를 확인하면 java 1.8 로 변한 것을 확인할 수 있다.&lt;/p&gt;
+&lt;p&gt;그 다음은 tomcat 설정인데, 해당 spring project 를 tomcat server 에 놓자. 그 다음에 서버를 실행해보자. 그런 다음 http://localhost:PORT/main/ 에 정상적으로 접속되면 서버가 제대로 작동하는 것이다.&lt;/p&gt;
+&lt;p&gt;기타 과정으로, server operation 시간 제한을 설정해보자. Tomcat server 를 더블 클릭한 후 Overview &amp;gt; Timeouts 에서 start 를 180 으로 설정한다.&lt;/p&gt;
+&lt;h2 id=&#34;2-url-에서-java-project-name-제거&#34;&gt;2. URL 에서 Java Project name 제거&lt;/h2&gt;
+&lt;p&gt;두 가지 방법이 있다. 첫 번째는 tomcat 서버 설정을 변경하는 것이다. Tomcat server 를 더블 클릭한 후 modules 탭을 클릭한다. 그리고 변경하고자 하는 프로젝트를 선택한 후 Edit 버튼을 누른다.  &lt;strong&gt;/main&lt;/strong&gt; 을 &lt;strong&gt;/&lt;/strong&gt; 으로 고치고 OK 를 클릭한다. Ctrl + S 를 눌러 저장해주면 된다.&lt;/p&gt;
+&lt;p&gt;두 번째 방법은, project 설정을 변경하는 방법이다. Eclipse 에서 해당 project 를 우클릭하여 properties 에 들어간다. 여기서 Web Project Settings 를 클릭한다. 그리고 Context root 를 &lt;strong&gt;/main&lt;/strong&gt; 에서 &lt;strong&gt;/&lt;/strong&gt; 으로 고친다. 그리고 project clean 을 한 후에, 서버를 삭제하고 다시 추가한다.&lt;/p&gt;
+&lt;h2 id=&#34;3-encoding-utf-8-설정-및-default-servlet---webxml-jsp&#34;&gt;3. Encoding UTF-8 설정 및 default Servlet - web.xml, jsp&lt;/h2&gt;
+&lt;p&gt;이제 웹페이지에서 unicode 가 제대로 나오게 하기 &lt;strong&gt;web.xml&lt;/strong&gt; 에서 encoding 을 utf-8 으로 설정한다. src/main/webapp/WEB_INF/web.xml 에 아래의 코드를 추가한다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;web.xml&lt;/strong&gt; 추가 설정&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;filter&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;filter-name&amp;gt;&lt;/span&gt;encodingFilter&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/filter-name&amp;gt;&lt;/span&gt; 
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;filter-class&amp;gt;&lt;/span&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/filter-class&amp;gt;&lt;/span&gt; 
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;init-param&amp;gt;&lt;/span&gt; 
+       &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;param-name&amp;gt;&lt;/span&gt;encoding&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/param-name&amp;gt;&lt;/span&gt; 
+       &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;param-value&amp;gt;&lt;/span&gt;UTF-8&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/param-value&amp;gt;&lt;/span&gt; 
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/init-param&amp;gt;&lt;/span&gt; 
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;init-param&amp;gt;&lt;/span&gt; 
+       &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;param-name&amp;gt;&lt;/span&gt;forceEncoding&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/param-name&amp;gt;&lt;/span&gt; 
+       &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;param-value&amp;gt;&lt;/span&gt;true&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/param-value&amp;gt;&lt;/span&gt; 
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/init-param&amp;gt;&lt;/span&gt; 
+ &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/filter&amp;gt;&lt;/span&gt; 
+ &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;filter-mapping&amp;gt;&lt;/span&gt; 
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;filter-name&amp;gt;&lt;/span&gt;encodingFilter&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/filter-name&amp;gt;&lt;/span&gt; 
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;url-pattern&amp;gt;&lt;/span&gt;/*&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/url-pattern&amp;gt;&lt;/span&gt; 
+ &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/filter-mapping&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그리고 &lt;strong&gt;home.jsp&lt;/strong&gt; 파일에 아래와 같은 코드를 추가한다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-jsp&#34; data-lang=&#34;jsp&#34;&gt;&amp;lt;%@ page contentType=&amp;quot;text/html; charset=UTF-8&amp;quot; pageEncoding=&amp;quot;UTF-8&amp;quot; language=&amp;quot;java&amp;quot; %&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;참고로 default &lt;strong&gt;web.xml&lt;/strong&gt; 설정을 살펴보자.&lt;/p&gt;
+&lt;p&gt;default &lt;strong&gt;web.xml&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- The definition of the Root Spring Container shared by all Servlets and Filters --&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;context-param&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;param-name&amp;gt;&lt;/span&gt;contextConfigLocation&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/param-name&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;param-value&amp;gt;&lt;/span&gt;/WEB-INF/spring/root-context.xml&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/param-value&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/context-param&amp;gt;&lt;/span&gt;
+
+&lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- Creates the Spring Container shared by all Servlets and Filters --&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;listener&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;listener-class&amp;gt;&lt;/span&gt;org.springframework.web.context.ContextLoaderListener&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/listener-class&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/listener&amp;gt;&lt;/span&gt;
+
+&lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- Processes application requests --&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;servlet&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;servlet-name&amp;gt;&lt;/span&gt;appServlet&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/servlet-name&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;servlet-class&amp;gt;&lt;/span&gt;org.springframework.web.servlet.DispatcherServlet&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/servlet-class&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;init-param&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;param-name&amp;gt;&lt;/span&gt;contextConfigLocation&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/param-name&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;param-value&amp;gt;&lt;/span&gt;/WEB-INF/spring/appServlet/servlet-context.xml&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/param-value&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/init-param&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;load-on-startup&amp;gt;&lt;/span&gt;1&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/load-on-startup&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/servlet&amp;gt;&lt;/span&gt;
+    
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;servlet-mapping&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;servlet-name&amp;gt;&lt;/span&gt;appServlet&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/servlet-name&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;url-pattern&amp;gt;&lt;/span&gt;/&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/url-pattern&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/servlet-mapping&amp;gt;&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/web-app&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;크게 &amp;lt;context-param&amp;gt; 과 &amp;lt;servlet&amp;gt; 가 있다. &amp;lt;context-param&amp;gt; 는 root-context.xml 을, &amp;lt;servlet&amp;gt; 은 servlet-context.xml 을 &amp;lt;param-value&amp;gt; 로 갖고 있는데, root-context.xml 는 non-web 을 servlet-context.xml 은 web 의 bean 을 설정한다.&lt;/p&gt;
+&lt;p&gt;&amp;lt;servlet&amp;gt;, &amp;lt;servlet-mapping&amp;gt; 두 가지 중 &amp;lt;servlet-mapping&amp;gt; 설정이 의미하는 것은 &amp;lt;url-pattern&amp;gt; 에 해당하는 url 을 &amp;lt;servlet-name&amp;gt; 이 appServlet 인 servlet 이 처리한다는 의미이다. &amp;lt;servlet&amp;gt; 에는 servlet 이 정의돼 있다. 위에서는 DispatcherServlet class 이다. 그리고 이 servlet 의 세부 설정은 servlet-context.xml 에 있다.&lt;/p&gt;
+&lt;h2 id=&#34;4-servlet-설정-확인---servlet-contextxml-controller&#34;&gt;4. Servlet 설정 확인 - servlet-context.xml, Controller&lt;/h2&gt;
+&lt;p&gt;web.xml 에서 servlet 설정을 확인했다. 세부 설정은 &lt;strong&gt;servlet-context.xml&lt;/strong&gt; 에서 확인할 수 있다. Default 는 아래와 같다.&lt;/p&gt;
+&lt;p&gt;Default &lt;strong&gt;servlet-context.xml&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory --&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;resources&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;mapping=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/resources/**&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;location=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/resources/&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;/&amp;gt;&lt;/span&gt;
+
+    &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory --&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;beans:bean&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;class=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;org.springframework.web.servlet.view.InternalResourceViewResolver&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;beans:property&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;name=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;prefix&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;value=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/WEB-INF/views/&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;/&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;beans:property&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;name=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;suffix&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;value=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;.jsp&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/beans:bean&amp;gt;&lt;/span&gt;
+    
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;context:component-scan&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;base-package=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;com.mycompany.main&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;/&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&amp;lt;resources&amp;gt; 는 html, css, javascript, image 등을 mapping 하기 위한 설정이다. &amp;lt;beans&amp;gt; 는 &lt;strong&gt;Controller&lt;/strong&gt; 가 return 할 때 사용하는 class, prefix, suffix 를 설정한다.&lt;/p&gt;
+&lt;p&gt;아래는 default &lt;strong&gt;HomeController&lt;/strong&gt; 에서 home method 이다.&lt;/p&gt;
+&lt;p&gt;Default &lt;strong&gt;HomeController&lt;/strong&gt; home method&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;@RequestMapping&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;value &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; method &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; RequestMethod&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;GET&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;home&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;Locale locale&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; Model model&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        logger&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;info&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Welcome home! The client locale is {}.&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; locale&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        
+        Date date &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; Date&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+        DateFormat dateFormat &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; DateFormat&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getDateTimeInstance&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;DateFormat&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;LONG&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; DateFormat&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;LONG&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; locale&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        
+        String formattedDate &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; dateFormat&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;format&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;date&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        
+        model&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;addAttribute&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;serverTime&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; formattedDate &lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;home&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&amp;ldquo;home&amp;rdquo; 이 return 된다. 하지만 &lt;strong&gt;servlet-context.xml&lt;/strong&gt; 의 설정에 의해 InternalResourceViewResolver 가 prefix + &amp;ldquo;home&amp;rdquo; + suffix 를 return 한다. 즉 /WEB-INF/views/home.jsp 를 return 한다.&lt;/p&gt;
+&lt;h2 id=&#34;5-controller-설정-1-생성---servlet-contextxml-controller&#34;&gt;5. Controller 설정 1: 생성 - servlet-context.xml, @Controller&lt;/h2&gt;
+&lt;p&gt;HomeController 외에 다른 Controller 가 필요할 경우 설정한다. 예시는 ForumController 를 생성하는 경우다. src/main/java &amp;gt; com.&amp;ldquo;mycompany&amp;rdquo;.forum.controller 패키지를 만든다. 그 패키지 하위에 ForumController 라는 Class 를 생성한다. 생성한 후에 @Controller 를 입력해 annotation 처리를 한다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ForumController&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.springframework.stereotype.Controller&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@Controller&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ForumController&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;@Controller&lt;/strong&gt; 는 @Component 를 상속한 annotation 으로서 class ForumController 의 객체를 메모리에 생성하며, DispatcherServlet 이 인식할 수 있도록 Controller 의 객체로 만들어준다 (채규태, 2020).&lt;/p&gt;
+&lt;p&gt;ForumController 를 Spring 의 제어를 받도록 설정해줘야 한다. src &amp;gt; main &amp;gt; WEB-INF &amp;gt; spring &amp;gt; appServlet &amp;gt; &lt;strong&gt;servlet-context.xml&lt;/strong&gt; 을 연다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;context:component-scan&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;base-package=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;com.mycompany.main&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;/&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;라고 돼 있는 것을 아래와 같이 수정한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;context:component-scan&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;base-package=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;com.mycompany&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;/&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;변경 사항이 적용되면 Eclipse Package Explorer 의 ForumController 에 S 마크가 붙는다.&lt;/p&gt;
+&lt;h2 id=&#34;6-controller-설정-2-request---model-requestmapping-getmapping-do&#34;&gt;6. Controller 설정 2: request - Model, @RequestMapping, @GetMapping, .do&lt;/h2&gt;
+&lt;p&gt;ForumController 에 @RequestMapping 을 추가한다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ForumController&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.springframework.stereotype.Controller&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.springframework.web.bind.annotation.RequestMapping&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.springframework.ui.Model&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; net.webjjang.util.PageObject&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@Controller&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@RequestMapping&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/forum&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ForumController&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;final&lt;/span&gt; String MODULE_NAME &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;forum&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 추후 설명
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;@Autowired&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt; ForumService service&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;@GetMapping&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/list.do&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;list&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;Model model&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; PageObject pageObject&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        System&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;ForumController.list().pageObjet:&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; pageObject&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+
+        model&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;addAttribute&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;list&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; service&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;list&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;pageObject&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+        model&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;addAttribute&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;pageObject&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; pageObject&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; MODULE_NAME &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/list&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;@RequestMapping&lt;/strong&gt; 은 클라이언트의 &amp;ldquo;/forum&amp;rdquo; request 에 method 를 대응한다는 의미다 (채규태, 2020). 위 코드에서는 class 를 매핑했다.&lt;/p&gt;
+&lt;p&gt;DB에서 data 를 가져와서 jsp 로 보낼 때는 request 객체가 필요하다. request 객체는 &lt;strong&gt;Model&lt;/strong&gt; 객체에 담겨 있다. PageObject 는 사용자가 정의한 jar 파일이다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;@GetMapping&lt;/strong&gt; 은 get 방식 request 에 대응하는 &lt;strong&gt;@RequestMapping&lt;/strong&gt; 이다. 위의 코드에서 &lt;strong&gt;@GetMapping(&amp;quot;/list.do&amp;rdquo;)&lt;/strong&gt; 가 의미하는 것은 &lt;strong&gt;/list.do&lt;/strong&gt; 에서 request 를 받겠다는 것이다. 즉, request 를 받는 url 을 임의로 지정할 수 있다. 예제에서는 &lt;strong&gt;.do&lt;/strong&gt; 로 했는데, &lt;strong&gt;.abc&lt;/strong&gt;, &lt;strong&gt;.zzz&lt;/strong&gt; 등 어떻게 설정해도 상관 없다.&lt;/p&gt;
+&lt;p&gt;또한 &lt;strong&gt;@RequestMapping(&amp;quot;/forum&amp;rdquo;)&lt;/strong&gt; 가 class 에 위치하고, &lt;strong&gt;@GetMapping(&amp;quot;/list.do&amp;rdquo;)&lt;/strong&gt; 은 method 에 위치하기 때문에 request url 은 &amp;ldquo;/forum/list.do&amp;rdquo; 다.&lt;/p&gt;
+&lt;h2 id=&#34;7-mybatis-설정-root-contextxml&#34;&gt;7. Mybatis 설정: root-context.xml&lt;/h2&gt;
+&lt;p&gt;Mybatis 프레임워크의 특징은 두 가지로, 첫째는 한두 줄의 자바 코드로 DB 연동을 처리한다는 것이며, 둘째는 SQL 명령어를 자바 코드에서 분리하여 xml 파일에 따로 관리한다는 것이다 (채규태, 2020).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;root-context.xml&lt;/strong&gt; 파일을 설정한다. 아래는 &lt;a href=&#34;https://cafe.naver.com/webjjangma&#34;&gt;웹짱매니아&lt;/a&gt;에서 제공한 &lt;strong&gt;root-context.xml&lt;/strong&gt; 파일을 수정한 것이다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;root-context.xml&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;beans&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;xmlns=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://www.springframework.org/schema/beans&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;xmlns:xsi=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://www.w3.org/2001/XMLSchema-instance&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;xmlns:context=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://www.springframework.org/schema/context&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;xmlns:mybatis-spring=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://mybatis.org/schema/mybatis-spring&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;xsi:schemaLocation=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;  http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+
+    &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- Root Context: defines shared resources visible to all other web components --&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;bean&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;id=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hikariConfig&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;class=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;com.zaxxer.hikari.HikariConfig&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;property&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;name=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;driverClassName&amp;#34;&lt;/span&gt;
+            &lt;span style=&#34;color:#a6e22e&#34;&gt;value=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;oracle.jdbc.driver.OracleDriver&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;/&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;property&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;name=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;jdbcUrl&amp;#34;&lt;/span&gt;
+            &lt;span style=&#34;color:#a6e22e&#34;&gt;value=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;jdbc:oracle:thin:@localhost:1521:xe&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;/&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- value=&amp;#34;jdbc:oracle:thin:@IP_ADDRESS:PORT:SID&amp;#34; --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- 
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;        &amp;lt;property name=&amp;#34;jdbcUrl&amp;#34;
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;            value=&amp;#34;jdbc:log4jdbc:oracle:thin:@402-oracle:1521:orcl&amp;#34; /&amp;gt;
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;        --&amp;gt;&lt;/span&gt;
+
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;property&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;name=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;username&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;value=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;USERNAME&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;/&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;property&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;name=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;password&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;value=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;PASSWORD&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/bean&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;bean&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;id=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;dataSource&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;class=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;com.zaxxer.hikari.HikariDataSource&amp;#34;&lt;/span&gt;
+        &lt;span style=&#34;color:#a6e22e&#34;&gt;destroy-method=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;close&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;constructor-arg&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ref=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hikariConfig&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/bean&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- Mybaits - dao 코드 자동 생성 --&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- mapper Interface(메서드이름) - mapper xml(sql) --&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;bean&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;id=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;sqlSessionFactory&amp;#34;&lt;/span&gt;
+        &lt;span style=&#34;color:#a6e22e&#34;&gt;class=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;org.mybatis.spring.SqlSessionFactoryBean&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;property&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;name=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;dataSource&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ref=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;dataSource&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/bean&amp;gt;&lt;/span&gt;
+
+    &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- Mapper 인식 --&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;mybatis-spring:scan&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;base-package=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;com.mycompany&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;/&amp;gt;&lt;/span&gt;
+
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;context:component-scan&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;base-package=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;com.mycompany&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/context:component-scan&amp;gt;&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/beans&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;설정이 완료되면 Eclipse 에서 &lt;strong&gt;root-context.xml&lt;/strong&gt; 의 Namespaces 를 확인한다. Namespaces 에 체크 된 항목들은 &lt;strong&gt;root-context.xml&lt;/strong&gt; 의 &amp;lt;beans&amp;gt; 의 xmlns 항목임을 알 수 있다. 또한 &amp;lt;property&amp;gt; 설정과 &amp;lt;constructor-arg&amp;gt; 설정이 있는데, 이는 각각 Setter 와 Constructor 를 이용해 Dependency Injection 을 처리한다.&lt;/p&gt;
+&lt;p&gt;&amp;lt;bean id=&amp;quot;sqlSessionFactory&amp;gt; 를 보자. SqlSessionFactoryBean class 를 사용하는 bean 인데, 사용 방법에는 두 가지가 있다. 첫째는 DAO 를 작성하는 방법, 두 번째는 mapper interface 를 사용하는 방법이다. 여기서는 mapper interface 를 사용한다.&lt;/p&gt;
+&lt;p&gt;Mapper interface 를 사용하면 사용자가 DAO 를 만들지 않고 mybatis 가 DAO 를 생성한다. &amp;lt;mybatis-spring:scan&amp;gt; 은 base-package 에서 mapper interface 를 찾는 설정이다.&lt;/p&gt;
+&lt;p&gt;&amp;lt;context:component-scan&amp;gt; 와 헷갈리지 말자. &amp;lt;context:component-scan&amp;gt; 는 애플리케이션에서 사용할 객체들을 &amp;lt;bean&amp;gt; 에 등록하지 않고도 스프링 설정 파일에 자동으로 생성하기 위한 엘리먼로서,  이 설정을 추가하면 스프링 컨테이너는 클래스 패스에 있는 클래스들을 스캔하여 @Component 가 설정된 클래스들을 자동으로 객체 생성한다 (채규태, 2020).&lt;/p&gt;
+&lt;h2 id=&#34;8-mybatis-sql-mapper-xml-설정-forummapperxml-sql-mapper-xml-forummapper-interface&#34;&gt;8. Mybatis SQL Mapper XML 설정: ForumMapper.xml (SQL Mapper XML), ForumMapper (interface)&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;SQL Mapper XML&lt;/strong&gt; 은 SQL 명령어가 저장되는 파일로, 필자는 &lt;a href=&#34;https://cafe.naver.com/webjjangma&#34;&gt;웹짱매니아&lt;/a&gt;에서 제공한 &lt;strong&gt;boardMapper.xml&lt;/strong&gt; 파일을 수정해 &lt;strong&gt;ForumMapper.xml&lt;/strong&gt; 로 사용했다. 이 파일을 src/main/resources 하위에 두어야 한다.&lt;/p&gt;
+&lt;p&gt;하위 디렉토리는 반드시 &amp;lt;mapper&amp;gt; 의 namespace 와 동일하게 하자. 만약 namespace 와 다른 디렉토리에 &lt;strong&gt;ForumMapper.xml&lt;/strong&gt; 위치하면 다음과 같은 에러가 발생한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;Request processing failed; nested exception is org.apache.ibatis.binding.BindingException: Invalid bound statement &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;not found&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;: com.webjjang.forum.mapper.ForumMapper.getCount
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;사실 namespace 는 &lt;strong&gt;ForumMapper.java Interface&lt;/strong&gt; 의 경로이면서, &lt;strong&gt;ForumMapper.xml&lt;/strong&gt; 의 경로이다. 아래 예시에서는 namespace 가 com/webjjang/forum/mapper/ForumMapper 로 돼 있으니, src/main/resources/com/webjjang/forum/mapper 폴더를 생성한 후에, Eclipse 를 통해 여기에 &lt;strong&gt;ForumMapper.xml&lt;/strong&gt; 파일을 생성한 후 아래와 같이 작성한다. &lt;strong&gt;ForumMapper.xml&lt;/strong&gt; 에서 id 는 &lt;strong&gt;ForumMapper.java&lt;/strong&gt; 의 method 명과 동일해야 한다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ForumMapper.xml&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!DOCTYPE mapper PUBLIC &amp;#34;-//mybatis.org//DTD Mapper 3.0//EN&amp;#34;
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&amp;#34;http://mybatis.org/dtd/mybatis-3-mapper.dtd&amp;#34;&amp;gt;&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;mapper&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;namespace=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;com.webjjang.forum.mapper.ForumMapper&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;select&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;id=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;list&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;resultType=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;com.webjjang.forum.vo.ForumVO&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+        select * from (
+        select rownum rnum, no, title, writer, writeDate, hit
+        from (
+        select no, title, writer, writeDate, hit
+        from forum
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- 이곳에 조건을 쓴다. --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;include&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;refid=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;search&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;lt;/include&amp;gt;&lt;/span&gt;
+        order by no desc
+        )
+        )
+        where rnum between #{startRow} and #{endRow}
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/select&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;select&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;id=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;getCount&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;resultType=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;java.lang.Integer&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+        select count(*)
+        from forum
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- 이곳에 조건을 쓴다. --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;include&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;refid=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;search&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;lt;/include&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/select&amp;gt;&lt;/span&gt;
+
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;insert&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;id=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;write&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+        insert into forum(no, title, content, writer, pw)
+        values(forum_seq.nextval, #{title}, #{content}, #{writer}, #{pw})
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/insert&amp;gt;&lt;/span&gt;
+
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;sql&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;id=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;search&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- 검색어가 존재하는 경우에만 검색을 실행한다. mybatis doc을 참조하시오. --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;if&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;test=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;word != null and word != &amp;#39;&amp;#39;.toString() &amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+            where ( 2 = 1 &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- 형식을 맞추기 위한 false를 넣었다. or 연산시 하는 기법 and 연산시 하는 기법은 true를 
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;                넣기다. --&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- Mybatis에서 2글자 이상인 경우 : String 취급, 한 글자인 경우:char 취급 =&amp;gt; toString()를 
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;                이용해서 문자열 String로 만듬 --&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;if&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;test=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;key == &amp;#39;t&amp;#39;.toString()&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- concat(문자열, 문자열) : 2개만 연결, &amp;#34;||&amp;#34; : 문자열 이어 붙이는 연산자 --&amp;gt;&lt;/span&gt;
+                or title like &amp;#39;%&amp;#39; || #{word} || &amp;#39;%&amp;#39;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/if&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;if&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;test=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;key == &amp;#39;c&amp;#39;.toString()&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+                or content like &amp;#39;%&amp;#39; || #{word} || &amp;#39;%&amp;#39;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/if&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;if&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;test=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;key == &amp;#39;w&amp;#39;.toString()&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+                or writer like &amp;#39;%&amp;#39; || #{word} || &amp;#39;%&amp;#39;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/if&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;if&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;test=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;key == &amp;#39;tc&amp;#39;.toString()&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+                or title like &amp;#39;%&amp;#39; || #{word} || &amp;#39;%&amp;#39;
+                or content like &amp;#39;%&amp;#39; ||
+                #{word} || &amp;#39;%&amp;#39;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/if&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;if&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;test=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;key == &amp;#39;tw&amp;#39;.toString()&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+                or title like &amp;#39;%&amp;#39; || #{word} || &amp;#39;%&amp;#39;
+                or writer like &amp;#39;%&amp;#39; ||
+                #{word} || &amp;#39;%&amp;#39;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/if&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;if&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;test=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;key == &amp;#39;cw&amp;#39;.toString()&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+                or content like &amp;#39;%&amp;#39; || #{word} || &amp;#39;%&amp;#39;
+                or writer like &amp;#39;%&amp;#39;
+                || #{word} || &amp;#39;%&amp;#39;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/if&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;if&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;test=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;key == &amp;#39;tcw&amp;#39;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+                or title like &amp;#39;%&amp;#39; || #{word} || &amp;#39;%&amp;#39;
+                or content like &amp;#39;%&amp;#39; ||
+                #{word} || &amp;#39;%&amp;#39;
+                or writer like &amp;#39;%&amp;#39; || #{word} || &amp;#39;%&amp;#39;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/if&amp;gt;&lt;/span&gt;
+            )
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/if&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/sql&amp;gt;&lt;/span&gt;
+    
+&lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- 게시판 글 보기 --&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;select&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;id=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;view&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;resultType=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;com.webjjang.forum.vo.ForumVO&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+select no, title, content, writer, writeDate, hit
+from forum
+where no = #{no}
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/select&amp;gt;&lt;/span&gt;
+
+&lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- 조회수 1 증가 --&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;update&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;id=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;increase&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+update forum
+set hit = hit + 1
+where no = #{no}
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/update&amp;gt;&lt;/span&gt;
+
+&lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- 게시판 글삭제 : delete --&amp;gt;&lt;/span&gt;
+ &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;delete&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;id=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;delete&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+  delete from forum
+  where no = #{no} and pw = #{pw}
+ &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/delete&amp;gt;&lt;/span&gt;
+
+&lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- 게시판 글 수정
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;    오류가 나지 않으면서 정보가 수정이 안 되는 경우 - 비밀번호가 틀린 경우,
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt; --&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;update&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;id=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;update&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+update forum
+set title = #{title}, content = #{content}, writer = #{writer}
+where no = #{no} and pw = #{pw}
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/update&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/mapper&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;9-mapper-interface-생성-및-사용-forummapperxml-sql-mapper-xml-forummapper-interface-forumvo-forumservice-inject&#34;&gt;9. Mapper Interface 생성 및 사용: ForumMapper.xml (SQL Mapper XML), ForumMapper (interface), ForumVO, ForumService, @Inject&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;ForumMapper.xml&lt;/strong&gt; 의 namespace 는 &lt;strong&gt;mapper interface&lt;/strong&gt; 의 경로라고 위에서 언급했다. src/main/java 에 namespace 에 해당하는 경로에 &lt;strong&gt;interface&lt;/strong&gt; 를 생성한다. 여기서는 &lt;strong&gt;ForumMapper&lt;/strong&gt; 를 아래와 같이 생성했다. &lt;strong&gt;ForumMapper&lt;/strong&gt; 의 method 명은 &lt;strong&gt;ForumMapper.xml&lt;/strong&gt; 의 id 와 동일해야 한다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ForumMapper&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;package&lt;/span&gt; com.webjjang.forum.mapper&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; java.util.List&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; com.webjjang.forum.vo.ForumVO&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; net.webjjang.util.PageObject&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;interface&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ForumMapper&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 게시판 리스트
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; List&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;ForumVO&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;list&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;PageObject pageObject&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; Integer &lt;span style=&#34;color:#a6e22e&#34;&gt;getCount&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;PageObject pageObject&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 게시판 글 보기
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; ForumVO &lt;span style=&#34;color:#a6e22e&#34;&gt;view&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; no&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;increase&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; no&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 게시판 글 작성
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; Integer &lt;span style=&#34;color:#a6e22e&#34;&gt;write&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;ForumVO vo&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 게시판 글 삭제
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; Integer &lt;span style=&#34;color:#a6e22e&#34;&gt;delete&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;ForumVO vo&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 게시판 글 수정
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; Integer &lt;span style=&#34;color:#a6e22e&#34;&gt;update&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;ForumVO vo&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위의 코드를 보면 DB 값을 가져오기 위해 VO 를 사용했음을 알 수 있다. 이에 맞게 VO 를 아래와 같이 생성한다. 여기서는 &lt;strong&gt;ForumVO&lt;/strong&gt; class 를 src/main/java 생성했다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ForumVO&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;package&lt;/span&gt; com.webjjang.forum.vo&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; java.util.Date&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ForumVO&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// long 으로도 많이들 잡는다.
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; no&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt; String title&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; content&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; writer&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt; Date writeDate&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; hit&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt; String pw&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;getNo&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; no&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;setNo&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; no&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;no&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; no&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;getTitle&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; title&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;setTitle&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;String title&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;title&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; title&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;getContent&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; content&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;setContent&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;String content&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;content&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; content&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;getWriter&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; writer&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;setWriter&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;String writer&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;writer&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; writer&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; Date &lt;span style=&#34;color:#a6e22e&#34;&gt;getWriteDate&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; writeDate&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;setWriteDate&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;Date writeDate&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;writeDate&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; writeDate&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;getHit&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; hit&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;setHit&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; hit&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;hit&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; hit&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;getPw&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; pw&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;setPw&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;String pw&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;pw&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; pw&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;@Override&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;toString&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;ForumVO [no=&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; no &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;, title=&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; title &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;, content=&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; content &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;, writer=&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; writer &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;, writeDate=&amp;#34;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; writeDate &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;, hit=&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; hit &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;, pw=&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; pw &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;]&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이제 &lt;strong&gt;ForumService&lt;/strong&gt; class 를 src/main/java 에 아래와 같이 생성하자. 보통은 &lt;strong&gt;ForumService&lt;/strong&gt; 를 interface로 만든 후에 ForumServiceImpl을 만들어 상속한다. 하지만 여기서는 단일 class 로 생성한다. 참고로 Service 는 DB 데이터를 DAO 로부터 전달받아 가공하는 것으로, 여기서는 mapper interface 가 DAO 의 역할을 한다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ForumService&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;package&lt;/span&gt; com.webjjang.forum.service&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; java.util.List&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; javax.inject.Inject&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.springframework.stereotype.Service&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; com.webjjang.forum.mapper.ForumMapper&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; com.webjjang.forum.vo.ForumVO&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; net.webjjang.util.PageObject&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@Service&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ForumService&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;@Inject&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt; ForumMapper mapper&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 게시판 글 보기
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; List&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;ForumVO&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;list&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;PageObject pageObject&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;// paeObject에 전체 데이터의 개수를 셋팅하는 것이 필요
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;        pageObject&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setTotalRow&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;mapper&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getCount&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;pageObject&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; mapper&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;list&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;pageObject&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; ForumVO &lt;span style=&#34;color:#a6e22e&#34;&gt;view&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; no&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; inc&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;inc &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; 1&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+            mapper&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;increase&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;no&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; mapper&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;view&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;no&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 검색 게시판 글 수정
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;update&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;ForumVO vo&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; Exception &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;mapper&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;update&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;vo&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; 0&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+            &lt;span style=&#34;color:#66d9ef&#34;&gt;throw&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; Exception&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;입력한 정보를 확인해주세요.&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;write&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;ForumVO vo&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; Exception &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;mapper&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;write&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;vo&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; 0&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+            &lt;span style=&#34;color:#66d9ef&#34;&gt;throw&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; Exception&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;입력한 정보를 확인해주세요.&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;delete&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;ForumVO vo&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; Exception&lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;mapper&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;delete&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;vo&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; 0&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+            &lt;span style=&#34;color:#66d9ef&#34;&gt;throw&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; Exception&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;입력한 정보를 확인해주세요.&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;   
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;@Inject&lt;/strong&gt; 는 자동으로 Dependency Injection 을 실행하는 annotation 중 하나다. Dependency Injection 을 자동 실행하는 annotation 은 @Autowired, &lt;strong&gt;@Inject&lt;/strong&gt;, @Resource 이다.&lt;/p&gt;
+&lt;p&gt;@Autowired 는 스프링에서만 사용할 수 있지만, &lt;strong&gt;@Inject&lt;/strong&gt; 와 @Resource 는 JSR 에 실려있는 자바 기존의 annotion 으로 스프링 외에서도 사용할 수 있다. Dependency Injection 방식에서도 차이가 있는데, @Autowired 와 &lt;strong&gt;@Inject&lt;/strong&gt; 는 타입에 맞춰서 하는 반면, @Resource 는 이름에 맞춰서 연결한다 (쿠우v - OKKY, 2017).&lt;/p&gt;
+&lt;h2 id=&#34;10-controller-최종-설정-forumcontroller-autowired&#34;&gt;10 Controller 최종 설정: ForumController, @Autowired&lt;/h2&gt;
+&lt;p&gt;아래는 최종 &lt;strong&gt;ForumController&lt;/strong&gt; 의 코드이다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ForumController&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;package&lt;/span&gt; com.webjjang.forum.controller&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; java.net.URLEncoder&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.springframework.beans.factory.annotation.Autowired&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.springframework.stereotype.Controller&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.springframework.ui.Model&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.springframework.web.bind.annotation.GetMapping&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.springframework.web.bind.annotation.PostMapping&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.springframework.web.bind.annotation.RequestMapping&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; com.webjjang.forum.service.ForumService&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; com.webjjang.forum.vo.ForumVO&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; net.webjjang.util.PageObject&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@Controller&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@RequestMapping&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/forum&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ForumController&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;final&lt;/span&gt; String MODULE_NAME &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;forum&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;@Autowired&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt; ForumService service&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 게시글 리스트
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;@GetMapping&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/list.do&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;list&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;Model model&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; PageObject pageObject&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        System&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;ForumController.list().pageObjet:&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; pageObject&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;// DB에서 데이터 가져오기 - Controller - Service - Mapper (DAO 자동 생성)
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;        model&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;addAttribute&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;list&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; service&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;list&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;pageObject&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+        model&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;addAttribute&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;pageObject&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; pageObject&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; MODULE_NAME &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/list&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 게시글 보기
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;@GetMapping&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/view.do&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;view&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;Model model&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; no&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; inc&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        model&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;addAttribute&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;vo&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; service&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;view&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;no&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; inc&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;//      model.addAttribute(&amp;#34;pageObject&amp;#34;, pageObject);
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; MODULE_NAME &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/view&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 글 쓰기 폼
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;@GetMapping&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/write.do&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;writeForm&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; MODULE_NAME &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/write&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 글 쓰기 처리 - 제목, 내용, 작성자, 비밀번호
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;@PostMapping&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/write.do&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;write&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;ForumVO vo&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; Exception&lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        System&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;ForumController.write().vo:&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt;vo&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        service&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;write&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;vo&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;// 화면에 JSP를 보여주지 않고 바로 list로 이동한다.
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;redirect:list.do&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 글 수정 폼
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;@GetMapping&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/update.do&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;updateForm&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;Model model&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; no&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; inc&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        model&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;addAttribute&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;vo&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; service&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;view&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;no&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; inc&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; MODULE_NAME &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/update&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 글 수정 처리 - 글번호, 제목, 내용, 작성자, 확인용 비밀번호
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;@PostMapping&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/update.do&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;update&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;ForumVO vo&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; PageObject pageObject&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; Exception&lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        System&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;ForumController.update().vo:&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt;vo&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        System&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;ForumController.update().pageObject:&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt;pageObject&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;// DB 처리
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;        service&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;update&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;vo&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;// 검색어가 null이면 null이 아닌 &amp;#34;&amp;#34;로 변경
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;pageObject&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getWord&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; pageObject&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setWord&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;// 화면에 JSP를 보여주지 않고 바로 글 보기로 이동한다.
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;redirect:view.do?no=&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; vo&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getNo&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;amp;inc=0&amp;#34;&lt;/span&gt; 
+        &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;amp;page=&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; pageObject&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getPage&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;amp;perPageNum=&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; pageObject&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getPerPageNum&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;amp;key=&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; pageObject&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getKey&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;// 검색어 한글 처리
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;amp;word=&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; URLEncoder&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;encode&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;pageObject&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getWord&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(),&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;utf-8&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 글 삭제 폼
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;@GetMapping&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/delete.do&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;deleteForm&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; MODULE_NAME &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/delete&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;   
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 글 삭제 처리
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;@PostMapping&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/delete.do&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;delete&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;ForumVO vo&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; Exception&lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        service&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;delete&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;vo&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;redirect:list.do&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;@Autowired&lt;/strong&gt; 는 자동으로 Dependency Injection 을 실행하는 annotation 중 하나다. Dependency Injection 을 자동 실행하는 annotation 은 &lt;strong&gt;@Autowired&lt;/strong&gt;, @Inject, @Resource 이다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;@Autowired&lt;/strong&gt; 는 스프링에서만 사용할 수 있지만, @Inject 와 @Resource 는 JSR 에 실려있는 자바 기존의 annotion 으로 스프링 외에서도 사용할 수 있다. Dependency Injection 방식에서도 차이가 있는데, &lt;strong&gt;@Autowired&lt;/strong&gt; 와 @Inject 는 타입에 맞춰서 하는 반면, @Resource 는 이름에 맞춰서 연결한다 (쿠우v - OKKY, 2017).&lt;/p&gt;
+&lt;h2 id=&#34;11-jsp-작성-viewjsp&#34;&gt;11. JSP 작성: view.jsp&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/Scoobi-wisdoom/spring/tree/master/spring_search/src/main/webapp/WEB-INF/views/forum&#34;&gt;필자의 github 링크&lt;/a&gt; 에 이 프로젝트에 필요한 모든 jsp 파일이 있다. 그 중 하나인 &lt;strong&gt;view.jsp&lt;/strong&gt; 일부를 보자.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;view.jsp&lt;/strong&gt; 일부&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-jsp&#34; data-lang=&#34;jsp&#34;&gt;&amp;lt;div class=&amp;quot;container&amp;quot;&amp;gt;
+    &amp;lt;h2&amp;gt;게시판 글 보기&amp;lt;/h2&amp;gt;
+    &amp;lt;table class=&amp;quot;table&amp;quot;&amp;gt;
+        &amp;lt;tr&amp;gt;&amp;lt;th&amp;gt;번호&amp;lt;/th&amp;gt;&amp;lt;td&amp;gt;${vo.no }&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;&amp;lt;th&amp;gt;제목&amp;lt;/th&amp;gt;&amp;lt;td&amp;gt;${vo.title }&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;&amp;lt;th&amp;gt;내용&amp;lt;/th&amp;gt;&amp;lt;td&amp;gt;&amp;lt;pre style=&amp;quot;border: none&amp;quot;&amp;gt;${vo.content }&amp;lt;/pre&amp;gt;&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;&amp;lt;th&amp;gt;작성자&amp;lt;/th&amp;gt;&amp;lt;td&amp;gt;${vo.writer }&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;&amp;lt;th&amp;gt;작성일&amp;lt;/th&amp;gt;&amp;lt;td&amp;gt;&amp;lt;fmt:formatDate value=&amp;quot;${vo.writeDate }&amp;quot; pattern=&amp;quot;yyyy.MM.dd&amp;quot;/&amp;gt;&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;&amp;lt;th&amp;gt;조회수&amp;lt;/th&amp;gt;&amp;lt;td&amp;gt;${vo.hit }&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;
+    &amp;lt;/table&amp;gt;
+&amp;lt;/div&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;여기서 &lt;strong&gt;${vo}&lt;/strong&gt; 에 주목하자. 이는 ForumController 가 service 의 view method 를 실행해 return 한 값을 Model 에 추가해 &lt;strong&gt;view.jsp&lt;/strong&gt; 에 return 한 값이다.&lt;/p&gt;
+&lt;p&gt;ForumController 일부&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;@GetMapping&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/view.do&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;view&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;Model model&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; no&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; inc&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        model&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;addAttribute&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;vo&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; service&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;view&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;no&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; inc&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; MODULE_NAME &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/view&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;!-- raw HTML omitted --&gt;&lt;br&gt;
+&lt;strong&gt;pom.xml&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;project&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;xmlns=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://maven.apache.org/POM/4.0.0&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;xmlns:xsi=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://www.w3.org/2001/XMLSchema-instance&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;xsi:schemaLocation=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;modelVersion&amp;gt;&lt;/span&gt;4.0.0&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/modelVersion&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;com.webjjang&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;main&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;spring_search&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;packaging&amp;gt;&lt;/span&gt;war&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/packaging&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.0.0-BUILD-SNAPSHOT&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;properties&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;java-version&amp;gt;&lt;/span&gt;1.8&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/java-version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;org.springframework-version&amp;gt;&lt;/span&gt;5.0.7.RELEASE&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/org.springframework-version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;org.aspectj-version&amp;gt;&lt;/span&gt;1.9.0&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/org.aspectj-version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;org.slf4j-version&amp;gt;&lt;/span&gt;1.7.25&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/org.slf4j-version&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/properties&amp;gt;&lt;/span&gt;
+
+    &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- 라이브러리 등록 : 기본 다운로드 저장소 : maven.org --&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- 메이븐에 등록된 라이브러리 찾아보기 : search.maven.org --&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependencies&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- Spring --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.springframework&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;spring-context&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;${org.springframework-version}&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;exclusions&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- Exclude Commons Logging in favor of SLF4j --&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;exclusion&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;commons-logging&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;commons-logging&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/exclusion&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/exclusions&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.springframework&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;spring-webmvc&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;${org.springframework-version}&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- AspectJ --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.aspectj&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;aspectjrt&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;${org.aspectj-version}&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- Logging --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.slf4j&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;slf4j-api&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;${org.slf4j-version}&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.slf4j&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;jcl-over-slf4j&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;${org.slf4j-version}&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;runtime&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.slf4j&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;slf4j-log4j12&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;${org.slf4j-version}&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;runtime&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;log4j&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;log4j&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.2.15&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;exclusions&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;exclusion&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;javax.mail&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;mail&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/exclusion&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;exclusion&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;javax.jms&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;jms&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/exclusion&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;exclusion&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;com.sun.jdmk&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;jmxtools&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/exclusion&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;exclusion&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;com.sun.jmx&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;jmxri&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/exclusion&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/exclusions&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;runtime&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.bgee.log4jdbc-log4j2&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;log4jdbc-log4j2-jdbc4&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.16&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- @Inject --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;javax.inject&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;javax.inject&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- Servlet --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- Servlet은 web.xml의 web-app 태그의 속성을 바꿔줘야 한다. 2.5-&amp;gt; 3.0으로 변경해 준다. --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;javax.servlet&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;javax.servlet-api&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;3.1.0&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;provided&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;javax.servlet.jsp&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;jsp-api&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;2.1&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;provided&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;javax.servlet&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;jstl&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.2&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- JSON / XML --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;com.fasterxml.jackson.core&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;jackson-databind&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;2.9.4&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- File Upload --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;commons-fileupload&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;commons-fileupload&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.3.3&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- Test --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.springframework&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;spring-test&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;${org.springframework-version}&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.projectlombok&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;lombok&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.18.0&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;provided&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;junit&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;junit&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;4.12&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;test&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- 페이지 관련 라이브러리 --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;net.webjjang&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;util.pageObject&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.0.0&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;system&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;systemPath&amp;gt;&lt;/span&gt;${project.basedir}/src/main/webapp/WEB-INF/lib/pageObject.jar&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/systemPath&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- DB 관련 라이브러리 --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;oracle&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;ojdbc6&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;11.2.0&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;system&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;systemPath&amp;gt;&lt;/span&gt;${project.basedir}/src/main/webapp/WEB-INF/lib/ojdbc6.jar&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/systemPath&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- HikariCP 라이브러리 --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;com.zaxxer&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;HikariCP&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;2.7.4&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- Mybatis : ORM --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.mybatis&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;mybatis&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;3.4.6&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.mybatis&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;mybatis-spring&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.3.2&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- Spring JDBC 관련 --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.springframework&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;spring-tx&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;${org.springframework-version}&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.springframework&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;spring-jdbc&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;${org.springframework-version}&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+
+
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/dependencies&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;build&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;plugins&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;plugin&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;maven-eclipse-plugin&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;2.9&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;configuration&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;additionalProjectnatures&amp;gt;&lt;/span&gt;
+                        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;projectnature&amp;gt;&lt;/span&gt;org.springframework.ide.eclipse.core.springnature&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/projectnature&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/additionalProjectnatures&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;additionalBuildcommands&amp;gt;&lt;/span&gt;
+                        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;buildcommand&amp;gt;&lt;/span&gt;org.springframework.ide.eclipse.core.springbuilder&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/buildcommand&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/additionalBuildcommands&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;downloadSources&amp;gt;&lt;/span&gt;true&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/downloadSources&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;downloadJavadocs&amp;gt;&lt;/span&gt;true&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/downloadJavadocs&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/configuration&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;plugin&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.apache.maven.plugins&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;maven-compiler-plugin&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;2.5.1&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;configuration&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;source&amp;gt;&lt;/span&gt;${java-version}&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/source&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;target&amp;gt;&lt;/span&gt;${java-version}&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/target&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;compilerArgument&amp;gt;&lt;/span&gt;-Xlint:all&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/compilerArgument&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;showWarnings&amp;gt;&lt;/span&gt;true&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/showWarnings&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;showDeprecation&amp;gt;&lt;/span&gt;true&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/showDeprecation&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/configuration&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;plugin&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.codehaus.mojo&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;exec-maven-plugin&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.2.1&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;configuration&amp;gt;&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;mainClass&amp;gt;&lt;/span&gt;org.test.int1.Main&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/mainClass&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/configuration&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/plugins&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/build&amp;gt;&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/project&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;reference&#34;&gt;Reference&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=_XZsYODcVyc&amp;amp;list=PLE5Oosh5zKQfFh7BWBrebDYRxeCRYPvY_&amp;amp;index=3&#34;&gt;Webjjang Spring 00-03 무조건 게시판 만들기 - 서버 등록 / 프로젝트 생성 / 사용 라이브러리 등록(웹짱과 함께하는 스프링), 웹짱이영환쌤 - Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://youtu.be/2PP68nc-wWQ?t=62&#34;&gt;Webjjang Spring 00-04 무조건 게시판 만들기 - 프로젝트 흐름 이해 / 게시판리스트 보이기(웹짱과 함께하는 스프링), 웹짱이영환쌤 - Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://youtu.be/m-XSRFOdVj0?t=432&#34;&gt;Webjjang Spring 02-02 무조건 검색 게시판 - Controller와 JSP, 웹짱이영환쌤 - Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://youtu.be/XlYsj4E5_Pg?t=1094&#34;&gt;Webjjang Spring 00-05 무조건 게시판 만들기 - PageObject 등록 MyBatis 설정(웹짱과 함께하는 스프링), 웹짱이영환쌤 - Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://youtu.be/wZ5AnmefV5g?t=604&#34;&gt;Webjjang Spring 00-06 무조건 게시판 만들기 - Mapper 작성 JAVA단 작성(웹짱과 함께하는 스프링), 웹짱이영환쌤 - Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://nyhooni.tistory.com/59&#34;&gt;localhost/프로젝트명(URL)에서 프로젝트명 없애기, NewYorker IT Report&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://jayviii.tistory.com/21#:~:text=Service%EC%9D%98%20%EC%97%AD%ED%95%A0%EC%9D%80%20Dao,%EC%9D%B4%20%ED%95%84%EC%9A%94%ED%95%98%EB%8B%A4%EA%B3%A0%20%EA%B0%80%EC%A0%95%ED%95%B4%EB%B3%B4%EC%9E%90.&#34;&gt;처음 하는 스프링(Spring), Service와 Controller, jayviii - blog&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://okky.kr/article/382734&#34;&gt;@Autowired, @Resource, @Inject의 차이, 쿠우v - OKKY&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://blog.naver.com/javaking75/220074858236&#34;&gt;[Spring MVC] Resource Mapping : JSP 페이지에 JavaScript Or CSS Or 이미지 포함하는 방법 (리소스 폴더 설정), 자바킹 - blog&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://dlgkstjq623.tistory.com/238&#34;&gt;Spring resources [js, css, img] 맵핑 (No mapping for GET), 초보 개발자의 프로그래밍 공부방 - blog&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://gmlwjd9405.github.io/2019/01/01/spring-utf8.html&#34;&gt;[Spring] Spring UTF8 한글 설정하기, heejeong Kwon - blog&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;채규태, 스프링 퀵 스타트, 루비페이퍼, 2020&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+     </item>
    
      <item>
        <title>Docker와 AWS (EC2)</title>
