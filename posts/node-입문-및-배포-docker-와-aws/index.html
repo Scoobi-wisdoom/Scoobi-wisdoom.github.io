@@ -8,9 +8,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="description" content="The HTML5 Herald" />
 <meta name="author" content="" /><meta property="og:title" content="Node 입문 및 배포 (Docker 와 Aws)" />
-<meta property="og:description" content="NodeJS, ExpressJS 와 Docker  nodeJS 앱 만들기
-프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.
-app.js  const express = require(&#39;express&#39;); const app = express(); app.get(&#39;/&#39;, (req, res) =&gt; res.send(&#39;hello world&#39;)); app.listen(80, () =&gt; { console.log(&#39;My REST API running on port 80!&#39;); }); Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다." />
+<meta property="og:description" content="NodeJS, ExpressJS 와 Docker nodeJS 앱 만들기 프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.
+app.js
+const express = require(&#39;express&#39;); const app = express(); app.get(&#39;/&#39;, (req, res) =&gt; res.send(&#39;hello world&#39;)); app.listen(80, () =&gt; { console.log(&#39;My REST API running on port 80!&#39;); }); Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.
+npm install express 이제 package." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://Scoobi-wisdoom.github.io/posts/node-%EC%9E%85%EB%AC%B8-%EB%B0%8F-%EB%B0%B0%ED%8F%AC-docker-%EC%99%80-aws/" />
 <meta property="article:published_time" content="2021-04-06T23:36:09+09:00" />
@@ -18,9 +19,10 @@ app.js  const express = require(&#39;express&#39;); const app = express(); app.g
 
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Node 입문 및 배포 (Docker 와 Aws)"/>
-<meta name="twitter:description" content="NodeJS, ExpressJS 와 Docker  nodeJS 앱 만들기
-프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.
-app.js  const express = require(&#39;express&#39;); const app = express(); app.get(&#39;/&#39;, (req, res) =&gt; res.send(&#39;hello world&#39;)); app.listen(80, () =&gt; { console.log(&#39;My REST API running on port 80!&#39;); }); Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다."/>
+<meta name="twitter:description" content="NodeJS, ExpressJS 와 Docker nodeJS 앱 만들기 프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.
+app.js
+const express = require(&#39;express&#39;); const app = express(); app.get(&#39;/&#39;, (req, res) =&gt; res.send(&#39;hello world&#39;)); app.listen(80, () =&gt; { console.log(&#39;My REST API running on port 80!&#39;); }); Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.
+npm install express 이제 package."/>
 
 <meta name="generator" content="Hugo 0.74.3" />
     
@@ -87,12 +89,9 @@ app.js  const express = require(&#39;express&#39;); const app = express(); app.g
 
 
     <h2 id="nodejs-expressjs-와-docker">NodeJS, ExpressJS 와 Docker</h2>
-<ol>
-<li>nodeJS 앱 만들기<br>
-<!-- raw HTML omitted -->
-프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.<br>
-<strong>app.js</strong></li>
-</ol>
+<h3 id="nodejs-앱-만들기">nodeJS 앱 만들기</h3>
+<p>프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.<br>
+<strong>app.js</strong></p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">express</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;express&#39;</span>);
 <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">app</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">express</span>();
 <span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;/&#39;</span>, (<span style="color:#a6e22e">req</span>, <span style="color:#a6e22e">res</span>) =&gt; <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">&#39;hello world&#39;</span>));
@@ -109,12 +108,9 @@ app.js  const express = require(&#39;express&#39;); const app = express(); app.g
 },
 </code></pre></div><p>start command 가 제대로 작동하는지 확인하기 위해 terminal 에서 다음과 같이 명령어를 입력한 후에 웹브라우저에서 localhost 로 접속한다.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">npm start
-</code></pre></div><ol start="2">
-<li>Docker 활용<br>
-<!-- raw HTML omitted -->
-프로젝트 디렉토리에 파일을 새로 만들고, 이름을 Dockerfile 이라고 한다. 아래와 같이 코드를 작성해준다.<br>
-<strong>Dockerfile</strong></li>
-</ol>
+</code></pre></div><h3 id="docker-활용">Docker 활용</h3>
+<p>프로젝트 디렉토리에 파일을 새로 만들고, 이름을 Dockerfile 이라고 한다. 아래와 같이 코드를 작성해준다.<br>
+<strong>Dockerfile</strong></p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> node:14-slim</span><span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">WORKDIR</span><span style="color:#e6db74"> /app</span><span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> package.json /app<span style="color:#960050;background-color:#1e0010">
@@ -123,18 +119,18 @@ app.js  const express = require(&#39;express&#39;); const app = express(); app.g
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> . /app<span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010"></span>&lt;!-- COPY . . --&gt;<span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;npm&#34;</span>, <span style="color:#e6db74">&#34;start&#34;</span>]<span style="color:#960050;background-color:#1e0010">
-</span></code></pre></div><p>위의 코드에서 <strong>FROM, WORKDIR, COPY, RUN, CMD</strong> 는 Instruction 로 통칭한다. 각 instruction 의 뜻을 살펴보자. <!-- raw HTML omitted --><!-- raw HTML omitted -->
-<strong>FROM</strong> instruction 은 DockerHub 에서 불러와 Container 안에서 사용할 Docker image 지정한다. 여기서 말하는 Docker image 는 node, python, ubuntu 등으로, DockerHub 에 이미 공식적으로 등록돼 있다. 위의 코드에서 <strong>FROM</strong> instruction 은 terminal 에서 <strong>install node</strong> 명령어를 실행한 것과 같다. 즉, <strong>FROM</strong> instruction 덕분에 따로 node 를 설치하지 않아도 되는 것이다. node:14-slim 에서 14-slim 은 tag 로, node 의 버전이다. slim, alpine, buster 등 버전 차이는 reference 를 참고하자.<!-- raw HTML omitted --><!-- raw HTML omitted -->
-<strong>WORKDIR</strong> 는 Container 의 working directory 를 의미한다. 위의 코드에서는 <strong>WORKDIR</strong> /app 이 입력돼 있다. 그렇기 때문에 아래에 있는 두 개의 <strong>COPY</strong> instructions 에서 &ldquo;/app&rdquo; 대신에 &ldquo;.&rdquo; 를 써도 된다.<!-- raw HTML omitted --><!-- raw HTML omitted -->
-<strong>COPY</strong> instruction 은 Host 에 있는 local 파일을 Container 에 복사하는 기능을 한다. <strong>COPY</strong> 는 <strong>RUN</strong> 과 다르게 Host 에서 명령어를 실행한다. <strong>COPY &lt;source&gt; &lt;target&gt;</strong> 가 instruction 형식으로, 위의 코드에서는 &ldquo;<strong>COPY</strong> . /app&rdquo; 이 입력돼 있다. 이 코드는 Host 의 directory &ldquo;.&rdquo; 에 있는 파일을 Container 의 &ldquo;/app&rdquo; directory 에 복사한다는 뜻이다.<!-- raw HTML omitted --><!-- raw HTML omitted -->
-<strong>RUN</strong> instruction 은 리눅스 명령어를 Container 내부에서 실행하는 기능을 한다. 즉, 위의 코드에서 <strong>RUN</strong> npm install 은 Container 내부에서만 실행될뿐, Host 나 local 에서는 실행되지 않는다.<!-- raw HTML omitted --><!-- raw HTML omitted -->
-<strong>CMD</strong> instruction 은 Container 안에서 무슨 linux 명령어를 실행할지 지정하는 기능이다. 위의 코드에서는 &ldquo;<strong>CMD</strong> [&ldquo;npm&rdquo;, &ldquo;start&rdquo;]&rdquo; 가 입력돼 있다. 이 코드는</p>
+</span></code></pre></div><p>위의 코드에서 <strong>FROM, WORKDIR, COPY, RUN, CMD</strong> 는 Instruction 로 통칭한다. 각 instruction 의 뜻을 살펴보자.</p>
+<p><strong>FROM</strong> instruction 은 DockerHub 에서 불러와 Container 안에서 사용할 Docker image 지정한다. 여기서 말하는 Docker image 는 node, python, ubuntu 등으로, DockerHub 에 이미 공식적으로 등록돼 있다. 위의 코드에서 <strong>FROM</strong> instruction 은 terminal 에서 <strong>install node</strong> 명령어를 실행한 것과 같다. 즉, <strong>FROM</strong> instruction 덕분에 따로 node 를 설치하지 않아도 되는 것이다. node:14-slim 에서 14-slim 은 tag 로, node 의 버전이다. slim, alpine, buster 등 버전 차이는 reference 를 참고하자.</p>
+<p><strong>WORKDIR</strong> 는 Container 의 working directory 를 의미한다. 위의 코드에서는 <strong>WORKDIR</strong> /app 이 입력돼 있다. 그렇기 때문에 아래에 있는 두 개의 <strong>COPY</strong> instructions 에서 &ldquo;/app&rdquo; 대신에 &ldquo;.&rdquo; 를 써도 된다.</p>
+<p><strong>COPY</strong> instruction 은 Host 에 있는 local 파일을 Container 에 복사하는 기능을 한다. <strong>COPY</strong> 는 <strong>RUN</strong> 과 다르게 Host 에서 명령어를 실행한다. <strong>COPY &lt;source&gt; &lt;target&gt;</strong> 가 instruction 형식으로, 위의 코드에서는 &ldquo;<strong>COPY</strong> . /app&rdquo; 이 입력돼 있다. 이 코드는 Host 의 directory &ldquo;.&rdquo; 에 있는 파일을 Container 의 &ldquo;/app&rdquo; directory 에 복사한다는 뜻이다.</p>
+<p><strong>RUN</strong> instruction 은 리눅스 명령어를 Container 내부에서 실행하는 기능을 한다. 즉, 위의 코드에서 <strong>RUN</strong> npm install 은 Container 내부에서만 실행될뿐, Host 나 local 에서는 실행되지 않는다.</p>
+<p><strong>CMD</strong> instruction 은 Container 안에서 무슨 linux 명령어를 실행할지 지정하는 기능이다. 위의 코드에서는 &ldquo;<strong>CMD</strong> [&ldquo;npm&rdquo;, &ldquo;start&rdquo;]&rdquo; 가 입력돼 있다. 이 코드는</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">npm start
 </code></pre></div><p>를 입력한 것과 동일하다. &ldquo;1. nodeJS 앱 만들기&rdquo; 에서 <strong>package.json</strong> 에 아래와 같은 설정을 한 바 있다.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#e6db74">&#34;scripts&#34;</span><span style="color:#f92672">:</span> {
 <span style="color:#e6db74">&#34;start&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;node app.js&#34;</span>,
-</code></pre></div><p>위의 설정으로 인해 &ldquo;npm start&rdquo; 는 &ldquo;node app.js&rdquo; 를 Terminal 에 입력하는 것과 동일하다.<!-- raw HTML omitted --><!-- raw HTML omitted -->
-AWS 를 통해 배포하는 것은 <a href="https://scoobi-wisdoom.github.io/posts/docker%EC%99%80-aws-ec2/">여기</a>를 참조하자.</p>
+</code></pre></div><p>위의 설정으로 인해 &ldquo;npm start&rdquo; 는 &ldquo;node app.js&rdquo; 를 Terminal 에 입력하는 것과 동일하다.</p>
+<p>AWS 를 통해 배포하는 것은 <a href="https://scoobi-wisdoom.github.io/posts/docker%EC%99%80-aws-ec2/">여기</a>를 참조하자.</p>
 <h3 id="reference">Reference</h3>
 <ul>
 <li><a href="https://youtu.be/CsWoMpK3EtE">Docker-izing a NodeJS ExpressJS API - Tutorial, TutorialEdge - Youtube</a></li>
