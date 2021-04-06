@@ -11,6 +11,106 @@
    
    
      <item>
+       <title>Node 입문 및 배포 (Docker 와 Aws)</title>
+       <link>http://Scoobi-wisdoom.github.io/posts/node-%EC%9E%85%EB%AC%B8-%EB%B0%8F-%EB%B0%B0%ED%8F%AC-docker-%EC%99%80-aws/</link>
+       <pubDate>Tue, 06 Apr 2021 23:36:09 +0900</pubDate>
+       
+       <guid>http://Scoobi-wisdoom.github.io/posts/node-%EC%9E%85%EB%AC%B8-%EB%B0%8F-%EB%B0%B0%ED%8F%AC-docker-%EC%99%80-aws/</guid>
+       <description>&lt;h2 id=&#34;nodejs-expressjs-와-docker&#34;&gt;NodeJS, ExpressJS 와 Docker&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;nodeJS 앱 만들기&lt;br&gt;
+&lt;!-- raw HTML omitted --&gt;
+프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.&lt;br&gt;
+&lt;strong&gt;app.js&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;express&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;require&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;express&amp;#39;&lt;/span&gt;);
+&lt;span style=&#34;color:#66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;app&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;express&lt;/span&gt;();
+&lt;span style=&#34;color:#a6e22e&#34;&gt;app&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;get&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/&amp;#39;&lt;/span&gt;, (&lt;span style=&#34;color:#a6e22e&#34;&gt;req&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;res&lt;/span&gt;) =&amp;gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;res&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;send&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hello world&amp;#39;&lt;/span&gt;));
+&lt;span style=&#34;color:#a6e22e&#34;&gt;app&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;listen&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;80&lt;/span&gt;, () =&amp;gt; {
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;console&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;log&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;My REST API running on port 80!&amp;#39;&lt;/span&gt;);
+});
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Express 를 &lt;strong&gt;app.js&lt;/strong&gt; 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;npm install express
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이제 &lt;strong&gt;package.json&lt;/strong&gt; 의 &lt;strong&gt;script&lt;/strong&gt; 에 start command 를 추가한다. 이는 &lt;strong&gt;app.js&lt;/strong&gt; 를 run 하기 위해서다.&lt;br&gt;
+&lt;strong&gt;package.json&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;scripts&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; {
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;start&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;node app.js&amp;#34;&lt;/span&gt;,
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;test&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;echo \&amp;#34;Error: no test specified\&amp;#34; &amp;amp;&amp;amp; exit 1&amp;#34;&lt;/span&gt;
+},
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;start command 가 제대로 작동하는지 확인하기 위해 terminal 에서 다음과 같이 명령어를 입력한 후에 웹브라우저에서 localhost 로 접속한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;npm start
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;Docker 활용&lt;br&gt;
+&lt;!-- raw HTML omitted --&gt;
+프로젝트 디렉토리에 파일을 새로 만들고, 이름을 Dockerfile 이라고 한다. 아래와 같이 코드를 작성해준다.&lt;br&gt;
+&lt;strong&gt;Dockerfile&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-Dockerfile&#34; data-lang=&#34;Dockerfile&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;FROM&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; node:14-slim&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;WORKDIR&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; /app&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;COPY&lt;/span&gt; package.json /app&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&amp;lt;!-- COPY package.json . --&amp;gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;RUN&lt;/span&gt; npm install&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;COPY&lt;/span&gt; . /app&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&amp;lt;!-- COPY . . --&amp;gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;CMD&lt;/span&gt; [&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;npm&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;start&amp;#34;&lt;/span&gt;]&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위의 코드에서 &lt;strong&gt;FROM, WORKDIR, COPY, RUN, CMD&lt;/strong&gt; 는 Instruction 로 통칭한다. 각 instruction 의 뜻을 살펴보자. &lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;
+&lt;strong&gt;FROM&lt;/strong&gt; instruction 은 DockerHub 에서 불러와 Container 안에서 사용할 Docker image 지정한다. 여기서 말하는 Docker image 는 node, python, ubuntu 등으로, DockerHub 에 이미 공식적으로 등록돼 있다. 위의 코드에서 &lt;strong&gt;FROM&lt;/strong&gt; instruction 은 terminal 에서 &lt;strong&gt;install node&lt;/strong&gt; 명령어를 실행한 것과 같다. 즉, &lt;strong&gt;FROM&lt;/strong&gt; instruction 덕분에 따로 node 를 설치하지 않아도 되는 것이다. node:14-slim 에서 14-slim 은 tag 로, node 의 버전이다. slim, alpine, buster 등 버전 차이는 reference 를 참고하자.&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;
+&lt;strong&gt;WORKDIR&lt;/strong&gt; 는 Container 의 working directory 를 의미한다. 위의 코드에서는 &lt;strong&gt;WORKDIR&lt;/strong&gt; /app 이 입력돼 있다. 그렇기 때문에 아래에 있는 두 개의 &lt;strong&gt;COPY&lt;/strong&gt; instructions 에서 &amp;ldquo;/app&amp;rdquo; 대신에 &amp;ldquo;.&amp;rdquo; 를 써도 된다.&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;
+&lt;strong&gt;COPY&lt;/strong&gt; instruction 은 Host 에 있는 local 파일을 Container 에 복사하는 기능을 한다. &lt;strong&gt;COPY&lt;/strong&gt; 는 &lt;strong&gt;RUN&lt;/strong&gt; 과 다르게 Host 에서 명령어를 실행한다. &lt;strong&gt;COPY &amp;lt;source&amp;gt; &amp;lt;target&amp;gt;&lt;/strong&gt; 가 instruction 형식으로, 위의 코드에서는 &amp;ldquo;&lt;strong&gt;COPY&lt;/strong&gt; . /app&amp;rdquo; 이 입력돼 있다. 이 코드는 Host 의 directory &amp;ldquo;.&amp;rdquo; 에 있는 파일을 Container 의 &amp;ldquo;/app&amp;rdquo; directory 에 복사한다는 뜻이다.&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;
+&lt;strong&gt;RUN&lt;/strong&gt; instruction 은 리눅스 명령어를 Container 내부에서 실행하는 기능을 한다. 즉, 위의 코드에서 &lt;strong&gt;RUN&lt;/strong&gt; npm install 은 Container 내부에서만 실행될뿐, Host 나 local 에서는 실행되지 않는다.&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;
+&lt;strong&gt;CMD&lt;/strong&gt; instruction 은 Container 안에서 무슨 linux 명령어를 실행할지 지정하는 기능이다. 위의 코드에서는 &amp;ldquo;&lt;strong&gt;CMD&lt;/strong&gt; [&amp;ldquo;npm&amp;rdquo;, &amp;ldquo;start&amp;rdquo;]&amp;rdquo; 가 입력돼 있다. 이 코드는&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;npm start
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;를 입력한 것과 동일하다. &amp;ldquo;1. nodeJS 앱 만들기&amp;rdquo; 에서 &lt;strong&gt;package.json&lt;/strong&gt; 에 아래와 같은 설정을 한 바 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;scripts&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; {
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;start&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;node app.js&amp;#34;&lt;/span&gt;,
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위의 설정으로 인해 &amp;ldquo;npm start&amp;rdquo; 는 &amp;ldquo;node app.js&amp;rdquo; 를 Terminal 에 입력하는 것과 동일하다.&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;
+AWS 를 통해 배포하는 것은 &lt;a href=&#34;https://scoobi-wisdoom.github.io/posts/docker%EC%99%80-aws-ec2/&#34;&gt;여기&lt;/a&gt;를 참조하자.&lt;/p&gt;
+&lt;h3 id=&#34;reference&#34;&gt;Reference&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://youtu.be/CsWoMpK3EtE&#34;&gt;Docker-izing a NodeJS ExpressJS API - Tutorial, TutorialEdge - Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.docker.com/develop/develop-images/dockerfile_best-practices/&#34;&gt;Best practices for writing Dockerfiles
+, docker docs - Docker Inc.&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://youtu.be/WmcdMiyqfZs?t=153&#34;&gt;Dockerfile Tutorial - Docker in Practice || Docker Tutorial 10
+, TechWorld with Nana - Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://youtu.be/UyHjZBoe194?t=329&#34;&gt;Dockerfile copy command, Richard Chesterwood - Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://medium.com/swlh/alpine-slim-stretch-buster-jessie-bullseye-bookworm-what-are-the-differences-in-docker-62171ed4531d&#34;&gt;Alpine, Slim, Stretch, Buster, Jessie, Bullseye — What are the Differences in Docker Images?, Julie Perilla Garcia - Medium&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;nodejs-crash-course-정리&#34;&gt;NodeJS Crash Course 정리&lt;/h2&gt;
+&lt;p&gt;node js 를 설치한 후에 visual studio terminal 에서&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;npm init
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;을 입력한다. 필자는 여기서 &lt;strong&gt;author&lt;/strong&gt; 만 설정하고 나머지는 모두 default 로 두었다.&lt;/p&gt;
+&lt;p&gt;추후에 dependenices 와 devDependencies 를 추가하기 위해 각각 아래와 같은 명령어를 terminal 에 입력한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;npm install uuid
+npm install -D nodemon
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;package.json&lt;/strong&gt; 에 dependencies 가 추가된 것을 확인할 수 있다. &lt;strong&gt;package.json&lt;/strong&gt; 로 dependencies 를 설정할 수 있으며, deploy 할 때는 &lt;strong&gt;node_modules&lt;/strong&gt; 로 하지 않고 &lt;strong&gt;package.json&lt;/strong&gt; 으로 한다.&lt;/p&gt;
+&lt;p&gt;이제 main file 을 생성한다. &lt;strong&gt;package.json&lt;/strong&gt; 을 보면 &lt;strong&gt;&amp;ldquo;main&amp;rdquo;&lt;/strong&gt; 이 &lt;strong&gt;&amp;ldquo;index.js&amp;rdquo;&lt;/strong&gt; 로 설정돼 있다. 그러므로 main file 의 이름을 &lt;strong&gt;index.js&lt;/strong&gt; 로 생성한다.&lt;/p&gt;
+&lt;p&gt;참고로 module 에는 &lt;strong&gt;Module Wrapper Function&lt;/strong&gt; 이 존재한다. 미리 생성돼 있기 때문에 우리가 써줄 필요는 없다. 아래와 같은 함수다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;(&lt;span style=&#34;color:#66d9ef&#34;&gt;function&lt;/span&gt; (&lt;span style=&#34;color:#a6e22e&#34;&gt;exports&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;require&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;module&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;__filename&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;__dirname&lt;/span&gt;) {
+    })
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그렇기 때문에 아래와 같은 코드를 입력해도 에러 없이 작동한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;console&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;log&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;__dirname&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;__filename&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;서버를 돌릴 경우 .js 파일이 변경될 때마다 서버를 중지하고 다시 실행해야 반영된다. 서버를 중지할 필요 없이 .js 파일의 변경 사항이 즉시 반영되게 하는 방법은 nodemon 이다. &lt;strong&gt;package.json&lt;/strong&gt; 의 Debug 항목에 다음과 같이 &lt;strong&gt;&amp;ldquo;dev&amp;rdquo;&lt;/strong&gt; 항목을 추가한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;scripts&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; {
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;start&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;node index&amp;#34;&lt;/span&gt;,
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;dev&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;nodemon index&amp;#34;&lt;/span&gt;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그 다음에 terminal 에서 다음과 같은 명령어를 실행하면, 서버를 중지할 필요 없이 즉시 변경사항이 반영된다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;npm run dev
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;!-- raw HTML omitted --&gt;
+이제 배포해야 한다. 배포할 때 중요한 것은 아래와 같이  process.env.PORT 와 start script 이다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;index.js&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;PORT&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;process&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;env&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;PORT&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;||&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;5000&lt;/span&gt;;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;package.json&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;start&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;node index&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;reference-1&#34;&gt;Reference&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://youtu.be/fBNz5xF-Kx4&#34;&gt;Node.js Crash Course, Traversy Media - Youtube&lt;/a&gt;&lt;br&gt;
+&lt;!-- raw HTML omitted --&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+     </item>
+   
+     <item>
        <title>Spring으로 게시판 만들기: 기본</title>
        <link>http://Scoobi-wisdoom.github.io/posts/web-with-spring/</link>
        <pubDate>Tue, 15 Dec 2020 16:23:22 +0900</pubDate>
