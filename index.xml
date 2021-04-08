@@ -6,10 +6,33 @@
    <description>Recent content on Wisdoom</description>
    <generator>Hugo -- gohugo.io</generator>
    <language>en-us</language>
-   <lastBuildDate>Tue, 06 Apr 2021 23:36:09 +0900</lastBuildDate>
+   <lastBuildDate>Thu, 08 Apr 2021 22:35:45 +0900</lastBuildDate>
    
        <atom:link href="http://Scoobi-wisdoom.github.io/index.xml" rel="self" type="application/rss+xml" />
    
+   
+     <item>
+       <title>AWS Ec2 Docker 에 Domain 연결</title>
+       <link>http://Scoobi-wisdoom.github.io/posts/aws-ec2-docker-%EC%97%90-domain-%EC%97%B0%EA%B2%B0/</link>
+       <pubDate>Thu, 08 Apr 2021 22:35:45 +0900</pubDate>
+       
+       <guid>http://Scoobi-wisdoom.github.io/posts/aws-ec2-docker-%EC%97%90-domain-%EC%97%B0%EA%B2%B0/</guid>
+       <description>&lt;h3 id=&#34;사전-준비-사항&#34;&gt;사전 준비 사항&lt;/h3&gt;
+&lt;p&gt;EC2 instance 생성 완료, domain 보유 완료.&lt;/p&gt;
+&lt;h3 id=&#34;주의-사항&#34;&gt;주의 사항&lt;/h3&gt;
+&lt;p&gt;EC2 를 stop 했다가 run 하면 두 가지를 신경써야 한다. 첫째로 IPv4 address 와 IPv4 DNS 이 모두 변경된다. 그렇기 때문에 Putty 에 주소 입력을 새롭게 해줘야 한다. 둘째로, Docker 가 inactive 가 된다. 결국 Putty 에서 다시 Docker run 을 실행해야 한다. &lt;a href=&#34;http://Scoobi-wisdoom.github.io/posts/docker%EC%99%80-aws-ec2/&#34;&gt;링크의 6. AWS EC2 에서 Docker 사용 부터 살펴보자.&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;aws-ec2-instance-에-domain-을-부여하자&#34;&gt;AWS EC2 instance 에 domain 을 부여하자.&lt;/h3&gt;
+&lt;p&gt;AWS 홈페이지에서 로그인 한 후에 Dashboard 에서 Compute &amp;gt; EC2 에 접속한다. 사용할 instance 가 running 상태인지 확인하자. Instance 가 running 상태가 아니면 &lt;strong&gt;Public IPv4 address&lt;/strong&gt; 가 없다. &lt;strong&gt;Public IPv4 address&lt;/strong&gt; 를 복사한다.&lt;/p&gt;
+&lt;p&gt;Dashboard 에서 Networking &amp;amp; Content Delivery &amp;gt; Route 53 에 접속한다. 여기 메뉴에서 Hosted zones 에 접속한다. 사용할 Domain name 을 클릭한다. 그 다음 &lt;strong&gt;Create record&lt;/strong&gt; 를 클릭한다. &lt;strong&gt;Name&lt;/strong&gt; 은 일단 공백으로 둔다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Record type&lt;/strong&gt; 은 &amp;ldquo;A-Routes traffic to an IPv4 address and some AWS resources&amp;rdquo; 를 선택하는데, 이 옵션은 ip 주소와 Record name 을 매칭하는 옵션이다. &lt;strong&gt;TTL&lt;/strong&gt; 은 time to live 의 약자로, 캐시 정보가 살아있는 시간이다. &lt;strong&gt;TTL&lt;/strong&gt; 을 길게 할수록 지연이 줄어들고 Route 53 비용을 절감할 수 있지만, 레코드를 변경하고 싶을 때 반영 시간이 오래 걸리기 때문에 불편하다. 도메인과 관련된 작업을 하기 전에는 낮게 설정하자 (ex. 60). &lt;strong&gt;Value&lt;/strong&gt; 에는 위에서 복사한 &lt;strong&gt;Public IPv4 address&lt;/strong&gt; 를 붙여넣고  &lt;strong&gt;alias&lt;/strong&gt; 꺼놓는다.  &lt;strong&gt;create hosted zone&lt;/strong&gt; 을 클릭한다.&lt;/p&gt;
+&lt;p&gt;다시 &lt;strong&gt;Create record&lt;/strong&gt; 를 클릭한다. &lt;strong&gt;Name&lt;/strong&gt; 에 www 를 입력한다. 나머지는 다른 설정과 모두 동일하게 진행한다.&lt;/p&gt;
+&lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://youtu.be/UkiLQYhDQ-k&#34;&gt;5분코딩 EC2 웹서버 도메인 연결, 15년차 파이썬 프리랜서 개발자 - Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://youtu.be/ob_ehpsQuSA&#34;&gt;AWS2 - Route 53 7. 도메인이름과 IP주소연결, 생활코딩 - Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+     </item>
    
      <item>
        <title>Node 입문 및 배포 (Docker 와 Aws)</title>

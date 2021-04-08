@@ -11,7 +11,7 @@
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="http://Scoobi-wisdoom.github.io/" />
-<meta property="og:updated_time" content="2021-04-06T23:36:09+09:00" />
+<meta property="og:updated_time" content="2021-04-08T22:35:45+09:00" />
 
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Wisdoom"/>
@@ -59,6 +59,38 @@
     
 
     <li class="first" >
+      <h1><a href="http://Scoobi-wisdoom.github.io/posts/aws-ec2-docker-%EC%97%90-domain-%EC%97%B0%EA%B2%B0/" title="AWS Ec2 Docker 에 Domain 연결">AWS Ec2 Docker 에 Domain 연결</a></h1>
+      <aside>
+    <ul>
+        <li>
+            <time class="post-date" datetime="2021-04-08T22:35:45&#43;09:00">Apr 8, 2021</time>
+        </li>
+        
+
+        
+
+        <li>2 minutes read</li>
+    </ul>
+</aside>
+
+      
+<div class="featured_image">
+    <a href="http://Scoobi-wisdoom.github.io/posts/aws-ec2-docker-%EC%97%90-domain-%EC%97%B0%EA%B2%B0/" title="AWS Ec2 Docker 에 Domain 연결">
+        <img src="">
+    </a>
+</div>
+
+
+      <p>사전 준비 사항 EC2 instance 생성 완료, domain 보유 완료.
+주의 사항 EC2 를 stop 했다가 run 하면 두 가지를 신경써야 한다. 첫째로 IPv4 address 와 IPv4 DNS 이 모두 변경된다. 그렇기 때문에 Putty 에 주소 입력을 새롭게 해줘야 한다. 둘째로, Docker 가 inactive 가 된다. 결국 Putty 에서 다시 Docker run 을 실행해야 한다. 링크의 6. AWS EC2 에서 Docker 사용 부터 살펴보자.
+AWS EC2 instance 에 domain 을 부여하자.</p>
+      
+      <a href="/posts/aws-ec2-docker-%EC%97%90-domain-%EC%97%B0%EA%B2%B0/">Read more…</a>
+      
+    </li>
+    
+
+    <li >
       <h1><a href="http://Scoobi-wisdoom.github.io/posts/node-%EC%9E%85%EB%AC%B8-%EB%B0%8F-%EB%B0%B0%ED%8F%AC-docker-%EC%99%80-aws/" title="Node 입문 및 배포 (Docker 와 Aws)">Node 입문 및 배포 (Docker 와 Aws)</a></h1>
       <aside>
     <ul>
@@ -339,43 +371,30 @@ public class Login { Frame frame; TextField txtid,txtpwd; Label label; Button bt
       
     </li>
     
-
-    <li >
-      <h1><a href="http://Scoobi-wisdoom.github.io/posts/hugo1/" title="Hugo로 블로그 만들기 1">Hugo로 블로그 만들기 1</a></h1>
-      <aside>
-    <ul>
-        <li>
-            <time class="post-date" datetime="2020-07-28T20:55:35&#43;09:00">Jul 28, 2020</time>
-        </li>
-        
-
-        
-
-        <li>One minute read</li>
-    </ul>
-</aside>
-
-      
-<div class="featured_image">
-    <a href="http://Scoobi-wisdoom.github.io/posts/hugo1/" title="Hugo로 블로그 만들기 1">
-        <img src="">
-    </a>
-</div>
-
-
-      <p>hugo로 웹사이트를 만들기 위해 씨름 중이다. 아직은 hugo 홈페이지의 QuickStart를 따라하는 중인데, 처음부터 오류가 걸려서 고생했다.
-문제는 아래의 단계에서 발생했다.
-echo &#39;theme = &#34;ananke&#34;&#39; &gt;&gt; config.toml Hugo 공식 홈페이지를 그대로 따라하는데도 아래와 같은 오류가 발생한다.
-config.toml:4:1&#34;: unmarshal failed: 해결방법은 간단하다. config.toml 파일을 열자. 열면 아래와 같이 나올 것이다.
-&#39;theme = &#34;kiera&#34;&#39; 이를 아래와 같이 수정하자.
-theme = &#34;kiera&#34; 그러면 오류가 발생하지 않을 것이다. 신나게 QuickStart의 다음 단계를 진행하면 된다.</p>
-      
-    </li>
-    
   </ul>
 </section>
 
 
+<ul class="pagination">
+  <li class="page-item">
+    <a href="/" class="page-link" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a>
+  </li>
+  <li class="page-item disabled">
+    <a  class="page-link" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+  </li>
+  <li class="page-item active">
+    <a class="page-link" href="/">1</a>
+  </li>
+  <li class="page-item">
+    <a class="page-link" href="/page/2/">2</a>
+  </li>
+  <li class="page-item">
+    <a href="/page/2/" class="page-link" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+  </li>
+  <li class="page-item">
+    <a href="/page/2/" class="page-link" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a>
+  </li>
+</ul>
 
 
 
