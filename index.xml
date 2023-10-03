@@ -13,7 +13,7 @@
       <pubDate>Tue, 26 Sep 2023 00:41:11 +0900</pubDate>
       
       <guid>https://Scoobi-wisdoom.github.io/posts/kotlin-coroutines/</guid>
-      <description>왜 coroutine 을 사용해야 할까? Kotlin coroutine 은 효율적으로 thread 를 사용하고, 프로그래머의 편하고, 퍼포먼스가 좋다.
+      <description>왜 coroutine 을 사용해야 할까? Kotlin coroutine 은 효율적으로 thread 를 사용하고, 프로그래머가 편하고, 퍼포먼스가 좋다.
 효율적으로 thread 를 사용한다 Thread 를 생성하는 데에는 큰 비용이 든다. 그런데 Coroutine 를 사용하기 위해 추가적인 thread 생성이 필요 없다.
 또한 coroutine 은 non-blocking 이다. 즉, coroutine 이 완료될 때까지 thread 가 멈춰있지 않고 다른 작업을 처리할 수 있다. 아래 예시를 보자.
 fun showOrderInfo(details: Details) = async { val orderId = orderProduct(details).await() val orderData = loadOrderData(orderId).</description>
