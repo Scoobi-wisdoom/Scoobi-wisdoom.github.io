@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>클래스의 프로퍼티를 Map으로 변환하기 | wisdoom</title>
+<meta name="keywords" content="">
+<meta name="description" content="코틀린 class 의 properties 개수가 많고, 이의 fields 가 반복되는 규칙의 이름을 가진 경우, objectMapper 를 통해 쉽게 값을 사용할 수 있다.
+어떤 경우에 이런 기능이 필요할까? 필자가 개발하다 보니, 인수인계 받은 코드의 item class 의 프로퍼티가 매우 많았다. item01 ~ item35 까지 있었다. 이렇게 되면 한 눈에 클래스를 파악하기도 힘들었다. 설상가상으로, item class 는 entity 였기 때문에 덩달아 service layer 의 코드도 길어졌다.
+이런 redundancy 를 줄이기 위해 ITEM01, ITEM02, &hellip; 대신에 listOfItems 라는 list 로 대체하는 작업을 했다.">
+<meta name="author" content="">
+<link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/%ED%81%B4%EB%9E%98%EC%8A%A4%EC%9D%98-%ED%94%84%EB%A1%9C%ED%8D%BC%ED%8B%B0%EB%A5%BC-map%EC%9C%BC%EB%A1%9C-%EB%B3%80%ED%99%98%ED%95%98%EA%B8%B0/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.5c25c975546c048d1a5600aadb48425ae1bc921a9a18fe67d6955c9535260811.css" integrity="sha256-XCXJdVRsBI0aVgCq20hCWuG8khqaGP5n1pVclTUmCBE=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.acb54fd32bbc1982428b8850317e45d076b95012730a5936667e6bc21777692a.js" integrity="sha256-rLVP0yu8GYJCi4hQMX5F0Ha5UBJzClk2Zn5rwhd3aSo="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Scoobi-wisdoom.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:title" content="클래스의 프로퍼티를 Map으로 변환하기" />
+<meta property="og:description" content="코틀린 class 의 properties 개수가 많고, 이의 fields 가 반복되는 규칙의 이름을 가진 경우, objectMapper 를 통해 쉽게 값을 사용할 수 있다.
+어떤 경우에 이런 기능이 필요할까? 필자가 개발하다 보니, 인수인계 받은 코드의 item class 의 프로퍼티가 매우 많았다. item01 ~ item35 까지 있었다. 이렇게 되면 한 눈에 클래스를 파악하기도 힘들었다. 설상가상으로, item class 는 entity 였기 때문에 덩달아 service layer 의 코드도 길어졌다.
+이런 redundancy 를 줄이기 위해 ITEM01, ITEM02, &hellip; 대신에 listOfItems 라는 list 로 대체하는 작업을 했다." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/%ED%81%B4%EB%9E%98%EC%8A%A4%EC%9D%98-%ED%94%84%EB%A1%9C%ED%8D%BC%ED%8B%B0%EB%A5%BC-map%EC%9C%BC%EB%A1%9C-%EB%B3%80%ED%99%98%ED%95%98%EA%B8%B0/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-09-13T23:27:26+09:00" />
+<meta property="article:modified_time" content="2021-09-13T23:27:26+09:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="클래스의 프로퍼티를 Map으로 변환하기"/>
+<meta name="twitter:description" content="코틀린 class 의 properties 개수가 많고, 이의 fields 가 반복되는 규칙의 이름을 가진 경우, objectMapper 를 통해 쉽게 값을 사용할 수 있다.
+어떤 경우에 이런 기능이 필요할까? 필자가 개발하다 보니, 인수인계 받은 코드의 item class 의 프로퍼티가 매우 많았다. item01 ~ item35 까지 있었다. 이렇게 되면 한 눈에 클래스를 파악하기도 힘들었다. 설상가상으로, item class 는 entity 였기 때문에 덩달아 service layer 의 코드도 길어졌다.
+이런 redundancy 를 줄이기 위해 ITEM01, ITEM02, &hellip; 대신에 listOfItems 라는 list 로 대체하는 작업을 했다."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Scoobi-wisdoom.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "클래스의 프로퍼티를 Map으로 변환하기",
+      "item": "https://Scoobi-wisdoom.github.io/posts/%ED%81%B4%EB%9E%98%EC%8A%A4%EC%9D%98-%ED%94%84%EB%A1%9C%ED%8D%BC%ED%8B%B0%EB%A5%BC-map%EC%9C%BC%EB%A1%9C-%EB%B3%80%ED%99%98%ED%95%98%EA%B8%B0/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "클래스의 프로퍼티를 Map으로 변환하기",
+  "name": "클래스의 프로퍼티를 Map으로 변환하기",
+  "description": "코틀린 class 의 properties 개수가 많고, 이의 fields 가 반복되는 규칙의 이름을 가진 경우, objectMapper 를 통해 쉽게 값을 사용할 수 있다.\n어떤 경우에 이런 기능이 필요할까? 필자가 개발하다 보니, 인수인계 받은 코드의 item class 의 프로퍼티가 매우 많았다. item01 ~ item35 까지 있었다. 이렇게 되면 한 눈에 클래스를 파악하기도 힘들었다. 설상가상으로, item class 는 entity 였기 때문에 덩달아 service layer 의 코드도 길어졌다.\n이런 redundancy 를 줄이기 위해 ITEM01, ITEM02, \u0026hellip; 대신에 listOfItems 라는 list 로 대체하는 작업을 했다.",
+  "keywords": [
+    
+  ],
+  "articleBody": "코틀린 class 의 properties 개수가 많고, 이의 fields 가 반복되는 규칙의 이름을 가진 경우, objectMapper 를 통해 쉽게 값을 사용할 수 있다.\n어떤 경우에 이런 기능이 필요할까? 필자가 개발하다 보니, 인수인계 받은 코드의 item class 의 프로퍼티가 매우 많았다. item01 ~ item35 까지 있었다. 이렇게 되면 한 눈에 클래스를 파악하기도 힘들었다. 설상가상으로, item class 는 entity 였기 때문에 덩달아 service layer 의 코드도 길어졌다.\n이런 redundancy 를 줄이기 위해 ITEM01, ITEM02, … 대신에 listOfItems 라는 list 로 대체하는 작업을 했다. 그때 유용하게 사용한 것이 ObjectMapper 의 convertValue 함수다.\n먼저 간단한 사용법을 알아보자. 아래와 같이 properties 가 redundant 한 class 는 objectMapper 를 사용해 Map 으로 변환할 수 있다.\nclass Item( val someProperty: String, val item01Name: String, val item01Value: Int, val ITEM02Name: String, val ITEM02Value: Int, val ITEM03Name: String, val ITEM03Value: Int ) fun main() { val objectMapper = ObjectMapper() val item = Item(\"some\", \"name01\", 1, \"name02\", 2, \"name03\", 3) val mappedPropertyInItem = objectMapper.convertValue(item, MutableMap::class.java) println(mappedPropertyInItem) } 출력 결과는 아래와 같다.\n{someProperty=some, item01Name=name01, item01Value=1, item02Value=2, item03Name=name03, item02Name=name02, item03Value=3} 클래스의 객체의 프로퍼티를 호출하고 싶을 때 objectMapper 를 사용해 간편하게 호출할 수 있다. 주의할 점은, 모든 key 가 lowercase 라는 것이다. 이는 출력 결과에서도 확인할 수 있다.\nfun main() { val objectMapper = ObjectMapper() val item = Item(\"some\", \"name01\", 1, \"name02\", 2, \"name03\", 3) val mappedPropertyInItem = objectMapper.convertValue(item, MutableMap::class.java) println(mappedPropertyInItem[\"ITEM02Name\"]) } 즉, 아래와 같이 null 을 출력한다.\nnull 이제 구체적인 응용법을 알아보자. 먼저 Item class 를 대체할 NewItem class 를 정의한다.\nclass NewItem( val someProperty: String, val listOfItems: List ) class ItemMap( val itemName: String, val itemValue: Int ) 이제 objectMapper 를 이용해 Item class object 를 NewItem class object 로 변환하자.\nfun main() { val objectMapper = ObjectMapper() val item = Item(\"some\", \"name01\", 1, \"name02\", 2, \"name03\", 3) val mappedPropertyInItem = objectMapper.convertValue(item, MutableMap::class.java) val listOfItemMaps = // item01 부터 item03 까지를 표현 (1..3) .map { number -\u003e number.toString().padStart(2, '0') } .map { numberWithPadding -\u003e val itemName = mappedPropertyInItem[\"item${numberWithPadding}Name\"].toString() val itemValue = mappedPropertyInItem[\"item${numberWithPadding}Value\"].toString().toInt() ItemMap(itemName, itemValue) } val newItem = NewItem(item.someProperty, listOfItemMaps) println(newItem) } NewItem(someProperty='some', listOfItems=[ItemMap(itemName='name01', itemValue=1), ItemMap(itemName='name02', itemValue=2), ItemMap(itemName='name03', itemValue=3)]) ",
+  "wordCount" : "337",
+  "inLanguage": "en",
+  "datePublished": "2021-09-13T23:27:26+09:00",
+  "dateModified": "2021-09-13T23:27:26+09:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Scoobi-wisdoom.github.io/posts/%ED%81%B4%EB%9E%98%EC%8A%A4%EC%9D%98-%ED%94%84%EB%A1%9C%ED%8D%BC%ED%8B%B0%EB%A5%BC-map%EC%9C%BC%EB%A1%9C-%EB%B3%80%ED%99%98%ED%95%98%EA%B8%B0/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "wisdoom",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Scoobi-wisdoom.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://Scoobi-wisdoom.github.io/" accesskey="h" title="wisdoom (Alt + H)">wisdoom</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title">
+      클래스의 프로퍼티를 Map으로 변환하기
+    </h1>
+    <div class="post-meta"><span title='2021-09-13 23:27:26 +0900 KST'>September 13, 2021</span>
+
+</div>
+  </header> 
+  <div class="post-content"><p>코틀린 class 의 properties 개수가 많고, 이의 fields 가 반복되는 규칙의 이름을 가진 경우, objectMapper 를 통해 쉽게 값을 사용할 수 있다.</p>
+<p>어떤 경우에 이런 기능이 필요할까? 필자가 개발하다 보니, 인수인계 받은 코드의 item class 의 프로퍼티가 매우 많았다. item01 ~ item35 까지 있었다. 이렇게 되면 한 눈에 클래스를 파악하기도 힘들었다. 설상가상으로, item class 는 entity 였기 때문에 덩달아 service layer 의 코드도 길어졌다.</p>
+<p>이런 redundancy 를 줄이기 위해 ITEM01, ITEM02, &hellip; 대신에 listOfItems 라는 list 로 대체하는 작업을 했다. 그때 유용하게 사용한 것이 ObjectMapper 의 convertValue 함수다.</p>
+<p>먼저 간단한 사용법을 알아보자. 아래와 같이 properties 가 redundant 한 class 는 objectMapper 를 사용해 Map 으로 변환할 수 있다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Item</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> someProperty: String,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> item01Name: String,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> item01Value: Int,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> ITEM02Name: String,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> ITEM02Value: Int,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> ITEM03Name: String,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> ITEM03Value: Int
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> objectMapper = ObjectMapper()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> item = Item(<span style="color:#e6db74">&#34;some&#34;</span>, <span style="color:#e6db74">&#34;name01&#34;</span>, <span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#34;name02&#34;</span>, <span style="color:#ae81ff">2</span>, <span style="color:#e6db74">&#34;name03&#34;</span>, <span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> mappedPropertyInItem = objectMapper.convertValue(item, MutableMap<span style="color:#f92672">::</span><span style="color:#66d9ef">class</span>.java)
+</span></span><span style="display:flex;"><span>    println(mappedPropertyInItem)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>출력 결과는 아래와 같다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>{someProperty=some, item01Name=name01, item01Value=1, item02Value=2, item03Name=name03, item02Name=name02, item03Value=3}
+</span></span></code></pre></div><p>클래스의 객체의 프로퍼티를 호출하고 싶을 때 objectMapper 를 사용해 간편하게 호출할 수 있다.  주의할 점은, 모든 key 가 lowercase 라는 것이다. 이는 출력 결과에서도 확인할 수 있다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> objectMapper = ObjectMapper()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> item = Item(<span style="color:#e6db74">&#34;some&#34;</span>, <span style="color:#e6db74">&#34;name01&#34;</span>, <span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#34;name02&#34;</span>, <span style="color:#ae81ff">2</span>, <span style="color:#e6db74">&#34;name03&#34;</span>, <span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> mappedPropertyInItem = objectMapper.convertValue(item, MutableMap<span style="color:#f92672">::</span><span style="color:#66d9ef">class</span>.java)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    println(mappedPropertyInItem[<span style="color:#e6db74">&#34;ITEM02Name&#34;</span>])
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>즉, 아래와 같이 null 을 출력한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>null
+</span></span></code></pre></div><p>이제 구체적인 응용법을 알아보자. 먼저 Item class 를 대체할 NewItem class 를 정의한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">NewItem</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> someProperty: String,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> listOfItems: List&lt;ItemMap&gt;
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ItemMap</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> itemName: String,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> itemValue: Int
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><p>이제 objectMapper 를 이용해 Item class object 를 NewItem class object 로 변환하자.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">val</span> objectMapper = ObjectMapper()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> item = Item(<span style="color:#e6db74">&#34;some&#34;</span>, <span style="color:#e6db74">&#34;name01&#34;</span>, <span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#34;name02&#34;</span>, <span style="color:#ae81ff">2</span>, <span style="color:#e6db74">&#34;name03&#34;</span>, <span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> mappedPropertyInItem = objectMapper.convertValue(item, MutableMap<span style="color:#f92672">::</span><span style="color:#66d9ef">class</span>.java)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> listOfItemMaps =
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    	<span style="color:#75715e">// item01 부터 item03 까지를 표현
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        (<span style="color:#ae81ff">1.</span>.<span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>            .map { number <span style="color:#f92672">-&gt;</span>
+</span></span><span style="display:flex;"><span>                number.toString().padStart(<span style="color:#ae81ff">2</span>, <span style="color:#e6db74">&#39;0&#39;</span>)
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            .map { numberWithPadding <span style="color:#f92672">-&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">val</span> itemName = mappedPropertyInItem[<span style="color:#e6db74">&#34;item</span><span style="color:#e6db74">${numberWithPadding}</span><span style="color:#e6db74">Name&#34;</span>].toString()
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">val</span> itemValue = mappedPropertyInItem[<span style="color:#e6db74">&#34;item</span><span style="color:#e6db74">${numberWithPadding}</span><span style="color:#e6db74">Value&#34;</span>].toString().toInt()
+</span></span><span style="display:flex;"><span>                ItemMap(itemName, itemValue)
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> newItem = NewItem(item.someProperty, listOfItemMaps)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    println(newItem)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>NewItem(someProperty=&#39;some&#39;, listOfItems=[ItemMap(itemName=&#39;name01&#39;, itemValue=1), ItemMap(itemName=&#39;name02&#39;, itemValue=2), ItemMap(itemName=&#39;name03&#39;, itemValue=3)])
+</span></span></code></pre></div>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2023 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

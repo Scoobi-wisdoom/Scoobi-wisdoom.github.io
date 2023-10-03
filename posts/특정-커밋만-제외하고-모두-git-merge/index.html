@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>특정 커밋만 제외하고 모두 git merge | wisdoom</title>
+<meta name="keywords" content="">
+<meta name="description" content="Develop 브랜치의 여러 개의 커밋 중 특정 커밋만 제외하고 나머지를 모두 master 브랜치에 merge하는 방법이 없을까?
+상황 먼저 이런 상황은 어떤 때 발생할까? 실제로 겪은 상황으로, 세부 사항은 아래와 같다.
+Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 테스트가 완료되지 않았다. 나머지 커밋은 당장 master에 merge 후 deploy해야 한다. 언제든 테스트가 완료되면, 두 번째 및 세 번째 커밋도 master에 merge해야 한다. 해결 방법: cherry pick Develop 브랜치의 commit log는 아래와 같다.">
+<meta name="author" content="">
+<link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/%ED%8A%B9%EC%A0%95-%EC%BB%A4%EB%B0%8B%EB%A7%8C-%EC%A0%9C%EC%99%B8%ED%95%98%EA%B3%A0-%EB%AA%A8%EB%91%90-git-merge/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.5c25c975546c048d1a5600aadb48425ae1bc921a9a18fe67d6955c9535260811.css" integrity="sha256-XCXJdVRsBI0aVgCq20hCWuG8khqaGP5n1pVclTUmCBE=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.acb54fd32bbc1982428b8850317e45d076b95012730a5936667e6bc21777692a.js" integrity="sha256-rLVP0yu8GYJCi4hQMX5F0Ha5UBJzClk2Zn5rwhd3aSo="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Scoobi-wisdoom.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:title" content="특정 커밋만 제외하고 모두 git merge" />
+<meta property="og:description" content="Develop 브랜치의 여러 개의 커밋 중 특정 커밋만 제외하고 나머지를 모두 master 브랜치에 merge하는 방법이 없을까?
+상황 먼저 이런 상황은 어떤 때 발생할까? 실제로 겪은 상황으로, 세부 사항은 아래와 같다.
+Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 테스트가 완료되지 않았다. 나머지 커밋은 당장 master에 merge 후 deploy해야 한다. 언제든 테스트가 완료되면, 두 번째 및 세 번째 커밋도 master에 merge해야 한다. 해결 방법: cherry pick Develop 브랜치의 commit log는 아래와 같다." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/%ED%8A%B9%EC%A0%95-%EC%BB%A4%EB%B0%8B%EB%A7%8C-%EC%A0%9C%EC%99%B8%ED%95%98%EA%B3%A0-%EB%AA%A8%EB%91%90-git-merge/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-12-04T22:59:12+09:00" />
+<meta property="article:modified_time" content="2022-12-04T22:59:12+09:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="특정 커밋만 제외하고 모두 git merge"/>
+<meta name="twitter:description" content="Develop 브랜치의 여러 개의 커밋 중 특정 커밋만 제외하고 나머지를 모두 master 브랜치에 merge하는 방법이 없을까?
+상황 먼저 이런 상황은 어떤 때 발생할까? 실제로 겪은 상황으로, 세부 사항은 아래와 같다.
+Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 테스트가 완료되지 않았다. 나머지 커밋은 당장 master에 merge 후 deploy해야 한다. 언제든 테스트가 완료되면, 두 번째 및 세 번째 커밋도 master에 merge해야 한다. 해결 방법: cherry pick Develop 브랜치의 commit log는 아래와 같다."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Scoobi-wisdoom.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "특정 커밋만 제외하고 모두 git merge",
+      "item": "https://Scoobi-wisdoom.github.io/posts/%ED%8A%B9%EC%A0%95-%EC%BB%A4%EB%B0%8B%EB%A7%8C-%EC%A0%9C%EC%99%B8%ED%95%98%EA%B3%A0-%EB%AA%A8%EB%91%90-git-merge/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "특정 커밋만 제외하고 모두 git merge",
+  "name": "특정 커밋만 제외하고 모두 git merge",
+  "description": "Develop 브랜치의 여러 개의 커밋 중 특정 커밋만 제외하고 나머지를 모두 master 브랜치에 merge하는 방법이 없을까?\n상황 먼저 이런 상황은 어떤 때 발생할까? 실제로 겪은 상황으로, 세부 사항은 아래와 같다.\nDevelop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 테스트가 완료되지 않았다. 나머지 커밋은 당장 master에 merge 후 deploy해야 한다. 언제든 테스트가 완료되면, 두 번째 및 세 번째 커밋도 master에 merge해야 한다. 해결 방법: cherry pick Develop 브랜치의 commit log는 아래와 같다.",
+  "keywords": [
+    
+  ],
+  "articleBody": "Develop 브랜치의 여러 개의 커밋 중 특정 커밋만 제외하고 나머지를 모두 master 브랜치에 merge하는 방법이 없을까?\n상황 먼저 이런 상황은 어떤 때 발생할까? 실제로 겪은 상황으로, 세부 사항은 아래와 같다.\nDevelop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 테스트가 완료되지 않았다. 나머지 커밋은 당장 master에 merge 후 deploy해야 한다. 언제든 테스트가 완료되면, 두 번째 및 세 번째 커밋도 master에 merge해야 한다. 해결 방법: cherry pick Develop 브랜치의 commit log는 아래와 같다.\ngit log --oneline b9eea54 (HEAD -\u003e develop) develop commit 5 589edb0 develop commit 4 7fb956e develop commit 3 cee7c6c develop commit 2 f14f086 develop commit 1 254035f (master) master commit 이제 여기서 commit 2, commit 3만 제외하고 master에 merge하려면 어떻게 해야 할까? 결론부터 말하자면 commit 2와 commit 3만 제외하고 모두 cherry pick하면 된다.\ngit checkout master git checkout -b release echo \"제외할 커밋 전까지의 커밋을 모두 cherry pick 한다. 여기서는 commit 1 한 개만 있다.\" git cherry-pick f14f086 echo \"제외할 커밋 후의 커밋을 모두 cherry pick 한다. 참고로 ^ 기호는 inclusive를 의미한다.\" git cherry-pick 589edb0^..b9eea54 참고로 cherry pick 대상이 여러 커밋이면 순서에 주의해야 한다. cherry pick 의 원리는 먼저 적힌 커밋부터 커밋하는 것이기 때문에, 두 개 이상의 커밋을 cherry pick 하려면 선행하는 것부터 먼저 입력해야 한다.\n위 명령어를 실행한 후에 커밋 내용을 살펴보자.\ngit log --oneline e6517ac (HEAD -\u003e release) develop commit 5 ba8b1cf develop commit 4 ce727f9 develop commit 1 254035f (master) master commit 의도한대로 commit 2, commit 3을 제외하고 모두 포함됐다. 이제 이 release 브랜치를 master 브랜치에 merge하자. 아래와 같이 말이다.\ngit checkout master git merge release 다른 방법 다른 방법은 없을까? 있긴 한데, 상황에 적절하지 않다.\nRevert (비추천) 첫 뻔째 다른 방법은, merge한 후에 제외하고 싶은 커밋을 revert하는 것이다.\ngit checkout master git checkout -b release git merge develop echo \"revert는 최신 커밋부터 오래된 커밋 순으로 실행한다.\" git revert 7fb956e git revert cee7c6c 아래 git log 명령어를 통해 commit 내역을 살펴보자.\ngit log --oneline 8a96d59 (HEAD -\u003e release) Revert \"develop commit 2\" ea6cde1 Revert \"develop commit 3\" b9eea54 (develop) develop commit 5 589edb0 develop commit 4 7fb956e develop commit 3 cee7c6c develop commit 2 f14f086 develop commit 1 254035f (master) master commit 이 방법에는 문제점이 있다. 나중에 develop 브랜치를 master 브랜치에 merge할 때, 8a96d59 (HEAD -\u003e release) Revert \"develop commit 2\"와 ea6cde1 Revert \"develop commit 3\" 두 커밋을 다시 revert 해야 한다. 이 두 커밋을 revert하지 않으면, commit 2, commit 3은 영영 master에 반영되지 않는다. Develop branch를 통째로 master에 merge해도 말이다. 결국 개발자가 이 내용을 기억하고 있다가 revert를 실행해야 한다. 아래와 같이 말이다.\ngit checkout master git checkout -b release git merge develop echo \"commit 3과 commit 2를 revert한 커밋을 revert한다.\" git revert 8a96d59 git revert ea6cde1 매우 번거롭다. 최악의 경우에는 까먹을 수도 있다.\nmerge strategy ours (이 글의 문제를 해결하지 못 한다) Merge는 과거의 커밋까지 모두 가져온다. 그렇기 때문에 특정 커밋만 제외하는 것은 불가능하다. 하지만 merge를 하되, 변경 사항을 반영하지 않는 방법이 있다. git merge -s ours가 그것이다. -s ours는 ours 전략을 뜻하는데, 현재 git head가 위치한 브랜치가 ours로서, 해당 커밋에 대해서는 git head가 위치한 브랜치의 변경 사항을 유지하겠다는 뜻이다. 이게 무슨 이상한 설명일까? 알아보자.\n아래는 master, develop 브랜치별 파일 목록이다.\ngit checkout master ls master commit git checkout develop ls develop commit 1\tdevelop commit 3\tdevelop commit 5 develop commit 2\tdevelop commit 4\tmaster commit 참고로 커밋 하나당 하나의 파일을 만들었다. 아래와 같이 말이다.\ngit log develop --oneline echo \"실험을 위해 커밋 메시지와 동일한 파일을 커밋마다 생성했다.\" b9eea54 (HEAD -\u003e develop) develop commit 5 589edb0 develop commit 4 7fb956e develop commit 3 cee7c6c develop commit 2 f14f086 develop commit 1 254035f (master) master commit 이제 문제의 git merge -s ours를 실행해보자.\ngit checkout master git checkout -b release git merge f14f086 echo \"merge 대상에 대해서 ours strategy 적용. 제외하고 싶은 commit 2, commit 3에 대해 적용.\" git merge -s ours 7fb956e git merge develop 이제 merge가 완료됐다. 커밋 내역을 확인해보자.\ngit log release --oneline 6dc6150 (HEAD -\u003e release) Merge branch 'develop' into release baab338 Merge commit '7fb956e' into release b9eea54 (develop) develop commit 5 589edb0 develop commit 4 7fb956e develop commit 3 cee7c6c develop commit 2 f14f086 develop commit 1 254035f (master) master commit develop과 동일한 commit 내역을 갖고 있다. 하지만 실제 release 브랜치가 가진 파일은 develop과 다르다.\ngit checkout release ls develop commit 1\tdevelop commit 5 develop commit 4\tmaster commit git checkout develop ls develop commit 1\tdevelop commit 3\tdevelop commit 5 develop commit 2\tdevelop commit 4\tmaster commit 이제 위의 이상한 설명이 이해가 가는가? 사실 이 방법은 어디에 쓸지 잘 모르겠다. 일단 검색하다가 찾아서 정리해둔다.\nReferences How to cherry-pick multiple commits - stackoverflow git - skipping specific commits when merging - stackoverflow ",
+  "wordCount" : "760",
+  "inLanguage": "en",
+  "datePublished": "2022-12-04T22:59:12+09:00",
+  "dateModified": "2022-12-04T22:59:12+09:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Scoobi-wisdoom.github.io/posts/%ED%8A%B9%EC%A0%95-%EC%BB%A4%EB%B0%8B%EB%A7%8C-%EC%A0%9C%EC%99%B8%ED%95%98%EA%B3%A0-%EB%AA%A8%EB%91%90-git-merge/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "wisdoom",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Scoobi-wisdoom.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://Scoobi-wisdoom.github.io/" accesskey="h" title="wisdoom (Alt + H)">wisdoom</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title">
+      특정 커밋만 제외하고 모두 git merge
+    </h1>
+    <div class="post-meta"><span title='2022-12-04 22:59:12 +0900 KST'>December 4, 2022</span>
+
+</div>
+  </header> 
+  <div class="post-content"><p>Develop 브랜치의 여러 개의 커밋 중 특정 커밋만 제외하고 나머지를 모두 master 브랜치에 merge하는 방법이 없을까?</p>
+<h2 id="상황">상황<a hidden class="anchor" aria-hidden="true" href="#상황">#</a></h2>
+<p>먼저 이런 상황은 어떤 때 발생할까? 실제로 겪은 상황으로, 세부 사항은 아래와 같다.</p>
+<blockquote>
+<ul>
+<li>Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 테스트가 완료되지 않았다.</li>
+<li>나머지 커밋은 당장 master에 merge 후 deploy해야 한다.</li>
+<li>언제든 테스트가 완료되면, 두 번째 및 세 번째 커밋도 master에 merge해야 한다.</li>
+</ul>
+</blockquote>
+<h2 id="해결-방법-cherry-pick">해결 방법: cherry pick<a hidden class="anchor" aria-hidden="true" href="#해결-방법-cherry-pick">#</a></h2>
+<p>Develop 브랜치의 commit log는 아래와 같다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>git log --oneline
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>b9eea54 (HEAD -&gt; develop) develop commit 5
+</span></span><span style="display:flex;"><span>589edb0 develop commit 4
+</span></span><span style="display:flex;"><span>7fb956e develop commit 3
+</span></span><span style="display:flex;"><span>cee7c6c develop commit 2
+</span></span><span style="display:flex;"><span>f14f086 develop commit 1
+</span></span><span style="display:flex;"><span>254035f (master) master commit
+</span></span></code></pre></div><p>이제 여기서 commit 2, commit 3만 제외하고 master에 merge하려면 어떻게 해야 할까? 결론부터 말하자면 commit 2와 commit 3만 제외하고 모두 cherry pick하면 된다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>git checkout master
+</span></span><span style="display:flex;"><span>git checkout -b release
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>echo &#34;제외할 커밋 전까지의 커밋을 모두 cherry pick 한다. 여기서는 commit 1 한 개만 있다.&#34;
+</span></span><span style="display:flex;"><span>git cherry-pick f14f086
+</span></span><span style="display:flex;"><span>echo &#34;제외할 커밋 후의 커밋을 모두 cherry pick 한다. 참고로 ^ 기호는 inclusive를 의미한다.&#34;
+</span></span><span style="display:flex;"><span>git cherry-pick 589edb0^..b9eea54
+</span></span></code></pre></div><p>참고로 cherry pick 대상이 여러 커밋이면 순서에 주의해야 한다. cherry pick 의 원리는 먼저 적힌 커밋부터 커밋하는 것이기 때문에, 두 개 이상의 커밋을 cherry pick 하려면 선행하는 것부터 먼저 입력해야 한다.</p>
+<p>위 명령어를 실행한 후에 커밋 내용을 살펴보자.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>git log --oneline
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>e6517ac (HEAD -&gt; release) develop commit 5
+</span></span><span style="display:flex;"><span>ba8b1cf develop commit 4
+</span></span><span style="display:flex;"><span>ce727f9 develop commit 1
+</span></span><span style="display:flex;"><span>254035f (master) master commit
+</span></span></code></pre></div><p>의도한대로 commit 2, commit 3을 제외하고 모두 포함됐다. 이제 이 release 브랜치를 master 브랜치에 merge하자. 아래와 같이 말이다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>git checkout master
+</span></span><span style="display:flex;"><span>git merge release
+</span></span></code></pre></div><h2 id="다른-방법">다른 방법<a hidden class="anchor" aria-hidden="true" href="#다른-방법">#</a></h2>
+<p>다른 방법은 없을까? 있긴 한데, 상황에 적절하지 않다.</p>
+<h3 id="revert-비추천">Revert (비추천)<a hidden class="anchor" aria-hidden="true" href="#revert-비추천">#</a></h3>
+<p>첫 뻔째 다른 방법은, merge한 후에 제외하고 싶은 커밋을 revert하는 것이다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>git checkout master
+</span></span><span style="display:flex;"><span>git checkout -b release
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>git merge develop
+</span></span><span style="display:flex;"><span>echo &#34;revert는 최신 커밋부터 오래된 커밋 순으로 실행한다.&#34;
+</span></span><span style="display:flex;"><span>git revert 7fb956e
+</span></span><span style="display:flex;"><span>git revert cee7c6c
+</span></span></code></pre></div><p>아래 <code>git log</code> 명령어를 통해 commit 내역을 살펴보자.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>git log --oneline
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>8a96d59 (HEAD -&gt; release) Revert &#34;develop commit 2&#34;
+</span></span><span style="display:flex;"><span>ea6cde1 Revert &#34;develop commit 3&#34;
+</span></span><span style="display:flex;"><span>b9eea54 (develop) develop commit 5
+</span></span><span style="display:flex;"><span>589edb0 develop commit 4
+</span></span><span style="display:flex;"><span>7fb956e develop commit 3
+</span></span><span style="display:flex;"><span>cee7c6c develop commit 2
+</span></span><span style="display:flex;"><span>f14f086 develop commit 1
+</span></span><span style="display:flex;"><span>254035f (master) master commit
+</span></span></code></pre></div><p>이 방법에는 문제점이 있다. 나중에 develop 브랜치를 master 브랜치에 merge할 때, <code>8a96d59 (HEAD -&gt; release) Revert &quot;develop commit 2&quot;</code>와 <code>ea6cde1 Revert &quot;develop commit 3&quot;</code> 두 커밋을 다시 revert 해야 한다. 이 두 커밋을 revert하지 않으면, commit 2, commit 3은 영영 master에 반영되지 않는다. Develop branch를 통째로 master에 merge해도 말이다. 결국 개발자가 이 내용을 기억하고 있다가 revert를 실행해야 한다. 아래와 같이 말이다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>git checkout master
+</span></span><span style="display:flex;"><span>git checkout -b release
+</span></span><span style="display:flex;"><span>git merge develop
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>echo &#34;commit 3과 commit 2를 revert한 커밋을 revert한다.&#34;
+</span></span><span style="display:flex;"><span>git revert 8a96d59
+</span></span><span style="display:flex;"><span>git revert ea6cde1
+</span></span></code></pre></div><p>매우 번거롭다. 최악의 경우에는 까먹을 수도 있다.</p>
+<h3 id="merge-strategy-ours-이-글의-문제를-해결하지-못-한다">merge strategy ours (이 글의 문제를 해결하지 못 한다)<a hidden class="anchor" aria-hidden="true" href="#merge-strategy-ours-이-글의-문제를-해결하지-못-한다">#</a></h3>
+<p>Merge는 과거의 커밋까지 모두 가져온다. 그렇기 때문에 특정 커밋만 제외하는 것은 불가능하다. 하지만 merge를 하되, 변경 사항을 반영하지 않는 방법이 있다. <code>git merge -s ours</code>가 그것이다. <code>-s ours</code>는 ours 전략을 뜻하는데, 현재 git head가 위치한 브랜치가 ours로서, 해당 커밋에 대해서는 git head가 위치한 브랜치의 변경 사항을 유지하겠다는 뜻이다. 이게 무슨 이상한 설명일까? 알아보자.</p>
+<p>아래는 master, develop 브랜치별 파일 목록이다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>git checkout master
+</span></span><span style="display:flex;"><span>ls
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>master commit
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>git checkout develop
+</span></span><span style="display:flex;"><span>ls
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>develop commit 1	develop commit 3	develop commit 5
+</span></span><span style="display:flex;"><span>develop commit 2	develop commit 4	master commit
+</span></span></code></pre></div><p>참고로 커밋 하나당 하나의 파일을 만들었다. 아래와 같이 말이다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>git log develop --oneline
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>echo &#34;실험을 위해 커밋 메시지와 동일한 파일을 커밋마다 생성했다.&#34;
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>b9eea54 (HEAD -&gt; develop) develop commit 5
+</span></span><span style="display:flex;"><span>589edb0 develop commit 4
+</span></span><span style="display:flex;"><span>7fb956e develop commit 3
+</span></span><span style="display:flex;"><span>cee7c6c develop commit 2
+</span></span><span style="display:flex;"><span>f14f086 develop commit 1
+</span></span><span style="display:flex;"><span>254035f (master) master commit
+</span></span></code></pre></div><p>이제 문제의 <code>git merge -s ours</code>를 실행해보자.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>git checkout master
+</span></span><span style="display:flex;"><span>git checkout -b release
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>git merge f14f086
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>echo &#34;merge 대상에 대해서 ours strategy 적용. 제외하고 싶은 commit 2, commit 3에 대해 적용.&#34;
+</span></span><span style="display:flex;"><span>git merge -s ours 7fb956e
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>git merge develop
+</span></span></code></pre></div><p>이제 merge가 완료됐다. 커밋 내역을 확인해보자.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>git log release --oneline
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>6dc6150 (HEAD -&gt; release) Merge branch &#39;develop&#39; into release
+</span></span><span style="display:flex;"><span>baab338 Merge commit &#39;7fb956e&#39; into release
+</span></span><span style="display:flex;"><span>b9eea54 (develop) develop commit 5
+</span></span><span style="display:flex;"><span>589edb0 develop commit 4
+</span></span><span style="display:flex;"><span>7fb956e develop commit 3
+</span></span><span style="display:flex;"><span>cee7c6c develop commit 2
+</span></span><span style="display:flex;"><span>f14f086 develop commit 1
+</span></span><span style="display:flex;"><span>254035f (master) master commit
+</span></span></code></pre></div><p>develop과 동일한 commit 내역을 갖고 있다. 하지만 실제 release 브랜치가 가진 파일은 develop과 다르다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>git checkout release
+</span></span><span style="display:flex;"><span>ls
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>develop commit 1	develop commit 5
+</span></span><span style="display:flex;"><span>develop commit 4	master commit
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>git checkout develop
+</span></span><span style="display:flex;"><span>ls
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>develop commit 1	develop commit 3	develop commit 5
+</span></span><span style="display:flex;"><span>develop commit 2	develop commit 4	master commit
+</span></span></code></pre></div><p>이제 위의 이상한 설명이 이해가 가는가? 사실 이 방법은 어디에 쓸지 잘 모르겠다. 일단 검색하다가 찾아서 정리해둔다.</p>
+<h2 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">#</a></h2>
+<ul>
+<li><a href="https://stackoverflow.com/a/3933416">How to cherry-pick multiple commits - stackoverflow</a></li>
+<li><a href="https://stackoverflow.com/a/729723">git - skipping specific commits when merging - stackoverflow</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2023 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

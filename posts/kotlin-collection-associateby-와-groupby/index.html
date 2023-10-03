@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Kotlin Collection | wisdoom</title>
+<meta name="keywords" content="">
+<meta name="description" content="Kotlin Collection - associateBy 와 groupBy 1. Kotlin Docs associateBy 와 groupBy 의 코드를 비교해보자.
+public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&gt; K): Map&lt;K, T&gt; { val capacity = mapCapacity(collectionSizeOrDefault(10)).coerceAtLeast(16) return associateByTo(LinkedHashMap&lt;K, T&gt;(capacity), keySelector) } public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.groupBy(keySelector: (T) -&gt; K): Map&lt;K, List&lt;T&gt;&gt; { return groupByTo(LinkedHashMap&lt;K, MutableList&lt;T&gt;&gt;(), keySelector) } 두 함수의 공통점은, Map 을 반환한다는 것이다. 차이점은, associateBy 는 T 를 value 로 반환하는 반면, groupBy 는 List 를 value 로 반환한다는 것이다.">
+<meta name="author" content="">
+<link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/kotlin-collection-associateby-%EC%99%80-groupby/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.5c25c975546c048d1a5600aadb48425ae1bc921a9a18fe67d6955c9535260811.css" integrity="sha256-XCXJdVRsBI0aVgCq20hCWuG8khqaGP5n1pVclTUmCBE=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.acb54fd32bbc1982428b8850317e45d076b95012730a5936667e6bc21777692a.js" integrity="sha256-rLVP0yu8GYJCi4hQMX5F0Ha5UBJzClk2Zn5rwhd3aSo="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Scoobi-wisdoom.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:title" content="Kotlin Collection" />
+<meta property="og:description" content="Kotlin Collection - associateBy 와 groupBy 1. Kotlin Docs associateBy 와 groupBy 의 코드를 비교해보자.
+public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&gt; K): Map&lt;K, T&gt; { val capacity = mapCapacity(collectionSizeOrDefault(10)).coerceAtLeast(16) return associateByTo(LinkedHashMap&lt;K, T&gt;(capacity), keySelector) } public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.groupBy(keySelector: (T) -&gt; K): Map&lt;K, List&lt;T&gt;&gt; { return groupByTo(LinkedHashMap&lt;K, MutableList&lt;T&gt;&gt;(), keySelector) } 두 함수의 공통점은, Map 을 반환한다는 것이다. 차이점은, associateBy 는 T 를 value 로 반환하는 반면, groupBy 는 List 를 value 로 반환한다는 것이다." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/kotlin-collection-associateby-%EC%99%80-groupby/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-08-15T19:11:54+09:00" />
+<meta property="article:modified_time" content="2021-08-15T19:11:54+09:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Kotlin Collection"/>
+<meta name="twitter:description" content="Kotlin Collection - associateBy 와 groupBy 1. Kotlin Docs associateBy 와 groupBy 의 코드를 비교해보자.
+public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&gt; K): Map&lt;K, T&gt; { val capacity = mapCapacity(collectionSizeOrDefault(10)).coerceAtLeast(16) return associateByTo(LinkedHashMap&lt;K, T&gt;(capacity), keySelector) } public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.groupBy(keySelector: (T) -&gt; K): Map&lt;K, List&lt;T&gt;&gt; { return groupByTo(LinkedHashMap&lt;K, MutableList&lt;T&gt;&gt;(), keySelector) } 두 함수의 공통점은, Map 을 반환한다는 것이다. 차이점은, associateBy 는 T 를 value 로 반환하는 반면, groupBy 는 List 를 value 로 반환한다는 것이다."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Scoobi-wisdoom.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Kotlin Collection",
+      "item": "https://Scoobi-wisdoom.github.io/posts/kotlin-collection-associateby-%EC%99%80-groupby/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Kotlin Collection",
+  "name": "Kotlin Collection",
+  "description": "Kotlin Collection - associateBy 와 groupBy 1. Kotlin Docs associateBy 와 groupBy 의 코드를 비교해보자.\npublic inline fun \u0026lt;T, K\u0026gt; Iterable\u0026lt;T\u0026gt;.associateBy(keySelector: (T) -\u0026gt; K): Map\u0026lt;K, T\u0026gt; { val capacity = mapCapacity(collectionSizeOrDefault(10)).coerceAtLeast(16) return associateByTo(LinkedHashMap\u0026lt;K, T\u0026gt;(capacity), keySelector) } public inline fun \u0026lt;T, K\u0026gt; Iterable\u0026lt;T\u0026gt;.groupBy(keySelector: (T) -\u0026gt; K): Map\u0026lt;K, List\u0026lt;T\u0026gt;\u0026gt; { return groupByTo(LinkedHashMap\u0026lt;K, MutableList\u0026lt;T\u0026gt;\u0026gt;(), keySelector) } 두 함수의 공통점은, Map 을 반환한다는 것이다. 차이점은, associateBy 는 T 를 value 로 반환하는 반면, groupBy 는 List 를 value 로 반환한다는 것이다.",
+  "keywords": [
+    
+  ],
+  "articleBody": "Kotlin Collection - associateBy 와 groupBy 1. Kotlin Docs associateBy 와 groupBy 의 코드를 비교해보자.\npublic inline fun \u003cT, K\u003e Iterable.associateBy(keySelector: (T) -\u003e K): Map { val capacity = mapCapacity(collectionSizeOrDefault(10)).coerceAtLeast(16) return associateByTo(LinkedHashMap(capacity), keySelector) } public inline fun \u003cT, K\u003e Iterable.groupBy(keySelector: (T) -\u003e K): Map",
+  "wordCount" : "553",
+  "inLanguage": "en",
+  "datePublished": "2021-08-15T19:11:54+09:00",
+  "dateModified": "2021-08-15T19:11:54+09:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Scoobi-wisdoom.github.io/posts/kotlin-collection-associateby-%EC%99%80-groupby/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "wisdoom",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Scoobi-wisdoom.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://Scoobi-wisdoom.github.io/" accesskey="h" title="wisdoom (Alt + H)">wisdoom</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title">
+      Kotlin Collection
+    </h1>
+    <div class="post-meta"><span title='2021-08-15 19:11:54 +0900 KST'>August 15, 2021</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="kotlin-collection---associateby-와-groupby">Kotlin Collection - associateBy 와 groupBy<a hidden class="anchor" aria-hidden="true" href="#kotlin-collection---associateby-와-groupby">#</a></h1>
+<h2 id="1-kotlin-docs">1. Kotlin Docs<a hidden class="anchor" aria-hidden="true" href="#1-kotlin-docs">#</a></h2>
+<p>associateBy 와 groupBy 의 코드를 비교해보자.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">inline</span> <span style="color:#66d9ef">fun</span> &lt;<span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">K</span>&gt; <span style="color:#a6e22e">Iterable</span>&lt;T&gt;.associateBy(keySelector: (T) <span style="color:#f92672">-&gt;</span> K): Map&lt;K, T&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> capacity = mapCapacity(collectionSizeOrDefault(<span style="color:#ae81ff">10</span>)).coerceAtLeast(<span style="color:#ae81ff">16</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> associateByTo(LinkedHashMap&lt;K, T&gt;(capacity), keySelector)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">inline</span> <span style="color:#66d9ef">fun</span> &lt;<span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">K</span>&gt; <span style="color:#a6e22e">Iterable</span>&lt;T&gt;.groupBy(keySelector: (T) <span style="color:#f92672">-&gt;</span> K): Map&lt;K, List&lt;T&gt;&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> groupByTo(LinkedHashMap&lt;K, MutableList&lt;T&gt;&gt;(), keySelector)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>두 함수의 공통점은, Map 을 반환한다는 것이다. 차이점은, associateBy 는 T 를 value 로 반환하는 반면, groupBy 는 List<!-- raw HTML omitted --> 를 value 로 반환한다는 것이다. 즉, associateBy 는 Iterable<!-- raw HTML omitted --> 에서 T 가 unique 하다고 가정하는 반면, groupBy 는 duplicates 가 있다고 가정하고 있다. 아래 예제를 살펴보자.</p>
+<h2 id="2-examples">2. Examples<a hidden class="anchor" aria-hidden="true" href="#2-examples">#</a></h2>
+<p>아래와 같이 Person class 를 정의하고, personList 에 Person 객체들을 집어넣자.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Person</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> name: String,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> isGood: Boolean
+</span></span><span style="display:flex;"><span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">toString</span>(): String {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Person(name=&#39;</span><span style="color:#e6db74">$name</span><span style="color:#e6db74">&#39;, isGood=</span><span style="color:#e6db74">$isGood</span><span style="color:#e6db74">)&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> personList = mutableListOf&lt;Person&gt;()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (i <span style="color:#66d9ef">in</span> <span style="color:#ae81ff">1.</span>.<span style="color:#ae81ff">3</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> name = <span style="color:#e6db74">&#34;name</span><span style="color:#e6db74">$i</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> boolean = i % <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> person = Person(name, boolean)
+</span></span><span style="display:flex;"><span>        personList.add(person)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>위의 코드에서 name 은 unique 하고, isGood 은 dupicates 가 있다. 그러므로 associateBy 는 name 에, groupBy 는 isGood 에 적합하다. 아래와 같이 말이다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> personAssociateByName = personList.associateBy { <span style="color:#66d9ef">it</span>.name }
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> personAssociateByIsGood = personList.associateBy { <span style="color:#66d9ef">it</span>.isGood }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>println(personAssociateByName)
+</span></span><span style="display:flex;"><span>println(personGroupByIsGood)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>{name1=Person(name=&#39;name1&#39;, isGood=false), name2=Person(name=&#39;name2&#39;, isGood=true), name3=Person(name=&#39;name3&#39;, isGood=false)}
+</span></span><span style="display:flex;"><span>{false=[Person(name=&#39;name1&#39;, isGood=false), Person(name=&#39;name3&#39;, isGood=false)], true=[Person(name=&#39;name2&#39;, isGood=true)]}
+</span></span></code></pre></div><p>associateBy 를 쓸 때 key 가 unique 하지 않아도 괜찮을까? 아래에서 확인해보자.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> personAssociateByIsGood = personList.associateBy { <span style="color:#66d9ef">it</span>.isGood }
+</span></span><span style="display:flex;"><span>println(personAssociateByIsGood)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>{false=Person(name=&#39;name3&#39;, isGood=false), true=Person(name=&#39;name2&#39;, isGood=true)}
+</span></span></code></pre></div><p>unique 하지 않아도 Exception 은 발생하지 않는다. 하지만 Map 의 key 는 unique 해야 하기 때문에 각 key 에 해당하는 마지막 values 만 반영된다.</p>
+<p>groupBy 를 key 가 unique 할 때 사용하면 associateBy 와 같은 결과를 반환할까? 아래에서 확인해보자.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> personAssociateByName = personList.associateBy { <span style="color:#66d9ef">it</span>.name }
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> personGroupByName = personList.groupBy { <span style="color:#66d9ef">it</span>.name }
+</span></span><span style="display:flex;"><span>pritnln(personAssociateByName)
+</span></span><span style="display:flex;"><span>println(personGroupByName)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>{name1=Person(name=&#39;name1&#39;, isGood=false), name2=Person(name=&#39;name2&#39;, isGood=true), name3=Person(name=&#39;name3&#39;, isGood=false)}
+</span></span><span style="display:flex;"><span>{name1=[Person(name=&#39;name1&#39;, isGood=false)], name2=[Person(name=&#39;name2&#39;, isGood=true)], name3=[Person(name=&#39;name3&#39;, isGood=false)]}
+</span></span></code></pre></div><p>언뜻 보면 같은 것을 반환하는 것으로 보인다. 하지만 <a href="#1-kotlin-docs">1. Kotlin Docs</a> 를 보면 알 수 있듯이, associateBy 가 반환하는 Map 의 value 는 T, 여기서는 Person 객체이며, groupBy 의 그것은 List<!-- raw HTML omitted -->, 여기서는 List<!-- raw HTML omitted --> 이다.</p>
+<h2 id="3-applications">3. Applications<a hidden class="anchor" aria-hidden="true" href="#3-applications">#</a></h2>
+<p>associateBy 에는 여러 용례가 있지만 여기서는 서로 다른 두 컬렉션을 합칠(merge) 때 사용한다. Person 객체와 Address 객체를 합쳐서 PersonAddress 객체를 만들어보자.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Person</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> name: String,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> isGood: Boolean
+</span></span><span style="display:flex;"><span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">toString</span>(): String {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Person(name=&#39;</span><span style="color:#e6db74">$name</span><span style="color:#e6db74">&#39;, isGood=</span><span style="color:#e6db74">$isGood</span><span style="color:#e6db74">)&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Address</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> name: String,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> address: String
+</span></span><span style="display:flex;"><span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">toString</span>(): String {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Address(name=&#39;</span><span style="color:#e6db74">$name</span><span style="color:#e6db74">&#39;, address=&#39;</span><span style="color:#e6db74">$address</span><span style="color:#e6db74">&#39;)&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">PersonAddress</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> name: String,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> address: String,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> isGood: Boolean
+</span></span><span style="display:flex;"><span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">toString</span>(): String {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;PersonAddress(name=&#39;</span><span style="color:#e6db74">$name</span><span style="color:#e6db74">&#39;, address=&#39;</span><span style="color:#e6db74">$address</span><span style="color:#e6db74">&#39;, isGood=</span><span style="color:#e6db74">$isGood</span><span style="color:#e6db74">)&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> personList = mutableListOf&lt;Person&gt;()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (i <span style="color:#66d9ef">in</span> <span style="color:#ae81ff">1.</span>.<span style="color:#ae81ff">3</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> name = <span style="color:#e6db74">&#34;name</span><span style="color:#e6db74">$i</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> boolean = i % <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> person = Person(name, boolean)
+</span></span><span style="display:flex;"><span>        personList.add(person)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> addressList = mutableListOf&lt;Address&gt;()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (i <span style="color:#66d9ef">in</span> <span style="color:#ae81ff">1.</span>.<span style="color:#ae81ff">3</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> name = <span style="color:#e6db74">&#34;name</span><span style="color:#e6db74">$i</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> address = <span style="color:#e6db74">&#34;address</span><span style="color:#e6db74">$i</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> addressElement = Address(name, address)
+</span></span><span style="display:flex;"><span>        addressList.add(addressElement)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> personAssociateByName = personList.associateBy { <span style="color:#66d9ef">it</span>.name }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> addressAssociateByName = addressList.associateBy { <span style="color:#66d9ef">it</span>.name }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> personWithAddress = personAssociateByName.map {
+</span></span><span style="display:flex;"><span>        (name, person) <span style="color:#f92672">-&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> correspondingAddress = addressAssociateByName[name]<span style="color:#f92672">!!</span>
+</span></span><span style="display:flex;"><span>        PersonAddress(
+</span></span><span style="display:flex;"><span>            name = name,
+</span></span><span style="display:flex;"><span>            address = correspondingAddress.address,
+</span></span><span style="display:flex;"><span>            isGood = person.isGood
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    println(personWithAddress)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>[PersonAddress(name=&#39;name1&#39;, address=&#39;address1&#39;, isGood=false), PersonAddress(name=&#39;name2&#39;, address=&#39;address2&#39;, isGood=true), PersonAddress(name=&#39;name3&#39;, address=&#39;address3&#39;, isGood=false)]
+</span></span></code></pre></div><p>groupBy 는 key 별로 갯수를 세고 싶을 때 사용한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>    println(
+</span></span><span style="display:flex;"><span>        personList
+</span></span><span style="display:flex;"><span>            .groupBy { <span style="color:#66d9ef">it</span>.isGood }
+</span></span><span style="display:flex;"><span>            .mapValues { <span style="color:#66d9ef">it</span>.<span style="color:#66d9ef">value</span>.size }
+</span></span><span style="display:flex;"><span>    )
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>{false=2, true=1}
+</span></span></code></pre></div>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2023 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Jpa 정리 Ch9 (1) | wisdoom</title>
+<meta name="keywords" content="">
+<meta name="description" content="의문점:
+JPQL 의 여러 값 projection 을 할 때, [Ljava.lang.Object 로 resultList 가 보이는데, 이걸 사람이 알아볼 수 있게 만드는 방법이 없을까? DTO 를 만들어서 TypedQuery&lt;DTO&gt; 로 해결하는 것으로 보인다. 이 글은 책(김영한, 자바 orm 표준 jpa 프로그래밍, 에이콘, 2019) 의 내용을 정리한 것임을 밝힌다.
+값 타입 JPA 의 데이터 타입은 엔티티 타입과 값 타입으로 나뉜다. 엔티티 타입의 객체는 @Entity 로 정의되는 객체로 JPA 에서 식별자와 생명주기를 가져 영속성 컨텍스트에서 관리되지만, 값 타입은 state로서 실별자도 생명주기도 없는 것으로서 기본값 타입(basic value type), 임베디드 타입(embedded type), 컬렉션 값 타입(collection value type) 으로 나뉜다.">
+<meta name="author" content="">
+<link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/jpa-%EC%A0%95%EB%A6%AC-ch9-1/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.5c25c975546c048d1a5600aadb48425ae1bc921a9a18fe67d6955c9535260811.css" integrity="sha256-XCXJdVRsBI0aVgCq20hCWuG8khqaGP5n1pVclTUmCBE=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.acb54fd32bbc1982428b8850317e45d076b95012730a5936667e6bc21777692a.js" integrity="sha256-rLVP0yu8GYJCi4hQMX5F0Ha5UBJzClk2Zn5rwhd3aSo="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Scoobi-wisdoom.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:title" content="Jpa 정리 Ch9 (1)" />
+<meta property="og:description" content="의문점:
+JPQL 의 여러 값 projection 을 할 때, [Ljava.lang.Object 로 resultList 가 보이는데, 이걸 사람이 알아볼 수 있게 만드는 방법이 없을까? DTO 를 만들어서 TypedQuery&lt;DTO&gt; 로 해결하는 것으로 보인다. 이 글은 책(김영한, 자바 orm 표준 jpa 프로그래밍, 에이콘, 2019) 의 내용을 정리한 것임을 밝힌다.
+값 타입 JPA 의 데이터 타입은 엔티티 타입과 값 타입으로 나뉜다. 엔티티 타입의 객체는 @Entity 로 정의되는 객체로 JPA 에서 식별자와 생명주기를 가져 영속성 컨텍스트에서 관리되지만, 값 타입은 state로서 실별자도 생명주기도 없는 것으로서 기본값 타입(basic value type), 임베디드 타입(embedded type), 컬렉션 값 타입(collection value type) 으로 나뉜다." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/jpa-%EC%A0%95%EB%A6%AC-ch9-1/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-09-27T22:15:56+09:00" />
+<meta property="article:modified_time" content="2021-09-27T22:15:56+09:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Jpa 정리 Ch9 (1)"/>
+<meta name="twitter:description" content="의문점:
+JPQL 의 여러 값 projection 을 할 때, [Ljava.lang.Object 로 resultList 가 보이는데, 이걸 사람이 알아볼 수 있게 만드는 방법이 없을까? DTO 를 만들어서 TypedQuery&lt;DTO&gt; 로 해결하는 것으로 보인다. 이 글은 책(김영한, 자바 orm 표준 jpa 프로그래밍, 에이콘, 2019) 의 내용을 정리한 것임을 밝힌다.
+값 타입 JPA 의 데이터 타입은 엔티티 타입과 값 타입으로 나뉜다. 엔티티 타입의 객체는 @Entity 로 정의되는 객체로 JPA 에서 식별자와 생명주기를 가져 영속성 컨텍스트에서 관리되지만, 값 타입은 state로서 실별자도 생명주기도 없는 것으로서 기본값 타입(basic value type), 임베디드 타입(embedded type), 컬렉션 값 타입(collection value type) 으로 나뉜다."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Scoobi-wisdoom.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Jpa 정리 Ch9 (1)",
+      "item": "https://Scoobi-wisdoom.github.io/posts/jpa-%EC%A0%95%EB%A6%AC-ch9-1/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Jpa 정리 Ch9 (1)",
+  "name": "Jpa 정리 Ch9 (1)",
+  "description": "의문점:\nJPQL 의 여러 값 projection 을 할 때, [Ljava.lang.Object 로 resultList 가 보이는데, 이걸 사람이 알아볼 수 있게 만드는 방법이 없을까? DTO 를 만들어서 TypedQuery\u0026lt;DTO\u0026gt; 로 해결하는 것으로 보인다. 이 글은 책(김영한, 자바 orm 표준 jpa 프로그래밍, 에이콘, 2019) 의 내용을 정리한 것임을 밝힌다.\n값 타입 JPA 의 데이터 타입은 엔티티 타입과 값 타입으로 나뉜다. 엔티티 타입의 객체는 @Entity 로 정의되는 객체로 JPA 에서 식별자와 생명주기를 가져 영속성 컨텍스트에서 관리되지만, 값 타입은 state로서 실별자도 생명주기도 없는 것으로서 기본값 타입(basic value type), 임베디드 타입(embedded type), 컬렉션 값 타입(collection value type) 으로 나뉜다.",
+  "keywords": [
+    
+  ],
+  "articleBody": "의문점:\nJPQL 의 여러 값 projection 을 할 때, [Ljava.lang.Object 로 resultList 가 보이는데, 이걸 사람이 알아볼 수 있게 만드는 방법이 없을까? DTO 를 만들어서 TypedQuery 로 해결하는 것으로 보인다. 이 글은 책(김영한, 자바 orm 표준 jpa 프로그래밍, 에이콘, 2019) 의 내용을 정리한 것임을 밝힌다.\n값 타입 JPA 의 데이터 타입은 엔티티 타입과 값 타입으로 나뉜다. 엔티티 타입의 객체는 @Entity 로 정의되는 객체로 JPA 에서 식별자와 생명주기를 가져 영속성 컨텍스트에서 관리되지만, 값 타입은 state로서 실별자도 생명주기도 없는 것으로서 기본값 타입(basic value type), 임베디드 타입(embedded type), 컬렉션 값 타입(collection value type) 으로 나뉜다.\n임베디드 타입(embedded value type. 복합 값 타입) 사용자가 직접 정의한 값 타입으로, 엔티티 타입이 아니라 값 타입이다. 엔티티 클래스를 더 객체지향에 가깝게 만들 수 있는 수단으로, 엔티티 객체 데이터 타입을 사용자가 정의한 클래스로 정한다.\n@Entity class Member( @Id @GeneratedValue val id: Long? = null, val name: String, @Embedded val homeAddress: Address ) @Embeddable class Address( val city: String, val street: String, val zipcode: String ) fun main() { val emf = Persistence.createEntityManagerFactory(\"jpabook\") val em = emf.createEntityManager() val tx = em.transaction try { tx.begin() logic(em) tx.commit() } catch (e: Exception) { e.printStackTrace() tx.rollback() } finally { em.close() } emf.close() } fun logic(em: EntityManager) { val address = Address(\"서울\", \"장안로\", \"111\") val member = Member(null, \"수호\", address) } 위의 코드를 통해 생성되는 DB 내의 Member 엔티티는 homeAddress 가 아니라 city, street, zipcode 필드를 갖는다. 아래의 쿼리에서 확인할 수 있다.\nHibernate: create table Member (id bigint not null, city varchar(255), street varchar(255), zipcode varchar(255), name varchar(255), primary key (id)) 참고로 위의 코틀린 코드에서 @Embedded 와 @Embeddable 을 누락하면 아래와 같은 예외가 발생한다.\nException in thread \"main\" javax.persistence.PersistenceException: [PersistenceUnit: jpabook] Unable to build Hibernate SessionFactory at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.persistenceException(EntityManagerFactoryBuilderImpl.java:1336) at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1262) at org.hibernate.jpa.HibernatePersistenceProvider.createEntityManagerFactory(HibernatePersistenceProvider.java:56) at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:79) at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:54) at com.wisdoom.MainKt.main(Main.kt:7) at com.wisdoom.MainKt.main(Main.kt) Caused by: org.hibernate.MappingException: Could not determine type for: com.wisdoom.Address, at table: Member, for columns: [org.hibernate.mapping.Column(homeAddress)] 위의 예제에서는 주소가 한 종류만 있다(집 주소). 그런데 회사 주소나, 형제의 주소 등, 동일한 임베디드 타입을 엔티티에 포함하려면 어떻게 해야 할까? 아래 코드와 같이 작성하면 column name 이 겹치는 일 없이 DB 엔티티가 생성된다.\n@Entity class Member( @Id @GeneratedValue val id: Long? = null, val name: String, @Embedded var homeAddress: Address?, // val 로 설정하는 것이 좋다. 추후 서술 @Embedded @AttributeOverrides( AttributeOverride(name = \"city\", column = Column(name = \"HOME2_CITY\")), AttributeOverride(name = \"street\", column = Column(name = \"HOME2_STREET\")), AttributeOverride(name = \"zipcode\", column = Column(name = \"HOME2_ZIPCODE\")) ) var home2Address: Address // val 로 설정하는 것이 좋다. 추후 서술 ) { } Hibernate: create table Member (id bigint not null, HOME2_CITY varchar(255), HOME2_STREET varchar(255), HOME2_ZIPCODE varchar(255), city varchar(255), street varchar(255), zipcode varchar(255), name varchar(255), primary key (id)) 참고로 임베디드 타입이 null 이면 매핑한 컬럼 값도 모두 null 이다. 재밌는 점은, Embeddable 클래스 Address 의 프로퍼티는 모두 not nullable 이라는 점이다.\nfun main() { // 생략 } fun logic(em: EntityManager) { val address = Address(\"서울\", \"장안로\", \"111\") val address2 = Address(\"서울\", \"장안로2\", \"222\") val member = Member(null, \"수호\", address, address2) member.home2Address = null em.persist(member) } 아래에 생성된 테이블에서 home2Address 의 매핑된 컬럽이 모두 null 임을 확인할 수 있다.\nID HOME2_CITY HOME2_STREET HOME2_ZIPCODE CITY STREET ZIPCODE NAME 1 서울 장안로2 222 null null null 수호 임베디드 타입을 사용할 때 주의할 점이 있다. 임베디드 타입은 클래스로서, 그 객체는 참조 변수다. 그러므로 다음과 같은 문제점이 생긴다.\nfun logic(em: EntityManager) { val address = Address(\"서울\", \"장안로\", \"111\") val address2 = Address(\"서울\", \"장안로2\", \"222\") val member = Member(null, \"수호\", address, address2) var addressCopy = member.homeAddress addressCopy?.city = \"NY\" addressCopy?.street = \"WS\" addressCopy?.zipcode = \"xxx\" val member2 = Member(null, \"수호\", addressCopy, address2) em.persist(member) em.persist(member2) } 아래 테이블과 같이 member2 의 주소만 변경되지 않고 member 의 주소도 변경됐다.\nID HOME2_CITY HOME2_STREET HOME2_ZIPCODE CITY STREET ZIPCODE NAME 1 서울 장안로2 222 NY WS xxx 수호 2 서울 장안로2 222 NY WS xxx 수호 이걸 막는 방법은 값 타입을 불변 객체로 설정하는 것이며, Java 에서는 setter 를 만들지 않는 방법으로 설정한다. Kotlin 에서는 값 타입의 멤버 변수를 var 가 아닌 val 로 선언하는 방법이 있다.\n컬렉션 값 타입(collection value type) 값 타입 컬렉션 대신에 one to many 관계가 많이 쓰인다. 왜냐하면 값 타입 컬렉션은 쿼리가 많이 발생하기 때문이다. 그렇기 때문에 여기서는 정리하지 않기로 한다.\n객체지향 쿼리 언어 JPA 가 지원하는 검색 방법으로는 JPQL, Criteria, native SQL, QueryDSL, JDBC 가 있다.\n객체지향 쿼리 언어의 기본은 JPQL 으로, Criteria 나 QueryDSL 모두 JPQL 을 편하게 다루기 위한 도구로 자바 코드로 JPQL 문을 생성한다. 그리고 JPQL 은 SQL 문을 생성한다.\nJPQL 은 테이블이 아니라 객체를 대상으로 검색하며, SQL 을 추상화해서 데이터베이스 dialect 에 의존하지 않는다.\n참고로 navtive query 를 사용하는 경우는 특정 DB dialect 에 의존해야 하는 경우이며, JDBC 를 직접 사용하거나 SQL 매퍼 프레임워크를 사용할 때의 주의 사항으로는 영속성 컨텍스트를 적절한 시점에 강제로 flush 해야 한다는 것이다.\nJPQL 아래는 기본적인 JPQL 사용 방법과 출력 결과이다.\nfun main() { // JPQL val emf = Persistence.createEntityManagerFactory(\"jpabook\") val em = emf.createEntityManager() // JPQL 에서 entity 와 attribute 는 대소문자를 구분하지만, JPQL 키워드는 그렇지 않다. // JPQL 에서는 클래스 명이 아니라 엔티티 명을 사용한다. 즉, 아래 Member 는 엔티티 명이며 이는 @Entity(name=\"blah\") 로 지정할 수 있다. // 별칭(identification variable 또는 alias)이 필수다. 아래에서는 m 을 무조건 사용해야 한다. AS 는 생략 가능하다. val jpql = \"SELECT m from Member AS m WHERE m.name = '수호'\" val resultList: TypedQuery = em.createQuery(jpql, Member::class.java) resultList.resultList.forEach { println(it) } } Member(id=1, name='수호', homeAddress=Address(city='NY', street='WS', zipcode='xxx'), home2Address=Address(city='서울', street='장안로2', zipcode='222')) Member(id=2, name='수호', homeAddress=Address(city='NY', street='WS', zipcode='xxx'), home2Address=Address(city='서울', street='장안로2', zipcode='222')) JPQL 은 SELECT, UPDATE, DELETE 문을 사용할 수 있으며, INSERT 문은 없다 (em.persist() 로 대체).\n또한 JPQL 은 위치 기준 parameter binding 뿐만 아니라 이름 기준 parameter binding 기능을 제공한다.\nfun main() { // JPQL val emf = Persistence.createEntityManagerFactory(\"jpabook\") val em = emf.createEntityManager() val userNameParam = \"수호\" // parameter binding val queryWithParameterBinding: TypedQuery = em.createQuery(\"SELECT m FROM Member m WHERE m.name = :username\", Member::class.java) .setParameter(\"username\", userNameParam) val resultListParameterBinding = queryWithParameterBinding.resultList // position binding val queryWithPositionBinding: TypedQuery = em.createQuery(\"SELECT m FROM Member m WHERE m.name = ?1\", Member::class.java) .setParameter(1, userNameParam) val resultListPositionBinding = queryWithPositionBinding.resultList resultListParameterBinding.forEach { println(it) } println(\"-----------------\") resultListPositionBinding.forEach { println(it) } } Member(id=1, name='수호', homeAddress=Address(city='NY', street='WS', zipcode='xxx'), home2Address=Address(city='서울', street='장안로2', zipcode='222')) Member(id=2, name='수호', homeAddress=Address(city='NY', street='WS', zipcode='xxx'), home2Address=Address(city='서울', street='장안로2', zipcode='222')) ----------------- Member(id=1, name='수호', homeAddress=Address(city='NY', street='WS', zipcode='xxx'), home2Address=Address(city='서울', street='장안로2', zipcode='222')) Member(id=2, name='수호', homeAddress=Address(city='NY', street='WS', zipcode='xxx'), home2Address=Address(city='서울', street='장안로2', zipcode='222')) JPQL 에서 projection 이란 SELECT 절에서 조회할 대상을 지정하는 것을 말한다. “SELECT something” 에서 something 이 엔티티 타입, 임베디드 타입, 스칼라 타입(통계 쿼리도 여기 포함), 그리고 여러 값이 올 수 있다. 임베디드 타입 projection 의 경우 주의 사항이 있다. 임베디드 타입은 조회의 시작점이 될 수 없다는 점이다. 아래 코드를 실행하면 다음과 같은 예외가 발생한다.\nfun main() { // JPQL // 임베디드 타입 projection 주의 사항 val emf = Persistence.createEntityManagerFactory(\"jpabook\") val em = emf.createEntityManager() val query = \"SELECT a FROM Address a\" val queryOnAddress = em.createQuery(query, Address::class.java) } Exception in thread \"main\" java.lang.IllegalArgumentException: org.hibernate.hql.internal.ast.QuerySyntaxException: Address is not mapped [SELECT a FROM Address a] Caused by: org.hibernate.hql.internal.ast.QuerySyntaxException: Address is not mapped [SELECT a FROM Address a] Caused by: org.hibernate.hql.internal.ast.QuerySyntaxException: Address is not mapped 예외 발생 없이 임베디드 타입 projection 을 행하려면 다음과 같이 코드를 작성하면 된다.\nfun main() { // JPQL // 임베디드 타입 projection 주의 사항 val emf = Persistence.createEntityManagerFactory(\"jpabook\") val em = emf.createEntityManager() val query = \"SELECT m.homeAddress FROM Member m\" val addressList = em .createQuery(query, Address::class.java) // 아래도 가능 //.createQuery(query) .resultList println(addressList) } [Address(city='NY', street='WS', zipcode='xxx'), Address(city='NY', street='WS', zipcode='xxx')] 여러 값 projection 을 할 때 주의 사항은 TypedQuery 가 아니라 Query 를 사용해야 한다는 것이다.\nfun main() { // JPQL // 여러 값 projection 주의 사항 val emf = Persistence.createEntityManagerFactory(\"jpabook\") val em = emf.createEntityManager() // TypedQuery 가 아닌 Query 를 쓴다. val createQuery: Query = em.createQuery(\"SELECT m.id, m.name FROM Member m\") } 다음은 JPQL 의 페이징 API 다.\nfun main() { // JPQL // 페이징 API val emf = Persistence.createEntityManagerFactory(\"jpabook\") val em = emf.createEntityManager() val queryStatement = \"SELECT m FROM Member m ORDER BY m.id DESC\" val query = em.createQuery(queryStatement, Member::class.java) query.firstResult = 0 query.maxResults = 2 println(query.resultList) } [Member(id=2, name='수호', homeAddress=Address(city='NY', street='WS', zipcode='xxx'), home2Address=Address(city='서울', street='장안로2', zipcode='222')), Member(id=1, name='수호', homeAddress=Address(city='NY', street='WS', zipcode='xxx'), home2Address=Address(city='서울', street='장안로2', zipcode='222'))] ",
+  "wordCount" : "1308",
+  "inLanguage": "en",
+  "datePublished": "2021-09-27T22:15:56+09:00",
+  "dateModified": "2021-09-27T22:15:56+09:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Scoobi-wisdoom.github.io/posts/jpa-%EC%A0%95%EB%A6%AC-ch9-1/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "wisdoom",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Scoobi-wisdoom.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://Scoobi-wisdoom.github.io/" accesskey="h" title="wisdoom (Alt + H)">wisdoom</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title">
+      Jpa 정리 Ch9 (1)
+    </h1>
+    <div class="post-meta"><span title='2021-09-27 22:15:56 +0900 KST'>September 27, 2021</span>
+
+</div>
+  </header> 
+  <div class="post-content"><p>의문점:</p>
+<ol>
+<li>JPQL 의 여러 값 projection 을 할 때, [Ljava.lang.Object 로 resultList 가 보이는데, 이걸 사람이 알아볼 수 있게 만드는 방법이 없을까? DTO 를 만들어서 TypedQuery&lt;DTO&gt; 로 해결하는 것으로 보인다.</li>
+</ol>
+<p>이 글은 책(김영한, 자바 orm 표준 jpa 프로그래밍, 에이콘, 2019) 의 내용을 정리한 것임을 밝힌다.</p>
+<h2 id="값-타입">값 타입<a hidden class="anchor" aria-hidden="true" href="#값-타입">#</a></h2>
+<p>JPA 의 데이터 타입은 엔티티 타입과 값 타입으로 나뉜다. 엔티티 타입의 객체는 @Entity 로 정의되는 객체로 JPA 에서 식별자와 생명주기를 가져 <strong>영속성 컨텍스트에서 관리</strong>되지만, 값 타입은 state로서 실별자도 생명주기도 없는 것으로서 기본값 타입(basic value type), 임베디드 타입(embedded type), 컬렉션 값 타입(collection value type) 으로 나뉜다.</p>
+<h3 id="임베디드-타입embedded-value-type-복합-값-타입">임베디드 타입(embedded value type. 복합 값 타입)<a hidden class="anchor" aria-hidden="true" href="#임베디드-타입embedded-value-type-복합-값-타입">#</a></h3>
+<p>사용자가 직접 정의한 값 타입으로, 엔티티 타입이 아니라 값 타입이다. 엔티티 클래스를 더 객체지향에 가깝게 만들 수 있는 수단으로, 엔티티 객체 데이터 타입을 사용자가 정의한 클래스로 정한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Member</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Id</span> <span style="color:#a6e22e">@GeneratedValue</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> id: Long? = <span style="color:#66d9ef">null</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> name: String,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Embedded</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> homeAddress: Address
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Embeddable</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Address</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> city: String,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> street: String,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> zipcode: String
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> emf = <span style="color:#a6e22e">Persistence</span>.createEntityManagerFactory(<span style="color:#e6db74">&#34;jpabook&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> em = emf.createEntityManager()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> tx = em.transaction
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>        tx.begin()
+</span></span><span style="display:flex;"><span>        logic(em)
+</span></span><span style="display:flex;"><span>        tx.commit()
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">catch</span> (e: Exception) {
+</span></span><span style="display:flex;"><span>        e.printStackTrace()
+</span></span><span style="display:flex;"><span>        tx.rollback()
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">finally</span> {
+</span></span><span style="display:flex;"><span>        em.close()
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    emf.close()
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">logic</span>(em: EntityManager) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> address = Address(<span style="color:#e6db74">&#34;서울&#34;</span>, <span style="color:#e6db74">&#34;장안로&#34;</span>, <span style="color:#e6db74">&#34;111&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> member = Member(<span style="color:#66d9ef">null</span>, <span style="color:#e6db74">&#34;수호&#34;</span>, address)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>위의 코드를 통해 생성되는 DB 내의 Member 엔티티는 homeAddress 가 아니라 city, street, zipcode 필드를 갖는다. 아래의 쿼리에서 확인할 수 있다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>Hibernate: create table Member (id bigint not null, city varchar(255), street varchar(255), zipcode varchar(255), name varchar(255), primary key (id))
+</span></span></code></pre></div><p>참고로 위의 코틀린 코드에서 @Embedded 와 @Embeddable 을 누락하면 아래와 같은 예외가 발생한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>Exception in thread &#34;main&#34; javax.persistence.PersistenceException: [PersistenceUnit: jpabook] Unable to build Hibernate SessionFactory
+</span></span><span style="display:flex;"><span>	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.persistenceException(EntityManagerFactoryBuilderImpl.java:1336)
+</span></span><span style="display:flex;"><span>	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1262)
+</span></span><span style="display:flex;"><span>	at org.hibernate.jpa.HibernatePersistenceProvider.createEntityManagerFactory(HibernatePersistenceProvider.java:56)
+</span></span><span style="display:flex;"><span>	at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:79)
+</span></span><span style="display:flex;"><span>	at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:54)
+</span></span><span style="display:flex;"><span>	at com.wisdoom.MainKt.main(Main.kt:7)
+</span></span><span style="display:flex;"><span>	at com.wisdoom.MainKt.main(Main.kt)
+</span></span><span style="display:flex;"><span>Caused by: org.hibernate.MappingException: Could not determine type for: com.wisdoom.Address, at table: Member, for columns: [org.hibernate.mapping.Column(homeAddress)]
+</span></span></code></pre></div><p>위의 예제에서는 주소가 한 종류만 있다(집 주소). 그런데 회사 주소나, 형제의 주소 등, 동일한 임베디드 타입을 엔티티에 포함하려면 어떻게 해야 할까? 아래 코드와 같이 작성하면 column name 이 겹치는 일 없이 DB 엔티티가 생성된다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Member</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Id</span> <span style="color:#a6e22e">@GeneratedValue</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> id: Long? = <span style="color:#66d9ef">null</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> name: String,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Embedded</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> homeAddress: Address?, <span style="color:#75715e">// val 로 설정하는 것이 좋다. 추후 서술
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Embedded</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@AttributeOverrides</span>(
+</span></span><span style="display:flex;"><span>        AttributeOverride(name = <span style="color:#e6db74">&#34;city&#34;</span>, column = Column(name = <span style="color:#e6db74">&#34;HOME2_CITY&#34;</span>)),
+</span></span><span style="display:flex;"><span>        AttributeOverride(name = <span style="color:#e6db74">&#34;street&#34;</span>, column = Column(name = <span style="color:#e6db74">&#34;HOME2_STREET&#34;</span>)),
+</span></span><span style="display:flex;"><span>        AttributeOverride(name = <span style="color:#e6db74">&#34;zipcode&#34;</span>, column = Column(name = <span style="color:#e6db74">&#34;HOME2_ZIPCODE&#34;</span>))
+</span></span><span style="display:flex;"><span>    ) <span style="color:#66d9ef">var</span> home2Address: Address <span style="color:#75715e">// val 로 설정하는 것이 좋다. 추후 서술
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>) {
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>Hibernate: create table Member (id bigint not null, HOME2_CITY varchar(255), HOME2_STREET varchar(255), HOME2_ZIPCODE varchar(255), city varchar(255), street varchar(255), zipcode varchar(255), name varchar(255), primary key (id))
+</span></span></code></pre></div><p>참고로 임베디드 타입이 null 이면 매핑한 컬럼 값도 모두 null 이다. 재밌는 점은, Embeddable 클래스 Address 의 프로퍼티는 모두 not nullable 이라는 점이다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 생략
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">logic</span>(em: EntityManager) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> address = Address(<span style="color:#e6db74">&#34;서울&#34;</span>, <span style="color:#e6db74">&#34;장안로&#34;</span>, <span style="color:#e6db74">&#34;111&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> address2 = Address(<span style="color:#e6db74">&#34;서울&#34;</span>, <span style="color:#e6db74">&#34;장안로2&#34;</span>, <span style="color:#e6db74">&#34;222&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> member = Member(<span style="color:#66d9ef">null</span>, <span style="color:#e6db74">&#34;수호&#34;</span>, address, address2)
+</span></span><span style="display:flex;"><span>    member.home2Address = <span style="color:#66d9ef">null</span>
+</span></span><span style="display:flex;"><span>    em.persist(member)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>아래에 생성된 테이블에서 home2Address 의 매핑된 컬럽이 모두 null 임을 확인할 수 있다.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>HOME2_CITY</th>
+<th>HOME2_STREET</th>
+<th>HOME2_ZIPCODE</th>
+<th>CITY</th>
+<th>STREET</th>
+<th>ZIPCODE</th>
+<th>NAME</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>서울</td>
+<td>장안로2</td>
+<td>222</td>
+<td>null</td>
+<td>null</td>
+<td>null</td>
+<td>수호</td>
+</tr>
+</tbody>
+</table>
+<p>임베디드 타입을 사용할 때 주의할 점이 있다. 임베디드 타입은 클래스로서, 그 객체는 참조 변수다. 그러므로 다음과 같은 문제점이 생긴다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">logic</span>(em: EntityManager) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> address = Address(<span style="color:#e6db74">&#34;서울&#34;</span>, <span style="color:#e6db74">&#34;장안로&#34;</span>, <span style="color:#e6db74">&#34;111&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> address2 = Address(<span style="color:#e6db74">&#34;서울&#34;</span>, <span style="color:#e6db74">&#34;장안로2&#34;</span>, <span style="color:#e6db74">&#34;222&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> member = Member(<span style="color:#66d9ef">null</span>, <span style="color:#e6db74">&#34;수호&#34;</span>, address, address2)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> addressCopy = member.homeAddress
+</span></span><span style="display:flex;"><span>    addressCopy<span style="color:#f92672">?.</span>city = <span style="color:#e6db74">&#34;NY&#34;</span>
+</span></span><span style="display:flex;"><span>    addressCopy<span style="color:#f92672">?.</span>street = <span style="color:#e6db74">&#34;WS&#34;</span>
+</span></span><span style="display:flex;"><span>    addressCopy<span style="color:#f92672">?.</span>zipcode = <span style="color:#e6db74">&#34;xxx&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> member2 = Member(<span style="color:#66d9ef">null</span>, <span style="color:#e6db74">&#34;수호&#34;</span>, addressCopy, address2)
+</span></span><span style="display:flex;"><span>    em.persist(member)
+</span></span><span style="display:flex;"><span>    em.persist(member2)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>아래 테이블과 같이 member2 의 주소만 변경되지 않고 member 의 주소도 변경됐다.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>HOME2_CITY</th>
+<th>HOME2_STREET</th>
+<th>HOME2_ZIPCODE</th>
+<th>CITY</th>
+<th>STREET</th>
+<th>ZIPCODE</th>
+<th>NAME</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>서울</td>
+<td>장안로2</td>
+<td>222</td>
+<td>NY</td>
+<td>WS</td>
+<td>xxx</td>
+<td>수호</td>
+</tr>
+<tr>
+<td>2</td>
+<td>서울</td>
+<td>장안로2</td>
+<td>222</td>
+<td>NY</td>
+<td>WS</td>
+<td>xxx</td>
+<td>수호</td>
+</tr>
+</tbody>
+</table>
+<p>이걸 막는 방법은 값 타입을 불변 객체로 설정하는 것이며, Java 에서는 setter 를 만들지 않는 방법으로 설정한다. Kotlin 에서는 값 타입의 멤버 변수를 var 가 아닌 val 로 선언하는 방법이 있다.</p>
+<h3 id="컬렉션-값-타입collection-value-type">컬렉션 값 타입(collection value type)<a hidden class="anchor" aria-hidden="true" href="#컬렉션-값-타입collection-value-type">#</a></h3>
+<p>값 타입 컬렉션 대신에 one to many 관계가 많이 쓰인다. 왜냐하면 값 타입 컬렉션은 쿼리가 많이 발생하기 때문이다. 그렇기 때문에 여기서는 정리하지 않기로 한다.</p>
+<h2 id="객체지향-쿼리-언어">객체지향 쿼리 언어<a hidden class="anchor" aria-hidden="true" href="#객체지향-쿼리-언어">#</a></h2>
+<p>JPA 가 지원하는 검색 방법으로는 JPQL, Criteria, native SQL, QueryDSL, JDBC 가 있다.<br>
+객체지향 쿼리 언어의 기본은 JPQL 으로, Criteria 나 QueryDSL 모두 JPQL 을 편하게 다루기 위한 도구로 자바 코드로 JPQL 문을 생성한다. 그리고 JPQL 은 SQL 문을 생성한다.<br>
+JPQL 은 테이블이 아니라 객체를 대상으로 검색하며, SQL 을 추상화해서 데이터베이스 dialect 에 의존하지 않는다.</p>
+<p>참고로 navtive query 를 사용하는 경우는 특정 DB dialect 에 의존해야 하는 경우이며, JDBC 를 직접 사용하거나 SQL 매퍼 프레임워크를 사용할 때의 주의 사항으로는 영속성 컨텍스트를 적절한 시점에 강제로 flush 해야 한다는 것이다.</p>
+<h3 id="jpql">JPQL<a hidden class="anchor" aria-hidden="true" href="#jpql">#</a></h3>
+<p>아래는 기본적인 JPQL 사용 방법과 출력 결과이다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// JPQL
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">val</span> emf = <span style="color:#a6e22e">Persistence</span>.createEntityManagerFactory(<span style="color:#e6db74">&#34;jpabook&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> em = emf.createEntityManager()
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// JPQL 에서 entity 와 attribute 는 대소문자를 구분하지만, JPQL 키워드는 그렇지 않다.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// JPQL 에서는 클래스 명이 아니라 엔티티 명을 사용한다. 즉, 아래 Member 는 엔티티 명이며 이는 @Entity(name=&#34;blah&#34;) 로 지정할 수 있다.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// 별칭(identification variable 또는 alias)이 필수다. 아래에서는 m 을 무조건 사용해야 한다. AS 는 생략 가능하다. 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">val</span> jpql = <span style="color:#e6db74">&#34;SELECT m from Member AS m WHERE m.name = &#39;수호&#39;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> resultList: TypedQuery&lt;Member&gt; = em.createQuery(jpql, Member<span style="color:#f92672">::</span><span style="color:#66d9ef">class</span>.java)
+</span></span><span style="display:flex;"><span>    resultList.resultList.forEach {
+</span></span><span style="display:flex;"><span>        println(<span style="color:#66d9ef">it</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>Member(id=1, name=&#39;수호&#39;, homeAddress=Address(city=&#39;NY&#39;, street=&#39;WS&#39;, zipcode=&#39;xxx&#39;), home2Address=Address(city=&#39;서울&#39;, street=&#39;장안로2&#39;, zipcode=&#39;222&#39;))
+</span></span><span style="display:flex;"><span>Member(id=2, name=&#39;수호&#39;, homeAddress=Address(city=&#39;NY&#39;, street=&#39;WS&#39;, zipcode=&#39;xxx&#39;), home2Address=Address(city=&#39;서울&#39;, street=&#39;장안로2&#39;, zipcode=&#39;222&#39;))
+</span></span></code></pre></div><p>JPQL 은 SELECT, UPDATE, DELETE 문을 사용할 수 있으며, INSERT 문은 없다 (em.persist() 로 대체).</p>
+<p>또한 JPQL 은 위치 기준 parameter binding 뿐만 아니라 이름 기준 parameter binding 기능을 제공한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// JPQL
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">val</span> emf = <span style="color:#a6e22e">Persistence</span>.createEntityManagerFactory(<span style="color:#e6db74">&#34;jpabook&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> em = emf.createEntityManager()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> userNameParam = <span style="color:#e6db74">&#34;수호&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// parameter binding
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">val</span> queryWithParameterBinding: TypedQuery&lt;Member&gt; =
+</span></span><span style="display:flex;"><span>        em.createQuery(<span style="color:#e6db74">&#34;SELECT m FROM Member m WHERE m.name = :username&#34;</span>, Member<span style="color:#f92672">::</span><span style="color:#66d9ef">class</span>.java)
+</span></span><span style="display:flex;"><span>            .setParameter(<span style="color:#e6db74">&#34;username&#34;</span>, userNameParam)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> resultListParameterBinding = queryWithParameterBinding.resultList
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// position binding
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">val</span> queryWithPositionBinding: TypedQuery&lt;Member&gt; =
+</span></span><span style="display:flex;"><span>        em.createQuery(<span style="color:#e6db74">&#34;SELECT m FROM Member m WHERE m.name = ?1&#34;</span>, Member<span style="color:#f92672">::</span><span style="color:#66d9ef">class</span>.java)
+</span></span><span style="display:flex;"><span>            .setParameter(<span style="color:#ae81ff">1</span>, userNameParam)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> resultListPositionBinding = queryWithPositionBinding.resultList
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    resultListParameterBinding.forEach { println(<span style="color:#66d9ef">it</span>) }
+</span></span><span style="display:flex;"><span>    println(<span style="color:#e6db74">&#34;-----------------&#34;</span>)
+</span></span><span style="display:flex;"><span>    resultListPositionBinding.forEach { println(<span style="color:#66d9ef">it</span>) }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>Member(id=1, name=&#39;수호&#39;, homeAddress=Address(city=&#39;NY&#39;, street=&#39;WS&#39;, zipcode=&#39;xxx&#39;), home2Address=Address(city=&#39;서울&#39;, street=&#39;장안로2&#39;, zipcode=&#39;222&#39;))
+</span></span><span style="display:flex;"><span>Member(id=2, name=&#39;수호&#39;, homeAddress=Address(city=&#39;NY&#39;, street=&#39;WS&#39;, zipcode=&#39;xxx&#39;), home2Address=Address(city=&#39;서울&#39;, street=&#39;장안로2&#39;, zipcode=&#39;222&#39;))
+</span></span><span style="display:flex;"><span>-----------------
+</span></span><span style="display:flex;"><span>Member(id=1, name=&#39;수호&#39;, homeAddress=Address(city=&#39;NY&#39;, street=&#39;WS&#39;, zipcode=&#39;xxx&#39;), home2Address=Address(city=&#39;서울&#39;, street=&#39;장안로2&#39;, zipcode=&#39;222&#39;))
+</span></span><span style="display:flex;"><span>Member(id=2, name=&#39;수호&#39;, homeAddress=Address(city=&#39;NY&#39;, street=&#39;WS&#39;, zipcode=&#39;xxx&#39;), home2Address=Address(city=&#39;서울&#39;, street=&#39;장안로2&#39;, zipcode=&#39;222&#39;))
+</span></span></code></pre></div><p>JPQL 에서 projection 이란 SELECT 절에서 조회할 대상을 지정하는 것을 말한다. &ldquo;SELECT <em>something</em>&rdquo; 에서 <em>something</em> 이 엔티티 타입, 임베디드 타입, 스칼라 타입(통계 쿼리도 여기 포함), 그리고 여러 값이 올 수 있다. 임베디드 타입 projection 의 경우 주의 사항이 있다. 임베디드 타입은 조회의 시작점이 될 수 없다는 점이다. 아래 코드를 실행하면 다음과 같은 예외가 발생한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// JPQL
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// 임베디드 타입 projection 주의 사항
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">val</span> emf = <span style="color:#a6e22e">Persistence</span>.createEntityManagerFactory(<span style="color:#e6db74">&#34;jpabook&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> em = emf.createEntityManager()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> query = <span style="color:#e6db74">&#34;SELECT a FROM Address a&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> queryOnAddress = em.createQuery(query, Address<span style="color:#f92672">::</span><span style="color:#66d9ef">class</span>.java)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>Exception in thread &#34;main&#34; java.lang.IllegalArgumentException: org.hibernate.hql.internal.ast.QuerySyntaxException: Address is not mapped [SELECT a FROM Address a]
+</span></span><span style="display:flex;"><span>Caused by: org.hibernate.hql.internal.ast.QuerySyntaxException: Address is not mapped [SELECT a FROM Address a]
+</span></span><span style="display:flex;"><span>Caused by: org.hibernate.hql.internal.ast.QuerySyntaxException: Address is not mapped
+</span></span></code></pre></div><p>예외 발생 없이 임베디드 타입 projection 을 행하려면 다음과 같이 코드를 작성하면 된다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// JPQL
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// 임베디드 타입 projection 주의 사항
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">val</span> emf = <span style="color:#a6e22e">Persistence</span>.createEntityManagerFactory(<span style="color:#e6db74">&#34;jpabook&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> em = emf.createEntityManager()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> query = <span style="color:#e6db74">&#34;SELECT m.homeAddress FROM Member m&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> addressList = em
+</span></span><span style="display:flex;"><span>        .createQuery(query, Address<span style="color:#f92672">::</span><span style="color:#66d9ef">class</span>.java)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 아래도 가능
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#75715e">//.createQuery(query)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        .resultList
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    println(addressList)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>[Address(city=&#39;NY&#39;, street=&#39;WS&#39;, zipcode=&#39;xxx&#39;), Address(city=&#39;NY&#39;, street=&#39;WS&#39;, zipcode=&#39;xxx&#39;)]
+</span></span></code></pre></div><p>여러 값 projection 을 할 때 주의 사항은 TypedQuery 가 아니라 Query 를 사용해야 한다는 것이다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// JPQL
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// 여러 값 projection 주의 사항
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">val</span> emf = <span style="color:#a6e22e">Persistence</span>.createEntityManagerFactory(<span style="color:#e6db74">&#34;jpabook&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> em = emf.createEntityManager()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// TypedQuery 가 아닌 Query 를 쓴다.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">val</span> createQuery: Query = em.createQuery(<span style="color:#e6db74">&#34;SELECT m.id, m.name FROM Member m&#34;</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>다음은 JPQL 의 페이징 API 다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// JPQL
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// 페이징 API
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">val</span> emf = <span style="color:#a6e22e">Persistence</span>.createEntityManagerFactory(<span style="color:#e6db74">&#34;jpabook&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> em = emf.createEntityManager()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> queryStatement = <span style="color:#e6db74">&#34;SELECT m FROM Member m ORDER BY m.id DESC&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> query = em.createQuery(queryStatement, Member<span style="color:#f92672">::</span><span style="color:#66d9ef">class</span>.java)
+</span></span><span style="display:flex;"><span>    query.firstResult = <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    query.maxResults = <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    println(query.resultList)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>[Member(id=2, name=&#39;수호&#39;, homeAddress=Address(city=&#39;NY&#39;, street=&#39;WS&#39;, zipcode=&#39;xxx&#39;), home2Address=Address(city=&#39;서울&#39;, street=&#39;장안로2&#39;, zipcode=&#39;222&#39;)), Member(id=1, name=&#39;수호&#39;, homeAddress=Address(city=&#39;NY&#39;, street=&#39;WS&#39;, zipcode=&#39;xxx&#39;), home2Address=Address(city=&#39;서울&#39;, street=&#39;장안로2&#39;, zipcode=&#39;222&#39;))]
+</span></span></code></pre></div>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2023 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

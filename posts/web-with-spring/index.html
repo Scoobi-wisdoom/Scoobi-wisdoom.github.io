@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Spring으로 게시판 만들기: 기본 | wisdoom</title>
+<meta name="keywords" content="">
+<meta name="description" content="먼저 여기서 서술된 java project 코드는 Webjjang 무조건 Spring , 웹짱이영환쌤 - YouTube 을 가공한 것임을 밝힌다.
+1. Project 생성 및 서버 구동 - pom.xml, ojdbc, 사용자 정의 파일 Spring Legacy Project 를 생성할 때 Spring MVC Project 를 선택한다. Project 가 생성이 된 후에는 pom.xml 파일을 설정한다. 필자는 웹짱매니아에서 제공한 pom.xml 파일을 수정해 사용했다. pom.xml 은 코드가 길기 때문에 글 맨 아래에 두었다. 복사 붙여넣기 할 때는 version 태그 아래부터 하자.">
+<meta name="author" content="">
+<link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/web-with-spring/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.5c25c975546c048d1a5600aadb48425ae1bc921a9a18fe67d6955c9535260811.css" integrity="sha256-XCXJdVRsBI0aVgCq20hCWuG8khqaGP5n1pVclTUmCBE=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.acb54fd32bbc1982428b8850317e45d076b95012730a5936667e6bc21777692a.js" integrity="sha256-rLVP0yu8GYJCi4hQMX5F0Ha5UBJzClk2Zn5rwhd3aSo="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Scoobi-wisdoom.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:title" content="Spring으로 게시판 만들기: 기본" />
+<meta property="og:description" content="먼저 여기서 서술된 java project 코드는 Webjjang 무조건 Spring , 웹짱이영환쌤 - YouTube 을 가공한 것임을 밝힌다.
+1. Project 생성 및 서버 구동 - pom.xml, ojdbc, 사용자 정의 파일 Spring Legacy Project 를 생성할 때 Spring MVC Project 를 선택한다. Project 가 생성이 된 후에는 pom.xml 파일을 설정한다. 필자는 웹짱매니아에서 제공한 pom.xml 파일을 수정해 사용했다. pom.xml 은 코드가 길기 때문에 글 맨 아래에 두었다. 복사 붙여넣기 할 때는 version 태그 아래부터 하자." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/web-with-spring/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2020-12-15T16:23:22+09:00" />
+<meta property="article:modified_time" content="2020-12-15T16:23:22+09:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Spring으로 게시판 만들기: 기본"/>
+<meta name="twitter:description" content="먼저 여기서 서술된 java project 코드는 Webjjang 무조건 Spring , 웹짱이영환쌤 - YouTube 을 가공한 것임을 밝힌다.
+1. Project 생성 및 서버 구동 - pom.xml, ojdbc, 사용자 정의 파일 Spring Legacy Project 를 생성할 때 Spring MVC Project 를 선택한다. Project 가 생성이 된 후에는 pom.xml 파일을 설정한다. 필자는 웹짱매니아에서 제공한 pom.xml 파일을 수정해 사용했다. pom.xml 은 코드가 길기 때문에 글 맨 아래에 두었다. 복사 붙여넣기 할 때는 version 태그 아래부터 하자."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Scoobi-wisdoom.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Spring으로 게시판 만들기: 기본",
+      "item": "https://Scoobi-wisdoom.github.io/posts/web-with-spring/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Spring으로 게시판 만들기: 기본",
+  "name": "Spring으로 게시판 만들기: 기본",
+  "description": "먼저 여기서 서술된 java project 코드는 Webjjang 무조건 Spring , 웹짱이영환쌤 - YouTube 을 가공한 것임을 밝힌다.\n1. Project 생성 및 서버 구동 - pom.xml, ojdbc, 사용자 정의 파일 Spring Legacy Project 를 생성할 때 Spring MVC Project 를 선택한다. Project 가 생성이 된 후에는 pom.xml 파일을 설정한다. 필자는 웹짱매니아에서 제공한 pom.xml 파일을 수정해 사용했다. pom.xml 은 코드가 길기 때문에 글 맨 아래에 두었다. 복사 붙여넣기 할 때는 version 태그 아래부터 하자.",
+  "keywords": [
+    
+  ],
+  "articleBody": "먼저 여기서 서술된 java project 코드는 Webjjang 무조건 Spring , 웹짱이영환쌤 - YouTube 을 가공한 것임을 밝힌다.\n1. Project 생성 및 서버 구동 - pom.xml, ojdbc, 사용자 정의 파일 Spring Legacy Project 를 생성할 때 Spring MVC Project 를 선택한다. Project 가 생성이 된 후에는 pom.xml 파일을 설정한다. 필자는 웹짱매니아에서 제공한 pom.xml 파일을 수정해 사용했다. pom.xml 은 코드가 길기 때문에 글 맨 아래에 두었다. 복사 붙여넣기 할 때는 version 태그 아래부터 하자.\nojdbc6.jar 와 사용자 정의 파일 pageObject.jar 을 src/main/webapp/WEB-INF/lib 에 넣어준다. lib 가 없으면 폴더를 생성한다. 이렇게 파일을 디렉토리에 추가한다고 Spring 에서 인식하는 것은 아니다. pom.xml 에서 아래와 같이 설정해야 한다. 를 보면 디렉토리를 알 수 있다.\npom.xml 설정\nnet.webjjang util.pageObject 1.0.0 system ${project.basedir}/src/main/webapp/WEB-INF/lib/pageObject.jar oracle ojdbc6 11.2.0 system ${project.basedir}/src/main/webapp/WEB-INF/lib/ojdbc6.jar 성공적으로 반영되면 Maven Dependencies 에 ojdbc 와 사용자 정의 파일이 등록된 것을 알 수 있다.\n그리고 java version 을 맞춰야 한다. 기존의 pom.xml파일을 복사 붙여넣기 할 경우, 를 보면 1.8 이라고 된 경우가 있다. Project 의 버전 역시 이것으로 맞춰야 한다. 실제로 Eclipse 에서 해당 project 의 Properties 에서 Project Facets 를 확인해보면 java 1.6 이라고 돼 있을 있다. 이것을 변환하기 위해 해당 project 의 Maven 에서 Update project 를 실행한다. 여기서 Update project configuration from pom.xml 을 체크한 후에 ok 를 클릭한다. 이제 다시 Project Facets 를 확인하면 java 1.8 로 변한 것을 확인할 수 있다.\n그 다음은 tomcat 설정인데, 해당 spring project 를 tomcat server 에 놓자. 그 다음에 서버를 실행해보자. 그런 다음 http://localhost:PORT/main/ 에 정상적으로 접속되면 서버가 제대로 작동하는 것이다.\n기타 과정으로, server operation 시간 제한을 설정해보자. Tomcat server 를 더블 클릭한 후 Overview \u003e Timeouts 에서 start 를 180 으로 설정한다.\n2. URL 에서 Java Project name 제거 두 가지 방법이 있다. 첫 번째는 tomcat 서버 설정을 변경하는 것이다. Tomcat server 를 더블 클릭한 후 modules 탭을 클릭한다. 그리고 변경하고자 하는 프로젝트를 선택한 후 Edit 버튼을 누른다. /main 을 / 으로 고치고 OK 를 클릭한다. Ctrl + S 를 눌러 저장해주면 된다.\n두 번째 방법은, project 설정을 변경하는 방법이다. Eclipse 에서 해당 project 를 우클릭하여 properties 에 들어간다. 여기서 Web Project Settings 를 클릭한다. 그리고 Context root 를 /main 에서 / 으로 고친다. 그리고 project clean 을 한 후에, 서버를 삭제하고 다시 추가한다.\n3. Encoding UTF-8 설정 및 default Servlet - web.xml, jsp 이제 웹페이지에서 unicode 가 제대로 나오게 하기 web.xml 에서 encoding 을 utf-8 으로 설정한다. src/main/webapp/WEB_INF/web.xml 에 아래의 코드를 추가한다.\nweb.xml 추가 설정\nencodingFilter org.springframework.web.filter.CharacterEncodingFilter encoding UTF-8 forceEncoding true encodingFilter /* 그리고 home.jsp 파일에 아래와 같은 코드를 추가한다.\n\u003c%@ page contentType=\"text/html; charset=UTF-8\" pageEncoding=\"UTF-8\" language=\"java\" %\u003e 참고로 default web.xml 설정을 살펴보자.\ndefault web.xml\ncontextConfigLocation /WEB-INF/spring/root-context.xml org.springframework.web.context.ContextLoaderListener appServlet org.springframework.web.servlet.DispatcherServlet contextConfigLocation /WEB-INF/spring/appServlet/servlet-context.xml 1 appServlet / 크게 과 가 있다. 는 root-context.xml 을, 은 servlet-context.xml 을 로 갖고 있는데, root-context.xml 는 non-web 을 servlet-context.xml 은 web 의 bean 을 설정한다.\n, 두 가지 중 설정이 의미하는 것은 에 해당하는 url 을 이 appServlet 인 servlet 이 처리한다는 의미이다. 에는 servlet 이 정의돼 있다. 위에서는 DispatcherServlet class 이다. 그리고 이 servlet 의 세부 설정은 servlet-context.xml 에 있다.\n4. Servlet 설정 확인 - servlet-context.xml, Controller web.xml 에서 servlet 설정을 확인했다. 세부 설정은 servlet-context.xml 에서 확인할 수 있다. Default 는 아래와 같다.\nDefault servlet-context.xml\n",
+  "wordCount" : "3228",
+  "inLanguage": "en",
+  "datePublished": "2020-12-15T16:23:22+09:00",
+  "dateModified": "2020-12-15T16:23:22+09:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Scoobi-wisdoom.github.io/posts/web-with-spring/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "wisdoom",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Scoobi-wisdoom.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://Scoobi-wisdoom.github.io/" accesskey="h" title="wisdoom (Alt + H)">wisdoom</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title">
+      Spring으로 게시판 만들기: 기본
+    </h1>
+    <div class="post-meta"><span title='2020-12-15 16:23:22 +0900 KST'>December 15, 2020</span>
+
+</div>
+  </header> 
+  <div class="post-content"><p>먼저 여기서 서술된 java project 코드는 <a href="https://youtube.com/playlist?list=PLE5Oosh5zKQfFh7BWBrebDYRxeCRYPvY_">Webjjang 무조건 Spring , 웹짱이영환쌤 - YouTube</a> 을 가공한 것임을 밝힌다.</p>
+<h2 id="1-project-생성-및-서버-구동---pomxml-ojdbc-사용자-정의-파일">1. Project 생성 및 서버 구동 - pom.xml, ojdbc, 사용자 정의 파일<a hidden class="anchor" aria-hidden="true" href="#1-project-생성-및-서버-구동---pomxml-ojdbc-사용자-정의-파일">#</a></h2>
+<p>Spring Legacy Project 를 생성할 때 Spring MVC Project 를 선택한다. Project 가 생성이 된 후에는 <strong>pom.xml</strong> 파일을 설정한다. 필자는 <a href="https://cafe.naver.com/webjjangma">웹짱매니아</a>에서 제공한 <strong>pom.xml</strong> 파일을 수정해 사용했다. <strong>pom.xml</strong> 은 코드가 길기 때문에 글 맨 아래에 두었다. 복사 붙여넣기 할 때는 version 태그 아래부터 하자.</p>
+<p><strong>ojdbc6.jar</strong> 와 <strong>사용자 정의 파일 pageObject.jar</strong> 을 src/main/webapp/WEB-INF/lib 에 넣어준다. lib 가 없으면 폴더를 생성한다. 이렇게 파일을 디렉토리에 추가한다고 Spring 에서 인식하는 것은 아니다. <strong>pom.xml</strong> 에서 아래와 같이 설정해야 한다. &lt;systemPath&gt; 를 보면 디렉토리를 알 수 있다.</p>
+<p><strong>pom.xml</strong> 설정</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;groupId&gt;</span>net.webjjang<span style="color:#f92672">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;artifactId&gt;</span>util.pageObject<span style="color:#f92672">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;version&gt;</span>1.0.0<span style="color:#f92672">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;scope&gt;</span>system<span style="color:#f92672">&lt;/scope&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;systemPath&gt;</span>${project.basedir}/src/main/webapp/WEB-INF/lib/pageObject.jar<span style="color:#f92672">&lt;/systemPath&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/dependency&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;groupId&gt;</span>oracle<span style="color:#f92672">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;artifactId&gt;</span>ojdbc6<span style="color:#f92672">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;version&gt;</span>11.2.0<span style="color:#f92672">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;scope&gt;</span>system<span style="color:#f92672">&lt;/scope&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;systemPath&gt;</span>${project.basedir}/src/main/webapp/WEB-INF/lib/ojdbc6.jar<span style="color:#f92672">&lt;/systemPath&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/dependency&gt;</span>
+</span></span></code></pre></div><p>성공적으로 반영되면 Maven Dependencies 에 <strong>ojdbc</strong> 와 <strong>사용자 정의 파일</strong>이 등록된 것을 알 수 있다.</p>
+<p>그리고 java version 을 맞춰야 한다. 기존의 <strong>pom.xml</strong>파일을 복사 붙여넣기 할 경우, &lt;java-version&gt; 를 보면 1.8 이라고 된 경우가 있다. Project 의 버전 역시 이것으로 맞춰야 한다. 실제로 Eclipse 에서 해당 project 의 Properties 에서 Project Facets 를 확인해보면 java 1.6 이라고 돼 있을 있다. 이것을 변환하기 위해 해당 project 의 Maven 에서 Update project 를 실행한다. 여기서 Update project configuration from <strong>pom.xml</strong> 을 체크한 후에 ok 를 클릭한다. 이제 다시 Project Facets 를 확인하면 java 1.8 로 변한 것을 확인할 수 있다.</p>
+<p>그 다음은 tomcat 설정인데, 해당 spring project 를 tomcat server 에 놓자. 그 다음에 서버를 실행해보자. 그런 다음 http://localhost:PORT/main/ 에 정상적으로 접속되면 서버가 제대로 작동하는 것이다.</p>
+<p>기타 과정으로, server operation 시간 제한을 설정해보자. Tomcat server 를 더블 클릭한 후 Overview &gt; Timeouts 에서 start 를 180 으로 설정한다.</p>
+<h2 id="2-url-에서-java-project-name-제거">2. URL 에서 Java Project name 제거<a hidden class="anchor" aria-hidden="true" href="#2-url-에서-java-project-name-제거">#</a></h2>
+<p>두 가지 방법이 있다. 첫 번째는 tomcat 서버 설정을 변경하는 것이다. Tomcat server 를 더블 클릭한 후 modules 탭을 클릭한다. 그리고 변경하고자 하는 프로젝트를 선택한 후 Edit 버튼을 누른다.  <strong>/main</strong> 을 <strong>/</strong> 으로 고치고 OK 를 클릭한다. Ctrl + S 를 눌러 저장해주면 된다.</p>
+<p>두 번째 방법은, project 설정을 변경하는 방법이다. Eclipse 에서 해당 project 를 우클릭하여 properties 에 들어간다. 여기서 Web Project Settings 를 클릭한다. 그리고 Context root 를 <strong>/main</strong> 에서 <strong>/</strong> 으로 고친다. 그리고 project clean 을 한 후에, 서버를 삭제하고 다시 추가한다.</p>
+<h2 id="3-encoding-utf-8-설정-및-default-servlet---webxml-jsp">3. Encoding UTF-8 설정 및 default Servlet - web.xml, jsp<a hidden class="anchor" aria-hidden="true" href="#3-encoding-utf-8-설정-및-default-servlet---webxml-jsp">#</a></h2>
+<p>이제 웹페이지에서 unicode 가 제대로 나오게 하기 <strong>web.xml</strong> 에서 encoding 을 utf-8 으로 설정한다. src/main/webapp/WEB_INF/web.xml 에 아래의 코드를 추가한다.</p>
+<p><strong>web.xml</strong> 추가 설정</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;filter&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;filter-name&gt;</span>encodingFilter<span style="color:#f92672">&lt;/filter-name&gt;</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;filter-class&gt;</span>org.springframework.web.filter.CharacterEncodingFilter<span style="color:#f92672">&lt;/filter-class&gt;</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;init-param&gt;</span> 
+</span></span><span style="display:flex;"><span>       <span style="color:#f92672">&lt;param-name&gt;</span>encoding<span style="color:#f92672">&lt;/param-name&gt;</span> 
+</span></span><span style="display:flex;"><span>       <span style="color:#f92672">&lt;param-value&gt;</span>UTF-8<span style="color:#f92672">&lt;/param-value&gt;</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/init-param&gt;</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;init-param&gt;</span> 
+</span></span><span style="display:flex;"><span>       <span style="color:#f92672">&lt;param-name&gt;</span>forceEncoding<span style="color:#f92672">&lt;/param-name&gt;</span> 
+</span></span><span style="display:flex;"><span>       <span style="color:#f92672">&lt;param-value&gt;</span>true<span style="color:#f92672">&lt;/param-value&gt;</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/init-param&gt;</span> 
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">&lt;/filter&gt;</span> 
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">&lt;filter-mapping&gt;</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;filter-name&gt;</span>encodingFilter<span style="color:#f92672">&lt;/filter-name&gt;</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;url-pattern&gt;</span>/*<span style="color:#f92672">&lt;/url-pattern&gt;</span> 
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">&lt;/filter-mapping&gt;</span>
+</span></span></code></pre></div><p>그리고 <strong>home.jsp</strong> 파일에 아래와 같은 코드를 추가한다.</p>
+<pre tabindex="0"><code class="language-jsp" data-lang="jsp">&lt;%@ page contentType=&#34;text/html; charset=UTF-8&#34; pageEncoding=&#34;UTF-8&#34; language=&#34;java&#34; %&gt;
+</code></pre><p>참고로 default <strong>web.xml</strong> 설정을 살펴보자.</p>
+<p>default <strong>web.xml</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#75715e">&lt;!-- The definition of the Root Spring Container shared by all Servlets and Filters --&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;context-param&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;param-name&gt;</span>contextConfigLocation<span style="color:#f92672">&lt;/param-name&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;param-value&gt;</span>/WEB-INF/spring/root-context.xml<span style="color:#f92672">&lt;/param-value&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/context-param&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">&lt;!-- Creates the Spring Container shared by all Servlets and Filters --&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;listener&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;listener-class&gt;</span>org.springframework.web.context.ContextLoaderListener<span style="color:#f92672">&lt;/listener-class&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/listener&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">&lt;!-- Processes application requests --&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;servlet&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;servlet-name&gt;</span>appServlet<span style="color:#f92672">&lt;/servlet-name&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;servlet-class&gt;</span>org.springframework.web.servlet.DispatcherServlet<span style="color:#f92672">&lt;/servlet-class&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;init-param&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;param-name&gt;</span>contextConfigLocation<span style="color:#f92672">&lt;/param-name&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;param-value&gt;</span>/WEB-INF/spring/appServlet/servlet-context.xml<span style="color:#f92672">&lt;/param-value&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/init-param&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;load-on-startup&gt;</span>1<span style="color:#f92672">&lt;/load-on-startup&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/servlet&gt;</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;servlet-mapping&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;servlet-name&gt;</span>appServlet<span style="color:#f92672">&lt;/servlet-name&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;url-pattern&gt;</span>/<span style="color:#f92672">&lt;/url-pattern&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/servlet-mapping&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/web-app&gt;</span>
+</span></span></code></pre></div><p>크게 &lt;context-param&gt; 과 &lt;servlet&gt; 가 있다. &lt;context-param&gt; 는 root-context.xml 을, &lt;servlet&gt; 은 servlet-context.xml 을 &lt;param-value&gt; 로 갖고 있는데, root-context.xml 는 non-web 을 servlet-context.xml 은 web 의 bean 을 설정한다.</p>
+<p>&lt;servlet&gt;, &lt;servlet-mapping&gt; 두 가지 중 &lt;servlet-mapping&gt; 설정이 의미하는 것은 &lt;url-pattern&gt; 에 해당하는 url 을 &lt;servlet-name&gt; 이 appServlet 인 servlet 이 처리한다는 의미이다. &lt;servlet&gt; 에는 servlet 이 정의돼 있다. 위에서는 DispatcherServlet class 이다. 그리고 이 servlet 의 세부 설정은 servlet-context.xml 에 있다.</p>
+<h2 id="4-servlet-설정-확인---servlet-contextxml-controller">4. Servlet 설정 확인 - servlet-context.xml, Controller<a hidden class="anchor" aria-hidden="true" href="#4-servlet-설정-확인---servlet-contextxml-controller">#</a></h2>
+<p>web.xml 에서 servlet 설정을 확인했다. 세부 설정은 <strong>servlet-context.xml</strong> 에서 확인할 수 있다. Default 는 아래와 같다.</p>
+<p>Default <strong>servlet-context.xml</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#75715e">&lt;!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory --&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;resources</span> <span style="color:#a6e22e">mapping=</span><span style="color:#e6db74">&#34;/resources/**&#34;</span> <span style="color:#a6e22e">location=</span><span style="color:#e6db74">&#34;/resources/&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">&lt;!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory --&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;beans:bean</span> <span style="color:#a6e22e">class=</span><span style="color:#e6db74">&#34;org.springframework.web.servlet.view.InternalResourceViewResolver&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;beans:property</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;prefix&#34;</span> <span style="color:#a6e22e">value=</span><span style="color:#e6db74">&#34;/WEB-INF/views/&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;beans:property</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;suffix&#34;</span> <span style="color:#a6e22e">value=</span><span style="color:#e6db74">&#34;.jsp&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/beans:bean&gt;</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;context:component-scan</span> <span style="color:#a6e22e">base-package=</span><span style="color:#e6db74">&#34;com.mycompany.main&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span></code></pre></div><p>&lt;resources&gt; 는 html, css, javascript, image 등을 mapping 하기 위한 설정이다. &lt;beans&gt; 는 <strong>Controller</strong> 가 return 할 때 사용하는 class, prefix, suffix 를 설정한다.</p>
+<p>아래는 default <strong>HomeController</strong> 에서 home method 이다.</p>
+<p>Default <strong>HomeController</strong> home method</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@RequestMapping</span><span style="color:#f92672">(</span>value <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/&#34;</span><span style="color:#f92672">,</span> method <span style="color:#f92672">=</span> RequestMethod<span style="color:#f92672">.</span><span style="color:#a6e22e">GET</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">home</span><span style="color:#f92672">(</span>Locale locale<span style="color:#f92672">,</span> Model model<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        logger<span style="color:#f92672">.</span><span style="color:#a6e22e">info</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Welcome home! The client locale is {}.&#34;</span><span style="color:#f92672">,</span> locale<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        Date date <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date<span style="color:#f92672">();</span>
+</span></span><span style="display:flex;"><span>        DateFormat dateFormat <span style="color:#f92672">=</span> DateFormat<span style="color:#f92672">.</span><span style="color:#a6e22e">getDateTimeInstance</span><span style="color:#f92672">(</span>DateFormat<span style="color:#f92672">.</span><span style="color:#a6e22e">LONG</span><span style="color:#f92672">,</span> DateFormat<span style="color:#f92672">.</span><span style="color:#a6e22e">LONG</span><span style="color:#f92672">,</span> locale<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        String formattedDate <span style="color:#f92672">=</span> dateFormat<span style="color:#f92672">.</span><span style="color:#a6e22e">format</span><span style="color:#f92672">(</span>date<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        model<span style="color:#f92672">.</span><span style="color:#a6e22e">addAttribute</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;serverTime&#34;</span><span style="color:#f92672">,</span> formattedDate <span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;home&#34;</span><span style="color:#f92672">;</span>
+</span></span></code></pre></div><p>&ldquo;home&rdquo; 이 return 된다. 하지만 <strong>servlet-context.xml</strong> 의 설정에 의해 InternalResourceViewResolver 가 prefix + &ldquo;home&rdquo; + suffix 를 return 한다. 즉 /WEB-INF/views/home.jsp 를 return 한다.</p>
+<h2 id="5-controller-설정-1-생성---servlet-contextxml-controller">5. Controller 설정 1: 생성 - servlet-context.xml, @Controller<a hidden class="anchor" aria-hidden="true" href="#5-controller-설정-1-생성---servlet-contextxml-controller">#</a></h2>
+<p>HomeController 외에 다른 Controller 가 필요할 경우 설정한다. 예시는 ForumController 를 생성하는 경우다. src/main/java &gt; com.&ldquo;mycompany&rdquo;.forum.controller 패키지를 만든다. 그 패키지 하위에 ForumController 라는 Class 를 생성한다. 생성한 후에 @Controller 를 입력해 annotation 처리를 한다.</p>
+<p><strong>ForumController</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.stereotype.Controller<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Controller</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ForumController</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p><strong>@Controller</strong> 는 @Component 를 상속한 annotation 으로서 class ForumController 의 객체를 메모리에 생성하며, DispatcherServlet 이 인식할 수 있도록 Controller 의 객체로 만들어준다 (채규태, 2020).</p>
+<p>ForumController 를 Spring 의 제어를 받도록 설정해줘야 한다. src &gt; main &gt; WEB-INF &gt; spring &gt; appServlet &gt; <strong>servlet-context.xml</strong> 을 연다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;context:component-scan</span> <span style="color:#a6e22e">base-package=</span><span style="color:#e6db74">&#34;com.mycompany.main&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span></code></pre></div><p>라고 돼 있는 것을 아래와 같이 수정한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;context:component-scan</span> <span style="color:#a6e22e">base-package=</span><span style="color:#e6db74">&#34;com.mycompany&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span></code></pre></div><p>변경 사항이 적용되면 Eclipse Package Explorer 의 ForumController 에 S 마크가 붙는다.</p>
+<h2 id="6-controller-설정-2-request---model-requestmapping-getmapping-do">6. Controller 설정 2: request - Model, @RequestMapping, @GetMapping, .do<a hidden class="anchor" aria-hidden="true" href="#6-controller-설정-2-request---model-requestmapping-getmapping-do">#</a></h2>
+<p>ForumController 에 @RequestMapping 을 추가한다.</p>
+<p><strong>ForumController</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.stereotype.Controller<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.web.bind.annotation.RequestMapping<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.ui.Model<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> net.webjjang.util.PageObject<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Controller</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@RequestMapping</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/forum&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ForumController</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> String MODULE_NAME <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;forum&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 추후 설명
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@Autowired</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> ForumService service<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@GetMapping</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/list.do&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">list</span><span style="color:#f92672">(</span>Model model<span style="color:#f92672">,</span> PageObject pageObject<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;ForumController.list().pageObjet:&#34;</span> <span style="color:#f92672">+</span> pageObject<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        model<span style="color:#f92672">.</span><span style="color:#a6e22e">addAttribute</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;list&#34;</span><span style="color:#f92672">,</span> service<span style="color:#f92672">.</span><span style="color:#a6e22e">list</span><span style="color:#f92672">(</span>pageObject<span style="color:#f92672">));</span>
+</span></span><span style="display:flex;"><span>        model<span style="color:#f92672">.</span><span style="color:#a6e22e">addAttribute</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;pageObject&#34;</span><span style="color:#f92672">,</span> pageObject<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> MODULE_NAME <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/list&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p><strong>@RequestMapping</strong> 은 클라이언트의 &ldquo;/forum&rdquo; request 에 method 를 대응한다는 의미다 (채규태, 2020). 위 코드에서는 class 를 매핑했다.</p>
+<p>DB에서 data 를 가져와서 jsp 로 보낼 때는 request 객체가 필요하다. request 객체는 <strong>Model</strong> 객체에 담겨 있다. PageObject 는 사용자가 정의한 jar 파일이다.</p>
+<p><strong>@GetMapping</strong> 은 get 방식 request 에 대응하는 <strong>@RequestMapping</strong> 이다. 위의 코드에서 <strong>@GetMapping(&quot;/list.do&quot;)</strong> 가 의미하는 것은 <strong>/list.do</strong> 에서 request 를 받겠다는 것이다. 즉, request 를 받는 url 을 임의로 지정할 수 있다. 예제에서는 <strong>.do</strong> 로 했는데, <strong>.abc</strong>, <strong>.zzz</strong> 등 어떻게 설정해도 상관 없다.</p>
+<p>또한 <strong>@RequestMapping(&quot;/forum&quot;)</strong> 가 class 에 위치하고, <strong>@GetMapping(&quot;/list.do&quot;)</strong> 은 method 에 위치하기 때문에 request url 은 &ldquo;/forum/list.do&rdquo; 다.</p>
+<h2 id="7-mybatis-설정-root-contextxml">7. Mybatis 설정: root-context.xml<a hidden class="anchor" aria-hidden="true" href="#7-mybatis-설정-root-contextxml">#</a></h2>
+<p>Mybatis 프레임워크의 특징은 두 가지로, 첫째는 한두 줄의 자바 코드로 DB 연동을 처리한다는 것이며, 둘째는 SQL 명령어를 자바 코드에서 분리하여 xml 파일에 따로 관리한다는 것이다 (채규태, 2020).</p>
+<p><strong>root-context.xml</strong> 파일을 설정한다. 아래는 <a href="https://cafe.naver.com/webjjangma">웹짱매니아</a>에서 제공한 <strong>root-context.xml</strong> 파일을 수정한 것이다.</p>
+<p><strong>root-context.xml</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#75715e">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;beans</span> <span style="color:#a6e22e">xmlns=</span><span style="color:#e6db74">&#34;http://www.springframework.org/schema/beans&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">xmlns:xsi=</span><span style="color:#e6db74">&#34;http://www.w3.org/2001/XMLSchema-instance&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">xmlns:context=</span><span style="color:#e6db74">&#34;http://www.springframework.org/schema/context&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">xmlns:mybatis-spring=</span><span style="color:#e6db74">&#34;http://mybatis.org/schema/mybatis-spring&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">xsi:schemaLocation=</span><span style="color:#e6db74">&#34;http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">&lt;!-- Root Context: defines shared resources visible to all other web components --&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;bean</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;hikariConfig&#34;</span> <span style="color:#a6e22e">class=</span><span style="color:#e6db74">&#34;com.zaxxer.hikari.HikariConfig&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;property</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;driverClassName&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">value=</span><span style="color:#e6db74">&#34;oracle.jdbc.driver.OracleDriver&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;property</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;jdbcUrl&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">value=</span><span style="color:#e6db74">&#34;jdbc:oracle:thin:@localhost:1521:xe&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">&lt;!-- value=&#34;jdbc:oracle:thin:@IP_ADDRESS:PORT:SID&#34; --&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">&lt;!-- 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">        &lt;property name=&#34;jdbcUrl&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">            value=&#34;jdbc:log4jdbc:oracle:thin:@402-oracle:1521:orcl&#34; /&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">        --&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;property</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;username&#34;</span> <span style="color:#a6e22e">value=</span><span style="color:#e6db74">&#34;USERNAME&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;property</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;password&#34;</span> <span style="color:#a6e22e">value=</span><span style="color:#e6db74">&#34;PASSWORD&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/bean&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;bean</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;dataSource&#34;</span> <span style="color:#a6e22e">class=</span><span style="color:#e6db74">&#34;com.zaxxer.hikari.HikariDataSource&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">destroy-method=</span><span style="color:#e6db74">&#34;close&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;constructor-arg</span> <span style="color:#a6e22e">ref=</span><span style="color:#e6db74">&#34;hikariConfig&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/bean&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">&lt;!-- Mybaits - dao 코드 자동 생성 --&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">&lt;!-- mapper Interface(메서드이름) - mapper xml(sql) --&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;bean</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;sqlSessionFactory&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">class=</span><span style="color:#e6db74">&#34;org.mybatis.spring.SqlSessionFactoryBean&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;property</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;dataSource&#34;</span> <span style="color:#a6e22e">ref=</span><span style="color:#e6db74">&#34;dataSource&#34;</span><span style="color:#f92672">&gt;&lt;/property&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/bean&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">&lt;!-- Mapper 인식 --&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;mybatis-spring:scan</span> <span style="color:#a6e22e">base-package=</span><span style="color:#e6db74">&#34;com.mycompany&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;context:component-scan</span> <span style="color:#a6e22e">base-package=</span><span style="color:#e6db74">&#34;com.mycompany&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/context:component-scan&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/beans&gt;</span>
+</span></span></code></pre></div><p>설정이 완료되면 Eclipse 에서 <strong>root-context.xml</strong> 의 Namespaces 를 확인한다. Namespaces 에 체크 된 항목들은 <strong>root-context.xml</strong> 의 &lt;beans&gt; 의 xmlns 항목임을 알 수 있다. 또한 &lt;property&gt; 설정과 &lt;constructor-arg&gt; 설정이 있는데, 이는 각각 Setter 와 Constructor 를 이용해 Dependency Injection 을 처리한다.</p>
+<p>&lt;bean id=&ldquo;sqlSessionFactory&gt; 를 보자. SqlSessionFactoryBean class 를 사용하는 bean 인데, 사용 방법에는 두 가지가 있다. 첫째는 DAO 를 작성하는 방법, 두 번째는 mapper interface 를 사용하는 방법이다. 여기서는 mapper interface 를 사용한다.</p>
+<p>Mapper interface 를 사용하면 사용자가 DAO 를 만들지 않고 mybatis 가 DAO 를 생성한다. &lt;mybatis-spring:scan&gt; 은 base-package 에서 mapper interface 를 찾는 설정이다.</p>
+<p>&lt;context:component-scan&gt; 와 헷갈리지 말자. &lt;context:component-scan&gt; 는 애플리케이션에서 사용할 객체들을 &lt;bean&gt; 에 등록하지 않고도 스프링 설정 파일에 자동으로 생성하기 위한 엘리먼로서,  이 설정을 추가하면 스프링 컨테이너는 클래스 패스에 있는 클래스들을 스캔하여 @Component 가 설정된 클래스들을 자동으로 객체 생성한다 (채규태, 2020).</p>
+<h2 id="8-mybatis-sql-mapper-xml-설정-forummapperxml-sql-mapper-xml-forummapper-interface">8. Mybatis SQL Mapper XML 설정: ForumMapper.xml (SQL Mapper XML), ForumMapper (interface)<a hidden class="anchor" aria-hidden="true" href="#8-mybatis-sql-mapper-xml-설정-forummapperxml-sql-mapper-xml-forummapper-interface">#</a></h2>
+<p><strong>SQL Mapper XML</strong> 은 SQL 명령어가 저장되는 파일로, 필자는 <a href="https://cafe.naver.com/webjjangma">웹짱매니아</a>에서 제공한 <strong>boardMapper.xml</strong> 파일을 수정해 <strong>ForumMapper.xml</strong> 로 사용했다. 이 파일을 src/main/resources 하위에 두어야 한다.</p>
+<p>하위 디렉토리는 반드시 &lt;mapper&gt; 의 namespace 와 동일하게 하자. 만약 namespace 와 다른 디렉토리에 <strong>ForumMapper.xml</strong> 위치하면 다음과 같은 에러가 발생한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>Request processing failed; nested exception is org.apache.ibatis.binding.BindingException: Invalid bound statement <span style="color:#f92672">(</span>not found<span style="color:#f92672">)</span>: com.webjjang.forum.mapper.ForumMapper.getCount
+</span></span></code></pre></div><p>사실 namespace 는 <strong>ForumMapper.java Interface</strong> 의 경로이면서, <strong>ForumMapper.xml</strong> 의 경로이다. 아래 예시에서는 namespace 가 com/webjjang/forum/mapper/ForumMapper 로 돼 있으니, src/main/resources/com/webjjang/forum/mapper 폴더를 생성한 후에, Eclipse 를 통해 여기에 <strong>ForumMapper.xml</strong> 파일을 생성한 후 아래와 같이 작성한다. <strong>ForumMapper.xml</strong> 에서 id 는 <strong>ForumMapper.java</strong> 의 method 명과 동일해야 한다.</p>
+<p><strong>ForumMapper.xml</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#75715e">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">&lt;!DOCTYPE mapper PUBLIC &#34;-//mybatis.org//DTD Mapper 3.0//EN&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">&#34;http://mybatis.org/dtd/mybatis-3-mapper.dtd&#34;&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;mapper</span> <span style="color:#a6e22e">namespace=</span><span style="color:#e6db74">&#34;com.webjjang.forum.mapper.ForumMapper&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;select</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;list&#34;</span> <span style="color:#a6e22e">resultType=</span><span style="color:#e6db74">&#34;com.webjjang.forum.vo.ForumVO&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        select * from (
+</span></span><span style="display:flex;"><span>        select rownum rnum, no, title, writer, writeDate, hit
+</span></span><span style="display:flex;"><span>        from (
+</span></span><span style="display:flex;"><span>        select no, title, writer, writeDate, hit
+</span></span><span style="display:flex;"><span>        from forum
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">&lt;!-- 이곳에 조건을 쓴다. --&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;include</span> <span style="color:#a6e22e">refid=</span><span style="color:#e6db74">&#34;search&#34;</span><span style="color:#f92672">&gt;&lt;/include&gt;</span>
+</span></span><span style="display:flex;"><span>        order by no desc
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>        where rnum between #{startRow} and #{endRow}
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/select&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;select</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;getCount&#34;</span> <span style="color:#a6e22e">resultType=</span><span style="color:#e6db74">&#34;java.lang.Integer&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        select count(*)
+</span></span><span style="display:flex;"><span>        from forum
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">&lt;!-- 이곳에 조건을 쓴다. --&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;include</span> <span style="color:#a6e22e">refid=</span><span style="color:#e6db74">&#34;search&#34;</span><span style="color:#f92672">&gt;&lt;/include&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/select&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;insert</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;write&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        insert into forum(no, title, content, writer, pw)
+</span></span><span style="display:flex;"><span>        values(forum_seq.nextval, #{title}, #{content}, #{writer}, #{pw})
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/insert&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;sql</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;search&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">&lt;!-- 검색어가 존재하는 경우에만 검색을 실행한다. mybatis doc을 참조하시오. --&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;if</span> <span style="color:#a6e22e">test=</span><span style="color:#e6db74">&#34;word != null and word != &#39;&#39;.toString() &#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>            where ( 2 = 1 <span style="color:#75715e">&lt;!-- 형식을 맞추기 위한 false를 넣었다. or 연산시 하는 기법 and 연산시 하는 기법은 true를 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">                넣기다. --&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">&lt;!-- Mybatis에서 2글자 이상인 경우 : String 취급, 한 글자인 경우:char 취급 =&gt; toString()를 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">                이용해서 문자열 String로 만듬 --&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;if</span> <span style="color:#a6e22e">test=</span><span style="color:#e6db74">&#34;key == &#39;t&#39;.toString()&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">&lt;!-- concat(문자열, 문자열) : 2개만 연결, &#34;||&#34; : 문자열 이어 붙이는 연산자 --&gt;</span>
+</span></span><span style="display:flex;"><span>                or title like &#39;%&#39; || #{word} || &#39;%&#39;
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;/if&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;if</span> <span style="color:#a6e22e">test=</span><span style="color:#e6db74">&#34;key == &#39;c&#39;.toString()&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>                or content like &#39;%&#39; || #{word} || &#39;%&#39;
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;/if&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;if</span> <span style="color:#a6e22e">test=</span><span style="color:#e6db74">&#34;key == &#39;w&#39;.toString()&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>                or writer like &#39;%&#39; || #{word} || &#39;%&#39;
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;/if&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;if</span> <span style="color:#a6e22e">test=</span><span style="color:#e6db74">&#34;key == &#39;tc&#39;.toString()&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>                or title like &#39;%&#39; || #{word} || &#39;%&#39;
+</span></span><span style="display:flex;"><span>                or content like &#39;%&#39; ||
+</span></span><span style="display:flex;"><span>                #{word} || &#39;%&#39;
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;/if&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;if</span> <span style="color:#a6e22e">test=</span><span style="color:#e6db74">&#34;key == &#39;tw&#39;.toString()&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>                or title like &#39;%&#39; || #{word} || &#39;%&#39;
+</span></span><span style="display:flex;"><span>                or writer like &#39;%&#39; ||
+</span></span><span style="display:flex;"><span>                #{word} || &#39;%&#39;
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;/if&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;if</span> <span style="color:#a6e22e">test=</span><span style="color:#e6db74">&#34;key == &#39;cw&#39;.toString()&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>                or content like &#39;%&#39; || #{word} || &#39;%&#39;
+</span></span><span style="display:flex;"><span>                or writer like &#39;%&#39;
+</span></span><span style="display:flex;"><span>                || #{word} || &#39;%&#39;
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;/if&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;if</span> <span style="color:#a6e22e">test=</span><span style="color:#e6db74">&#34;key == &#39;tcw&#39;&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>                or title like &#39;%&#39; || #{word} || &#39;%&#39;
+</span></span><span style="display:flex;"><span>                or content like &#39;%&#39; ||
+</span></span><span style="display:flex;"><span>                #{word} || &#39;%&#39;
+</span></span><span style="display:flex;"><span>                or writer like &#39;%&#39; || #{word} || &#39;%&#39;
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;/if&gt;</span>
+</span></span><span style="display:flex;"><span>            )
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;/if&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/sql&gt;</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span><span style="color:#75715e">&lt;!-- 게시판 글 보기 --&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;select</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;view&#34;</span> <span style="color:#a6e22e">resultType=</span><span style="color:#e6db74">&#34;com.webjjang.forum.vo.ForumVO&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>select no, title, content, writer, writeDate, hit
+</span></span><span style="display:flex;"><span>from forum
+</span></span><span style="display:flex;"><span>where no = #{no}
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/select&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">&lt;!-- 조회수 1 증가 --&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;update</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;increase&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>update forum
+</span></span><span style="display:flex;"><span>set hit = hit + 1
+</span></span><span style="display:flex;"><span>where no = #{no}
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/update&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">&lt;!-- 게시판 글삭제 : delete --&gt;</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">&lt;delete</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;delete&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>  delete from forum
+</span></span><span style="display:flex;"><span>  where no = #{no} and pw = #{pw}
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">&lt;/delete&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">&lt;!-- 게시판 글 수정
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    오류가 나지 않으면서 정보가 수정이 안 되는 경우 - 비밀번호가 틀린 경우,
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> --&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;update</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;update&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>update forum
+</span></span><span style="display:flex;"><span>set title = #{title}, content = #{content}, writer = #{writer}
+</span></span><span style="display:flex;"><span>where no = #{no} and pw = #{pw}
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/update&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/mapper&gt;</span>
+</span></span></code></pre></div><h2 id="9-mapper-interface-생성-및-사용-forummapperxml-sql-mapper-xml-forummapper-interface-forumvo-forumservice-inject">9. Mapper Interface 생성 및 사용: ForumMapper.xml (SQL Mapper XML), ForumMapper (interface), ForumVO, ForumService, @Inject<a hidden class="anchor" aria-hidden="true" href="#9-mapper-interface-생성-및-사용-forummapperxml-sql-mapper-xml-forummapper-interface-forumvo-forumservice-inject">#</a></h2>
+<p><strong>ForumMapper.xml</strong> 의 namespace 는 <strong>mapper interface</strong> 의 경로라고 위에서 언급했다. src/main/java 에 namespace 에 해당하는 경로에 <strong>interface</strong> 를 생성한다. 여기서는 <strong>ForumMapper</strong> 를 아래와 같이 생성했다. <strong>ForumMapper</strong> 의 method 명은 <strong>ForumMapper.xml</strong> 의 id 와 동일해야 한다.</p>
+<p><strong>ForumMapper</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> com.webjjang.forum.mapper<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.List<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.webjjang.forum.vo.ForumVO<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> net.webjjang.util.PageObject<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">ForumMapper</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 게시판 리스트
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> List<span style="color:#f92672">&lt;</span>ForumVO<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">list</span><span style="color:#f92672">(</span>PageObject pageObject<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> Integer <span style="color:#a6e22e">getCount</span><span style="color:#f92672">(</span>PageObject pageObject<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 게시판 글 보기
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> ForumVO <span style="color:#a6e22e">view</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> no<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">increase</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> no<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 게시판 글 작성
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> Integer <span style="color:#a6e22e">write</span><span style="color:#f92672">(</span>ForumVO vo<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 게시판 글 삭제
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> Integer <span style="color:#a6e22e">delete</span><span style="color:#f92672">(</span>ForumVO vo<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 게시판 글 수정
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> Integer <span style="color:#a6e22e">update</span><span style="color:#f92672">(</span>ForumVO vo<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p>위의 코드를 보면 DB 값을 가져오기 위해 VO 를 사용했음을 알 수 있다. 이에 맞게 VO 를 아래와 같이 생성한다. 여기서는 <strong>ForumVO</strong> class 를 src/main/java 생성했다.</p>
+<p><strong>ForumVO</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> com.webjjang.forum.vo<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.Date<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ForumVO</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// long 으로도 많이들 잡는다.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> no<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> String title<span style="color:#f92672">,</span> content<span style="color:#f92672">,</span> writer<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Date writeDate<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> hit<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> String pw<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">getNo</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> no<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setNo</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> no<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">no</span> <span style="color:#f92672">=</span> no<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getTitle</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> title<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setTitle</span><span style="color:#f92672">(</span>String title<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">title</span> <span style="color:#f92672">=</span> title<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getContent</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> content<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setContent</span><span style="color:#f92672">(</span>String content<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">content</span> <span style="color:#f92672">=</span> content<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getWriter</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> writer<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setWriter</span><span style="color:#f92672">(</span>String writer<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">writer</span> <span style="color:#f92672">=</span> writer<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> Date <span style="color:#a6e22e">getWriteDate</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> writeDate<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setWriteDate</span><span style="color:#f92672">(</span>Date writeDate<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">writeDate</span> <span style="color:#f92672">=</span> writeDate<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">getHit</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> hit<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setHit</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> hit<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">hit</span> <span style="color:#f92672">=</span> hit<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getPw</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> pw<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setPw</span><span style="color:#f92672">(</span>String pw<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">pw</span> <span style="color:#f92672">=</span> pw<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">toString</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;ForumVO [no=&#34;</span> <span style="color:#f92672">+</span> no <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;, title=&#34;</span> <span style="color:#f92672">+</span> title <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;, content=&#34;</span> <span style="color:#f92672">+</span> content <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;, writer=&#34;</span> <span style="color:#f92672">+</span> writer <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;, writeDate=&#34;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">+</span> writeDate <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;, hit=&#34;</span> <span style="color:#f92672">+</span> hit <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;, pw=&#34;</span> <span style="color:#f92672">+</span> pw <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;]&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p>이제 <strong>ForumService</strong> class 를 src/main/java 에 아래와 같이 생성하자. 보통은 <strong>ForumService</strong> 를 interface로 만든 후에 ForumServiceImpl을 만들어 상속한다. 하지만 여기서는 단일 class 로 생성한다. 참고로 Service 는 DB 데이터를 DAO 로부터 전달받아 가공하는 것으로, 여기서는 mapper interface 가 DAO 의 역할을 한다.</p>
+<p><strong>ForumService</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> com.webjjang.forum.service<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.List<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> javax.inject.Inject<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.stereotype.Service<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.webjjang.forum.mapper.ForumMapper<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.webjjang.forum.vo.ForumVO<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> net.webjjang.util.PageObject<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Service</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ForumService</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Inject</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> ForumMapper mapper<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 게시판 글 보기
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> List<span style="color:#f92672">&lt;</span>ForumVO<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">list</span><span style="color:#f92672">(</span>PageObject pageObject<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// paeObject에 전체 데이터의 개수를 셋팅하는 것이 필요
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        pageObject<span style="color:#f92672">.</span><span style="color:#a6e22e">setTotalRow</span><span style="color:#f92672">(</span>mapper<span style="color:#f92672">.</span><span style="color:#a6e22e">getCount</span><span style="color:#f92672">(</span>pageObject<span style="color:#f92672">));</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> mapper<span style="color:#f92672">.</span><span style="color:#a6e22e">list</span><span style="color:#f92672">(</span>pageObject<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> ForumVO <span style="color:#a6e22e">view</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> no<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> inc<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>inc <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>            mapper<span style="color:#f92672">.</span><span style="color:#a6e22e">increase</span><span style="color:#f92672">(</span>no<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> mapper<span style="color:#f92672">.</span><span style="color:#a6e22e">view</span><span style="color:#f92672">(</span>no<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 검색 게시판 글 수정
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">update</span><span style="color:#f92672">(</span>ForumVO vo<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> Exception <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>mapper<span style="color:#f92672">.</span><span style="color:#a6e22e">update</span><span style="color:#f92672">(</span>vo<span style="color:#f92672">)</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Exception<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;입력한 정보를 확인해주세요.&#34;</span><span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">write</span><span style="color:#f92672">(</span>ForumVO vo<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> Exception <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>mapper<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span>vo<span style="color:#f92672">)</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Exception<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;입력한 정보를 확인해주세요.&#34;</span><span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">delete</span><span style="color:#f92672">(</span>ForumVO vo<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> Exception<span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>mapper<span style="color:#f92672">.</span><span style="color:#a6e22e">delete</span><span style="color:#f92672">(</span>vo<span style="color:#f92672">)</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Exception<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;입력한 정보를 확인해주세요.&#34;</span><span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>   
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p><strong>@Inject</strong> 는 자동으로 Dependency Injection 을 실행하는 annotation 중 하나다. Dependency Injection 을 자동 실행하는 annotation 은 @Autowired, <strong>@Inject</strong>, @Resource 이다.</p>
+<p>@Autowired 는 스프링에서만 사용할 수 있지만, <strong>@Inject</strong> 와 @Resource 는 JSR 에 실려있는 자바 기존의 annotion 으로 스프링 외에서도 사용할 수 있다. Dependency Injection 방식에서도 차이가 있는데, @Autowired 와 <strong>@Inject</strong> 는 타입에 맞춰서 하는 반면, @Resource 는 이름에 맞춰서 연결한다 (쿠우v - OKKY, 2017).</p>
+<h2 id="10-controller-최종-설정-forumcontroller-autowired">10 Controller 최종 설정: ForumController, @Autowired<a hidden class="anchor" aria-hidden="true" href="#10-controller-최종-설정-forumcontroller-autowired">#</a></h2>
+<p>아래는 최종 <strong>ForumController</strong> 의 코드이다.</p>
+<p><strong>ForumController</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> com.webjjang.forum.controller<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.net.URLEncoder<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.beans.factory.annotation.Autowired<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.stereotype.Controller<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.ui.Model<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.web.bind.annotation.GetMapping<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.web.bind.annotation.PostMapping<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.web.bind.annotation.RequestMapping<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.webjjang.forum.service.ForumService<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.webjjang.forum.vo.ForumVO<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> net.webjjang.util.PageObject<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Controller</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@RequestMapping</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/forum&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ForumController</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> String MODULE_NAME <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;forum&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Autowired</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> ForumService service<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 게시글 리스트
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@GetMapping</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/list.do&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">list</span><span style="color:#f92672">(</span>Model model<span style="color:#f92672">,</span> PageObject pageObject<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;ForumController.list().pageObjet:&#34;</span> <span style="color:#f92672">+</span> pageObject<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// DB에서 데이터 가져오기 - Controller - Service - Mapper (DAO 자동 생성)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        model<span style="color:#f92672">.</span><span style="color:#a6e22e">addAttribute</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;list&#34;</span><span style="color:#f92672">,</span> service<span style="color:#f92672">.</span><span style="color:#a6e22e">list</span><span style="color:#f92672">(</span>pageObject<span style="color:#f92672">));</span>
+</span></span><span style="display:flex;"><span>        model<span style="color:#f92672">.</span><span style="color:#a6e22e">addAttribute</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;pageObject&#34;</span><span style="color:#f92672">,</span> pageObject<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> MODULE_NAME <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/list&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 게시글 보기
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@GetMapping</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/view.do&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">view</span><span style="color:#f92672">(</span>Model model<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> no<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> inc<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        model<span style="color:#f92672">.</span><span style="color:#a6e22e">addAttribute</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;vo&#34;</span><span style="color:#f92672">,</span> service<span style="color:#f92672">.</span><span style="color:#a6e22e">view</span><span style="color:#f92672">(</span>no<span style="color:#f92672">,</span> inc<span style="color:#f92672">));</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//      model.addAttribute(&#34;pageObject&#34;, pageObject);
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> MODULE_NAME <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/view&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 글 쓰기 폼
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@GetMapping</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/write.do&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">writeForm</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> MODULE_NAME <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/write&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 글 쓰기 처리 - 제목, 내용, 작성자, 비밀번호
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@PostMapping</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/write.do&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">write</span><span style="color:#f92672">(</span>ForumVO vo<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> Exception<span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;ForumController.write().vo:&#34;</span><span style="color:#f92672">+</span>vo<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        service<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span>vo<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 화면에 JSP를 보여주지 않고 바로 list로 이동한다.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;redirect:list.do&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 글 수정 폼
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@GetMapping</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/update.do&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">updateForm</span><span style="color:#f92672">(</span>Model model<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> no<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> inc<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        model<span style="color:#f92672">.</span><span style="color:#a6e22e">addAttribute</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;vo&#34;</span><span style="color:#f92672">,</span> service<span style="color:#f92672">.</span><span style="color:#a6e22e">view</span><span style="color:#f92672">(</span>no<span style="color:#f92672">,</span> inc<span style="color:#f92672">));</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> MODULE_NAME <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/update&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 글 수정 처리 - 글번호, 제목, 내용, 작성자, 확인용 비밀번호
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@PostMapping</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/update.do&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">update</span><span style="color:#f92672">(</span>ForumVO vo<span style="color:#f92672">,</span> PageObject pageObject<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> Exception<span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;ForumController.update().vo:&#34;</span><span style="color:#f92672">+</span>vo<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;ForumController.update().pageObject:&#34;</span><span style="color:#f92672">+</span>pageObject<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// DB 처리
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        service<span style="color:#f92672">.</span><span style="color:#a6e22e">update</span><span style="color:#f92672">(</span>vo<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 검색어가 null이면 null이 아닌 &#34;&#34;로 변경
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span><span style="color:#f92672">(</span>pageObject<span style="color:#f92672">.</span><span style="color:#a6e22e">getWord</span><span style="color:#f92672">()</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">)</span> pageObject<span style="color:#f92672">.</span><span style="color:#a6e22e">setWord</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;&#34;</span><span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 화면에 JSP를 보여주지 않고 바로 글 보기로 이동한다.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;redirect:view.do?no=&#34;</span> <span style="color:#f92672">+</span> vo<span style="color:#f92672">.</span><span style="color:#a6e22e">getNo</span><span style="color:#f92672">()</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;inc=0&#34;</span> 
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;page=&#34;</span> <span style="color:#f92672">+</span> pageObject<span style="color:#f92672">.</span><span style="color:#a6e22e">getPage</span><span style="color:#f92672">()</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;perPageNum=&#34;</span> <span style="color:#f92672">+</span> pageObject<span style="color:#f92672">.</span><span style="color:#a6e22e">getPerPageNum</span><span style="color:#f92672">()</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;key=&#34;</span> <span style="color:#f92672">+</span> pageObject<span style="color:#f92672">.</span><span style="color:#a6e22e">getKey</span><span style="color:#f92672">()</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 검색어 한글 처리
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;word=&#34;</span> <span style="color:#f92672">+</span> URLEncoder<span style="color:#f92672">.</span><span style="color:#a6e22e">encode</span><span style="color:#f92672">(</span>pageObject<span style="color:#f92672">.</span><span style="color:#a6e22e">getWord</span><span style="color:#f92672">(),</span> <span style="color:#e6db74">&#34;utf-8&#34;</span><span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 글 삭제 폼
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@GetMapping</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/delete.do&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">deleteForm</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> MODULE_NAME <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/delete&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>   
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 글 삭제 처리
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">@PostMapping</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/delete.do&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">delete</span><span style="color:#f92672">(</span>ForumVO vo<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> Exception<span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        service<span style="color:#f92672">.</span><span style="color:#a6e22e">delete</span><span style="color:#f92672">(</span>vo<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;redirect:list.do&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p><strong>@Autowired</strong> 는 자동으로 Dependency Injection 을 실행하는 annotation 중 하나다. Dependency Injection 을 자동 실행하는 annotation 은 <strong>@Autowired</strong>, @Inject, @Resource 이다.</p>
+<p><strong>@Autowired</strong> 는 스프링에서만 사용할 수 있지만, @Inject 와 @Resource 는 JSR 에 실려있는 자바 기존의 annotion 으로 스프링 외에서도 사용할 수 있다. Dependency Injection 방식에서도 차이가 있는데, <strong>@Autowired</strong> 와 @Inject 는 타입에 맞춰서 하는 반면, @Resource 는 이름에 맞춰서 연결한다 (쿠우v - OKKY, 2017).</p>
+<h2 id="11-jsp-작성-viewjsp">11. JSP 작성: view.jsp<a hidden class="anchor" aria-hidden="true" href="#11-jsp-작성-viewjsp">#</a></h2>
+<p><a href="https://github.com/Scoobi-wisdoom/spring/tree/master/spring_search/src/main/webapp/WEB-INF/views/forum">필자의 github 링크</a> 에 이 프로젝트에 필요한 모든 jsp 파일이 있다. 그 중 하나인 <strong>view.jsp</strong> 일부를 보자.</p>
+<p><strong>view.jsp</strong> 일부</p>
+<pre tabindex="0"><code class="language-jsp" data-lang="jsp">&lt;div class=&#34;container&#34;&gt;
+    &lt;h2&gt;게시판 글 보기&lt;/h2&gt;
+    &lt;table class=&#34;table&#34;&gt;
+        &lt;tr&gt;&lt;th&gt;번호&lt;/th&gt;&lt;td&gt;${vo.no }&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;th&gt;제목&lt;/th&gt;&lt;td&gt;${vo.title }&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;th&gt;내용&lt;/th&gt;&lt;td&gt;&lt;pre style=&#34;border: none&#34;&gt;${vo.content }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;th&gt;작성자&lt;/th&gt;&lt;td&gt;${vo.writer }&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;th&gt;작성일&lt;/th&gt;&lt;td&gt;&lt;fmt:formatDate value=&#34;${vo.writeDate }&#34; pattern=&#34;yyyy.MM.dd&#34;/&gt;&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;th&gt;조회수&lt;/th&gt;&lt;td&gt;${vo.hit }&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+&lt;/div&gt;
+</code></pre><p>여기서 <strong>${vo}</strong> 에 주목하자. 이는 ForumController 가 service 의 view method 를 실행해 return 한 값을 Model 에 추가해 <strong>view.jsp</strong> 에 return 한 값이다.</p>
+<p>ForumController 일부</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    <span style="color:#a6e22e">@GetMapping</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/view.do&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">view</span><span style="color:#f92672">(</span>Model model<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> no<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> inc<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        model<span style="color:#f92672">.</span><span style="color:#a6e22e">addAttribute</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;vo&#34;</span><span style="color:#f92672">,</span> service<span style="color:#f92672">.</span><span style="color:#a6e22e">view</span><span style="color:#f92672">(</span>no<span style="color:#f92672">,</span> inc<span style="color:#f92672">));</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> MODULE_NAME <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/view&#34;</span><span style="color:#f92672">;</span>
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<pre><code>&lt;!-- 라이브러리 등록 : 기본 다운로드 저장소 : maven.org --&gt;
+&lt;!-- 메이븐에 등록된 라이브러리 찾아보기 : search.maven.org --&gt;
+&lt;dependencies&gt;
+    &lt;!-- Spring --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-context&lt;/artifactId&gt;
+        &lt;version&gt;${org.springframework-version}&lt;/version&gt;
+        &lt;exclusions&gt;
+            &lt;!-- Exclude Commons Logging in favor of SLF4j --&gt;
+            &lt;exclusion&gt;
+                &lt;groupId&gt;commons-logging&lt;/groupId&gt;
+                &lt;artifactId&gt;commons-logging&lt;/artifactId&gt;
+            &lt;/exclusion&gt;
+        &lt;/exclusions&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-webmvc&lt;/artifactId&gt;
+        &lt;version&gt;${org.springframework-version}&lt;/version&gt;
+    &lt;/dependency&gt;
+
+    &lt;!-- AspectJ --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.aspectj&lt;/groupId&gt;
+        &lt;artifactId&gt;aspectjrt&lt;/artifactId&gt;
+        &lt;version&gt;${org.aspectj-version}&lt;/version&gt;
+    &lt;/dependency&gt;
+
+    &lt;!-- Logging --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
+        &lt;artifactId&gt;slf4j-api&lt;/artifactId&gt;
+        &lt;version&gt;${org.slf4j-version}&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
+        &lt;artifactId&gt;jcl-over-slf4j&lt;/artifactId&gt;
+        &lt;version&gt;${org.slf4j-version}&lt;/version&gt;
+        &lt;scope&gt;runtime&lt;/scope&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
+        &lt;artifactId&gt;slf4j-log4j12&lt;/artifactId&gt;
+        &lt;version&gt;${org.slf4j-version}&lt;/version&gt;
+        &lt;scope&gt;runtime&lt;/scope&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;log4j&lt;/groupId&gt;
+        &lt;artifactId&gt;log4j&lt;/artifactId&gt;
+        &lt;version&gt;1.2.15&lt;/version&gt;
+        &lt;exclusions&gt;
+            &lt;exclusion&gt;
+                &lt;groupId&gt;javax.mail&lt;/groupId&gt;
+                &lt;artifactId&gt;mail&lt;/artifactId&gt;
+            &lt;/exclusion&gt;
+            &lt;exclusion&gt;
+                &lt;groupId&gt;javax.jms&lt;/groupId&gt;
+                &lt;artifactId&gt;jms&lt;/artifactId&gt;
+            &lt;/exclusion&gt;
+            &lt;exclusion&gt;
+                &lt;groupId&gt;com.sun.jdmk&lt;/groupId&gt;
+                &lt;artifactId&gt;jmxtools&lt;/artifactId&gt;
+            &lt;/exclusion&gt;
+            &lt;exclusion&gt;
+                &lt;groupId&gt;com.sun.jmx&lt;/groupId&gt;
+                &lt;artifactId&gt;jmxri&lt;/artifactId&gt;
+            &lt;/exclusion&gt;
+        &lt;/exclusions&gt;
+        &lt;scope&gt;runtime&lt;/scope&gt;
+    &lt;/dependency&gt;
+
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.bgee.log4jdbc-log4j2&lt;/groupId&gt;
+        &lt;artifactId&gt;log4jdbc-log4j2-jdbc4&lt;/artifactId&gt;
+        &lt;version&gt;1.16&lt;/version&gt;
+    &lt;/dependency&gt;
+
+    &lt;!-- @Inject --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;javax.inject&lt;/groupId&gt;
+        &lt;artifactId&gt;javax.inject&lt;/artifactId&gt;
+        &lt;version&gt;1&lt;/version&gt;
+    &lt;/dependency&gt;
+
+    &lt;!-- Servlet --&gt;
+    &lt;!-- Servlet은 web.xml의 web-app 태그의 속성을 바꿔줘야 한다. 2.5-&gt; 3.0으로 변경해 준다. --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
+        &lt;artifactId&gt;javax.servlet-api&lt;/artifactId&gt;
+        &lt;version&gt;3.1.0&lt;/version&gt;
+        &lt;scope&gt;provided&lt;/scope&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;javax.servlet.jsp&lt;/groupId&gt;
+        &lt;artifactId&gt;jsp-api&lt;/artifactId&gt;
+        &lt;version&gt;2.1&lt;/version&gt;
+        &lt;scope&gt;provided&lt;/scope&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
+        &lt;artifactId&gt;jstl&lt;/artifactId&gt;
+        &lt;version&gt;1.2&lt;/version&gt;
+    &lt;/dependency&gt;
+
+    &lt;!-- JSON / XML --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
+        &lt;artifactId&gt;jackson-databind&lt;/artifactId&gt;
+        &lt;version&gt;2.9.4&lt;/version&gt;
+    &lt;/dependency&gt;
+
+    &lt;!-- File Upload --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;commons-fileupload&lt;/groupId&gt;
+        &lt;artifactId&gt;commons-fileupload&lt;/artifactId&gt;
+        &lt;version&gt;1.3.3&lt;/version&gt;
+    &lt;/dependency&gt;
+
+    &lt;!-- Test --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-test&lt;/artifactId&gt;
+        &lt;version&gt;${org.springframework-version}&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+        &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+        &lt;version&gt;1.18.0&lt;/version&gt;
+        &lt;scope&gt;provided&lt;/scope&gt;
+    &lt;/dependency&gt;
+
+    &lt;dependency&gt;
+        &lt;groupId&gt;junit&lt;/groupId&gt;
+        &lt;artifactId&gt;junit&lt;/artifactId&gt;
+        &lt;version&gt;4.12&lt;/version&gt;
+        &lt;scope&gt;test&lt;/scope&gt;
+    &lt;/dependency&gt;
+    &lt;!-- 페이지 관련 라이브러리 --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;net.webjjang&lt;/groupId&gt;
+        &lt;artifactId&gt;util.pageObject&lt;/artifactId&gt;
+        &lt;version&gt;1.0.0&lt;/version&gt;
+        &lt;scope&gt;system&lt;/scope&gt;
+        &lt;systemPath&gt;${project.basedir}/src/main/webapp/WEB-INF/lib/pageObject.jar&lt;/systemPath&gt;
+    &lt;/dependency&gt;
+
+    &lt;!-- DB 관련 라이브러리 --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;oracle&lt;/groupId&gt;
+        &lt;artifactId&gt;ojdbc6&lt;/artifactId&gt;
+        &lt;version&gt;11.2.0&lt;/version&gt;
+        &lt;scope&gt;system&lt;/scope&gt;
+        &lt;systemPath&gt;${project.basedir}/src/main/webapp/WEB-INF/lib/ojdbc6.jar&lt;/systemPath&gt;
+    &lt;/dependency&gt;
+    &lt;!-- HikariCP 라이브러리 --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;com.zaxxer&lt;/groupId&gt;
+        &lt;artifactId&gt;HikariCP&lt;/artifactId&gt;
+        &lt;version&gt;2.7.4&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;!-- Mybatis : ORM --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.mybatis&lt;/groupId&gt;
+        &lt;artifactId&gt;mybatis&lt;/artifactId&gt;
+        &lt;version&gt;3.4.6&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.mybatis&lt;/groupId&gt;
+        &lt;artifactId&gt;mybatis-spring&lt;/artifactId&gt;
+        &lt;version&gt;1.3.2&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;!-- Spring JDBC 관련 --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-tx&lt;/artifactId&gt;
+        &lt;version&gt;${org.springframework-version}&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-jdbc&lt;/artifactId&gt;
+        &lt;version&gt;${org.springframework-version}&lt;/version&gt;
+    &lt;/dependency&gt;
+
+
+&lt;/dependencies&gt;
+&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+            &lt;artifactId&gt;maven-eclipse-plugin&lt;/artifactId&gt;
+            &lt;version&gt;2.9&lt;/version&gt;
+            &lt;configuration&gt;
+                &lt;additionalProjectnatures&gt;
+                    &lt;projectnature&gt;org.springframework.ide.eclipse.core.springnature&lt;/projectnature&gt;
+                &lt;/additionalProjectnatures&gt;
+                &lt;additionalBuildcommands&gt;
+                    &lt;buildcommand&gt;org.springframework.ide.eclipse.core.springbuilder&lt;/buildcommand&gt;
+                &lt;/additionalBuildcommands&gt;
+                &lt;downloadSources&gt;true&lt;/downloadSources&gt;
+                &lt;downloadJavadocs&gt;true&lt;/downloadJavadocs&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+            &lt;version&gt;2.5.1&lt;/version&gt;
+            &lt;configuration&gt;
+                &lt;source&gt;${java-version}&lt;/source&gt;
+                &lt;target&gt;${java-version}&lt;/target&gt;
+                &lt;compilerArgument&gt;-Xlint:all&lt;/compilerArgument&gt;
+                &lt;showWarnings&gt;true&lt;/showWarnings&gt;
+                &lt;showDeprecation&gt;true&lt;/showDeprecation&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
+            &lt;artifactId&gt;exec-maven-plugin&lt;/artifactId&gt;
+            &lt;version&gt;1.2.1&lt;/version&gt;
+            &lt;configuration&gt;
+                &lt;mainClass&gt;org.test.int1.Main&lt;/mainClass&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;
+</code></pre>
+<!-- raw HTML omitted -->
+<h3 id="reference">Reference<a hidden class="anchor" aria-hidden="true" href="#reference">#</a></h3>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=_XZsYODcVyc&amp;list=PLE5Oosh5zKQfFh7BWBrebDYRxeCRYPvY_&amp;index=3">Webjjang Spring 00-03 무조건 게시판 만들기 - 서버 등록 / 프로젝트 생성 / 사용 라이브러리 등록(웹짱과 함께하는 스프링), 웹짱이영환쌤 - Youtube</a></li>
+<li><a href="https://youtu.be/2PP68nc-wWQ?t=62">Webjjang Spring 00-04 무조건 게시판 만들기 - 프로젝트 흐름 이해 / 게시판리스트 보이기(웹짱과 함께하는 스프링), 웹짱이영환쌤 - Youtube</a></li>
+<li><a href="https://youtu.be/m-XSRFOdVj0?t=432">Webjjang Spring 02-02 무조건 검색 게시판 - Controller와 JSP, 웹짱이영환쌤 - Youtube</a></li>
+<li><a href="https://youtu.be/XlYsj4E5_Pg?t=1094">Webjjang Spring 00-05 무조건 게시판 만들기 - PageObject 등록 MyBatis 설정(웹짱과 함께하는 스프링), 웹짱이영환쌤 - Youtube</a></li>
+<li><a href="https://youtu.be/wZ5AnmefV5g?t=604">Webjjang Spring 00-06 무조건 게시판 만들기 - Mapper 작성 JAVA단 작성(웹짱과 함께하는 스프링), 웹짱이영환쌤 - Youtube</a></li>
+<li><a href="https://nyhooni.tistory.com/59">localhost/프로젝트명(URL)에서 프로젝트명 없애기, NewYorker IT Report</a></li>
+<li><a href="https://jayviii.tistory.com/21#:~:text=Service%EC%9D%98%20%EC%97%AD%ED%95%A0%EC%9D%80%20Dao,%EC%9D%B4%20%ED%95%84%EC%9A%94%ED%95%98%EB%8B%A4%EA%B3%A0%20%EA%B0%80%EC%A0%95%ED%95%B4%EB%B3%B4%EC%9E%90.">처음 하는 스프링(Spring), Service와 Controller, jayviii - blog</a></li>
+<li><a href="https://okky.kr/article/382734">@Autowired, @Resource, @Inject의 차이, 쿠우v - OKKY</a></li>
+<li><a href="http://blog.naver.com/javaking75/220074858236">[Spring MVC] Resource Mapping : JSP 페이지에 JavaScript Or CSS Or 이미지 포함하는 방법 (리소스 폴더 설정), 자바킹 - blog</a></li>
+<li><a href="https://dlgkstjq623.tistory.com/238">Spring resources [js, css, img] 맵핑 (No mapping for GET), 초보 개발자의 프로그래밍 공부방 - blog</a></li>
+<li><a href="https://gmlwjd9405.github.io/2019/01/01/spring-utf8.html">[Spring] Spring UTF8 한글 설정하기, heejeong Kwon - blog</a></li>
+<li>채규태, 스프링 퀵 스타트, 루비페이퍼, 2020</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2023 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

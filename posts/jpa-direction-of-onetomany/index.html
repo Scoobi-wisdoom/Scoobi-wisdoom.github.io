@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>JPA: 단뱡향 @ManyToOne만 써라 | wisdoom</title>
+<meta name="keywords" content="">
+<meta name="description" content="자극적인 제목 미안하다. 물론 장단점이 있을 수 있다. 하지만 글의 결론부터 말하자면, 단방향 (unidirectional) @OneToMany보다는 양방향 (bidirectional) @OneToMany가 좋고, 양방향 @OneToMany보다는 단방향 @ManyToOne이 좋다.
+@OneToMany를 사용한다면 무조건 양방향이 좋다. Spring Boot Persistence Best Practices 책의 저자는 @OneToMany가 단방향으로 설정됐을 때 얼마나 안 좋은지를 서술한다.
+JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이 생긴다. 그렇기 때문에 단방향으로 설정하는 경우가 있다.
+하지만 @OneToMany는 단방향을 선택하면 안 된다. 비효율적인 쿼리가 발생하기 때문이다. 여기서는 실험을 통해 이를 확인한다.">
+<meta name="author" content="">
+<link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/jpa-direction-of-onetomany/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.5c25c975546c048d1a5600aadb48425ae1bc921a9a18fe67d6955c9535260811.css" integrity="sha256-XCXJdVRsBI0aVgCq20hCWuG8khqaGP5n1pVclTUmCBE=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.acb54fd32bbc1982428b8850317e45d076b95012730a5936667e6bc21777692a.js" integrity="sha256-rLVP0yu8GYJCi4hQMX5F0Ha5UBJzClk2Zn5rwhd3aSo="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Scoobi-wisdoom.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:title" content="JPA: 단뱡향 @ManyToOne만 써라" />
+<meta property="og:description" content="자극적인 제목 미안하다. 물론 장단점이 있을 수 있다. 하지만 글의 결론부터 말하자면, 단방향 (unidirectional) @OneToMany보다는 양방향 (bidirectional) @OneToMany가 좋고, 양방향 @OneToMany보다는 단방향 @ManyToOne이 좋다.
+@OneToMany를 사용한다면 무조건 양방향이 좋다. Spring Boot Persistence Best Practices 책의 저자는 @OneToMany가 단방향으로 설정됐을 때 얼마나 안 좋은지를 서술한다.
+JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이 생긴다. 그렇기 때문에 단방향으로 설정하는 경우가 있다.
+하지만 @OneToMany는 단방향을 선택하면 안 된다. 비효율적인 쿼리가 발생하기 때문이다. 여기서는 실험을 통해 이를 확인한다." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/jpa-direction-of-onetomany/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-03-19T21:29:21+09:00" />
+<meta property="article:modified_time" content="2023-03-19T21:29:21+09:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="JPA: 단뱡향 @ManyToOne만 써라"/>
+<meta name="twitter:description" content="자극적인 제목 미안하다. 물론 장단점이 있을 수 있다. 하지만 글의 결론부터 말하자면, 단방향 (unidirectional) @OneToMany보다는 양방향 (bidirectional) @OneToMany가 좋고, 양방향 @OneToMany보다는 단방향 @ManyToOne이 좋다.
+@OneToMany를 사용한다면 무조건 양방향이 좋다. Spring Boot Persistence Best Practices 책의 저자는 @OneToMany가 단방향으로 설정됐을 때 얼마나 안 좋은지를 서술한다.
+JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이 생긴다. 그렇기 때문에 단방향으로 설정하는 경우가 있다.
+하지만 @OneToMany는 단방향을 선택하면 안 된다. 비효율적인 쿼리가 발생하기 때문이다. 여기서는 실험을 통해 이를 확인한다."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Scoobi-wisdoom.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "JPA: 단뱡향 @ManyToOne만 써라",
+      "item": "https://Scoobi-wisdoom.github.io/posts/jpa-direction-of-onetomany/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "JPA: 단뱡향 @ManyToOne만 써라",
+  "name": "JPA: 단뱡향 @ManyToOne만 써라",
+  "description": "자극적인 제목 미안하다. 물론 장단점이 있을 수 있다. 하지만 글의 결론부터 말하자면, 단방향 (unidirectional) @OneToMany보다는 양방향 (bidirectional) @OneToMany가 좋고, 양방향 @OneToMany보다는 단방향 @ManyToOne이 좋다.\n@OneToMany를 사용한다면 무조건 양방향이 좋다. Spring Boot Persistence Best Practices 책의 저자는 @OneToMany가 단방향으로 설정됐을 때 얼마나 안 좋은지를 서술한다.\nJPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이 생긴다. 그렇기 때문에 단방향으로 설정하는 경우가 있다.\n하지만 @OneToMany는 단방향을 선택하면 안 된다. 비효율적인 쿼리가 발생하기 때문이다. 여기서는 실험을 통해 이를 확인한다.",
+  "keywords": [
+    
+  ],
+  "articleBody": "자극적인 제목 미안하다. 물론 장단점이 있을 수 있다. 하지만 글의 결론부터 말하자면, 단방향 (unidirectional) @OneToMany보다는 양방향 (bidirectional) @OneToMany가 좋고, 양방향 @OneToMany보다는 단방향 @ManyToOne이 좋다.\n@OneToMany를 사용한다면 무조건 양방향이 좋다. Spring Boot Persistence Best Practices 책의 저자는 @OneToMany가 단방향으로 설정됐을 때 얼마나 안 좋은지를 서술한다.\nJPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이 생긴다. 그렇기 때문에 단방향으로 설정하는 경우가 있다.\n하지만 @OneToMany는 단방향을 선택하면 안 된다. 비효율적인 쿼리가 발생하기 때문이다. 여기서는 실험을 통해 이를 확인한다. Spring Boot Persistence Best Practices 책의 예제를 재구성해 실험했다.\n다음과 같은 엔티티가 있다.\n@Entity class Team( @Id @GeneratedValue(strategy = GenerationType.SEQUENCE) val id: Long = 0L, @OneToMany( orphanRemoval = true, cascade = [ALL], // 양방향일 경우 mappedBy 파라미터를 사용할 수 있다. // 이 프로퍼티를 사용하면 mapping table이 생성되지 않고 foreign key 가 사용된다. // mappedBy = \"team\" ) var members: MutableList, ) @Entity class Member( @Id @GeneratedValue(strategy = GenerationType.SEQUENCE) val id: Long = 0L, var name: String, // 아래 코드를 활성화하면 bidirectional, 활성화하지 않으면 unidirectional OneToMany relationship. // @ManyToOne // var team: Team, ) 실험을 시작하기 전에 테이블에 미리 저장한 데이터는 아래와 같다.\nteam TABLE | id | |----| | 1 | member TABLE | id | name | |----|---------------------| | 2 | 1st member: default | | 3 | 2st member: default | team_members TABLE unidirectional @OneToMany 의 경우 꼭 필요한 mapping table이며, ddl-auto 설정에 따라 hibernate 가 자동 생성한다. | team_id | members_id | |---------|------------| | 1 | 2 | | 1 | 3 | 왜 단방향 @OneToMany를 사용하면 안 되는지 이미 어느 정도 힌트가 제공됐다. 단방향일 경우, team_members 라는 테이블이 추가적으로 필요해진다.\n이제 실험을 위해 같은 엔드포인트 및 서비스 로직을 실행하고 hibernate가 어떤 쿼리를 생성하는지 살펴보자. 참고로 RESTful 설계를 고려하지 않았다. 실험의 편의성을 위해 모두 GET method를 사용했다.\n@RestController @RequestMapping(\"/demo\") class TeamController( private val teamService: TeamService, private val teamRepository: TeamRepository, ) { @GetMapping(\"/save-another\") fun saveAnother() { println(\"---- save one ----\") val team = teamRepository.findAll().first() val anotherMember = Member(name = \"2nd member\") // 아래 코드를 활성화하면 bidirectional, 활성화하지 않으면 unidirectional OneToMany relationship. // val anotherMember = Member(name = \"2nd member\", team = team) teamService.insertMember(team = team, member = anotherMember) } @GetMapping(\"/delete-first\") fun deleteFirst() { val team = teamRepository.findAll().first() teamService.deleteMember(team, team.members.first()) } @GetMapping(\"/delete-last\") fun deleteLast() { val team = teamRepository.findAll().first() teamService.deleteMember(team, team.members.last()) } } @Service class TeamService { @Transactional fun insertMember( team: Team, member: Member, ) { team.members.add(member) } @Transactional fun deleteMember( team: Team, member: Member, ) { team.members.remove(member) } } interface TeamRepository : JpaRepository Hibernate 가 생성하는 쿼리 saveAnother() 호출 단방향\nselect team0_.id as id1_5_ from team team0_ select members0_.team_id as team_id1_6_0_, members0_.members_id as members_2_6_0_, member1_.id as id1_3_1_, member1_.name as name2_3_1_ from team_members members0_ inner join member member1_ on members0_.members_id=member1_.id where members0_.team_id=? select nextval ('hibernate_sequence') insert into member (name, id) values (?, ?) delete from team_members where team_id=? insert into team_members (team_id, members_id) values (?, ?) insert into team_members (team_id, members_id) values (?, ?) insert into team_members (team_id, members_id) values (?, ?) 양방향\n위의 코드에서 주석 처리한 양방향 관련된 코드를 활성하자. 그 다음 API를 호출하면 다음과 같은 쿼리가 생성된다.\nselect team0_.id as id1_5_ from team team0_ select nextval ('hibernate_sequence') insert into member (name, team_id, id) values (?, ?, ?) 단방향 @OneToMany과 양방향의 차이점은 크게 두 가지로 보인다. 첫째, mapping table team_members의 존재 여부다. 단방향은 foreign key를 사용하지 않기 때문에 반드시 mapping table이 필요하다. 그렇기 때문에 mapping table과 child table 둘 다에 insert 쿼리를 실행해야 한다. 둘째, insert query 개수 차이뿐만 아니라 delete query 여부가 다르다. 단방향의 경우 mapping table에서 parent에 해당하는 레코드를 모두 삭제한 후에 기존 children을 insert하고, saveAnother()에서 추가하려고 한 member를 insert한다. deleteFirst()와 deleteLast() 역시 같은 양상을 보인다. 아래를 참고하자.\ndeleteFirst() 호출 단방향\nselect team0_.id as id1_5_ from team team0_ select members0_.team_id as team_id1_6_0_, members0_.members_id as members_2_6_0_, member1_.id as id1_3_1_, member1_.name as name2_3_1_ from team_members members0_ inner join member member1_ on members0_.members_id=member1_.id where members0_.team_id=? delete from team_members where team_id=? insert into team_members (team_id, members_id) values (?, ?) delete from member where id=? 양방향\nselect team0_.id as id1_5_ from team team0_ select members0_.team_id as team_id3_3_0_, members0_.id as id1_3_0_, members0_.id as id1_3_1_, members0_.name as name2_3_1_, members0_.team_id as team_id3_3_1_ from member members0_ where members0_.team_id=? delete from member where id=? deleteLast() 호출 단방향\nselect team0_.id as id1_5_ from team team0_ select members0_.team_id as team_id1_6_0_, members0_.members_id as members_2_6_0_, member1_.id as id1_3_1_, member1_.name as name2_3_1_ from team_members members0_ inner join member member1_ on members0_.members_id=member1_.id where members0_.team_id=? delete from team_members where team_id=? insert into team_members (team_id, members_id) values (?, ?) delete from member where id=? 양방향\nselect team0_.id as id1_5_ from team team0_ select members0_.team_id as team_id3_3_0_, members0_.id as id1_3_0_, members0_.id as id1_3_1_, members0_.name as name2_3_1_, members0_.team_id as team_id3_3_1_ from member members0_ where members0_.team_id=? delete from member where id=? @OneToMany 결론: 양방향을 쓴다. 단방향 @OneToMany를 쓰지 말자. @OneToMany를 사용해야 한다면 양방향으로 설정하자.\n애초에 @OneToMany를 쓰지 말자. 나는 왜 @OneToMany를 쓰는가? 위에서 @OneToMany를 써야 한다면 양방향으로 설정해야 한다고 결론을 내렸다. 그런데 언제 @OneToMany가 필요할까? 이미 단방향 @ManyToOne으로도 웬만하면 모든 상황을 커버할 수 있는데, 굳이 왜 @OneToMany를 설정해야 할까?\n필자가 생각하는 이유는 엔티티 클래스 설정에서 cascade 때문이다. 특히 이 중에서도 REMOVE 때문이다. 여기에 추가로 orphanRemoval 설정도 포함하자. 이 두 가지 설정으로, 부모 엔티티를 삭제하거나, 자식 엔티티를 부모 엔티티에서 떼어낼 경우 자식 엔티티가 모두 삭제된다.\n프로그래머는 따로 로직을 짤 필요 없이 부모 엔티티의 로직만 구현하면 되기 때문에 편리하다.\n실험: cascade, orphanRemoval 설정이 만드는 쿼리 정말 cascade 와 orphanRemoval 조합은 편할까? 혹시 비효율적인 쿼리가 발생할까? 발생한다. 실험을 통해 이를 확인하자.\n다음과 같은 양방향 @OneToMany가 있다.\n@Entity class Team( @Id @GeneratedValue(strategy = GenerationType.SEQUENCE) val id: Long = 0L, @OneToMany( orphanRemoval = true, cascade = [ALL], mappedBy = \"team\", ) var members: MutableList, ) @Entity class Member( @Id @GeneratedValue(strategy = GenerationType.SEQUENCE) val id: Long = 0L, var name: String, @ManyToOne(fetch = LAZY) var team: Team, ) 실험을 시작하기 전에 테이블에 미리 저장한 데이터는 아래와 같다.\nteam TABLE | id | |----| | 1 | member TABLE | id | name | |----|---------------------| | 2 | 1st member: default | | 3 | 2st member: default | 이제 실험을 위해 같은 엔드포인트 및 서비스 로직을 실행하고 hibernate가 어떤 쿼리를 생성하는지 살펴보자. 참고로 RESTful 설계를 고려하지 않았다. 실험의 편의성을 위해 모두 GET method를 사용했다.\n@RestController @RequestMapping(\"/demo\") class TeamController( private val teamService: TeamService, private val teamRepository: TeamRepository, ) { @GetMapping(\"/delete-team\") @Transactional fun deleteTeam() { val team = teamRepository.findAll().first() teamRepository.delete(team) } @GetMapping(\"/detach-members\") @Transactional fun detachMembers() { val team = teamRepository.findAll().first() team.members.clear() } } Hibernate 가 생성하는 쿼리 deleteTeam()와 detachMembers() 모두 delete 쿼리가 레코드 개수만큼 발생하는 것을 아래와 같이 확인할 수 있다.\ndeleteTeam() 호출 select team0_.id as id1_5_ from team team0_ select members0_.team_id as team_id3_3_0_, members0_.id as id1_3_0_, members0_.id as id1_3_1_, members0_.name as name2_3_1_, members0_.team_id as team_id3_3_1_ from member members0_ where members0_.team_id=? delete from member where id=? delete from member where id=? delete from team where id=? detachMembers() 호출 select team0_.id as id1_5_ from team team0_ select members0_.team_id as team_id3_3_0_, members0_.id as id1_3_0_, members0_.id as id1_3_1_, members0_.name as name2_3_1_, members0_.team_id as team_id3_3_1_ from member members0_ where members0_.team_id=? delete from member where id=? delete from member where id=? @OneToMany를 써도 유용한 상황: many가 아니라 few인 경우 Vlad Mihalcea가 쓴 글을 보면 자식 엔티티의 레코드 개수가 제한적일 경우에만 @OneToMany가 유용히다고 한다. 그렇기 때문에 @OneToMany가 아니라 @OneToFew라는 명칭이 더 적합한 거 같다고 서술한다.\n사실 위의 실험에서 알 수 있듯이, delete 쿼리가 자식 레코드 개수만큼 발생하기 때문에, 자식 레코드 개수가 적으면 적을수록 쿼리의 효율성을 덜 신경 써도 된다. 이 상황에서는 별도의 로직 없이 cascade, orphanRemoval 설정만으로 자식 레코드를 삭제하는 게 좋을 수도 있다. 또한 삭제가 거의 일어나지 않는 도메인에서 사용하기에도 좋을 거 같다. 하지만 이런 확신이 없다면 @OneToMany는 피하자.\nRule of Thumb: 단방향 @ManyToOne 특별한 상황이 아니라면 단방향 @ManyToOne를 사용하자. 참고로, @ManyToOne은 단방향으로 설정해도 괜찮다. 자세한 건 Spring Boot Persistence Best Practices 책을 참고하자.\nReferences Anghel Leonard. (2020) Spring Boot Persistence Best Practices. Apress The best way to map a @OneToMany relationship with JPA and Hibernate, Vlad Mihalcea ",
+  "wordCount" : "1274",
+  "inLanguage": "en",
+  "datePublished": "2023-03-19T21:29:21+09:00",
+  "dateModified": "2023-03-19T21:29:21+09:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Scoobi-wisdoom.github.io/posts/jpa-direction-of-onetomany/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "wisdoom",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Scoobi-wisdoom.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://Scoobi-wisdoom.github.io/" accesskey="h" title="wisdoom (Alt + H)">wisdoom</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title">
+      JPA: 단뱡향 @ManyToOne만 써라
+    </h1>
+    <div class="post-meta"><span title='2023-03-19 21:29:21 +0900 KST'>March 19, 2023</span>
+
+</div>
+  </header> 
+  <div class="post-content"><p>자극적인 제목 미안하다. 물론 장단점이 있을 수 있다. 하지만 글의 결론부터 말하자면, 단방향 (unidirectional) <code>@OneToMany</code>보다는 양방향 (bidirectional) <code>@OneToMany</code>가 좋고, 양방향 <code>@OneToMany</code>보다는 단방향 <code>@ManyToOne</code>이 좋다.</p>
+<h1 id="onetomany를-사용한다면-무조건-양방향이-좋다"><code>@OneToMany</code>를 사용한다면 무조건 양방향이 좋다.<a hidden class="anchor" aria-hidden="true" href="#onetomany를-사용한다면-무조건-양방향이-좋다">#</a></h1>
+<p><em>Spring Boot Persistence Best Practices</em> 책의 저자는 <code>@OneToMany</code>가 단방향으로 설정됐을 때 얼마나 안 좋은지를 서술한다.</p>
+<p>JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이 생긴다.
+그렇기 때문에 단방향으로 설정하는 경우가 있다.</p>
+<p>하지만 <code>@OneToMany</code>는 단방향을 선택하면 안 된다. <strong>비효율적인 쿼리가 발생</strong>하기 때문이다.
+여기서는 실험을 통해 이를 확인한다. <em>Spring Boot Persistence Best Practices</em> 책의 예제를 재구성해 실험했다.</p>
+<p>다음과 같은 엔티티가 있다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Team</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Id</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@GeneratedValue</span>(strategy = <span style="color:#a6e22e">GenerationType</span>.SEQUENCE)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> id: Long = <span style="color:#ae81ff">0L</span>,
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@OneToMany</span>(
+</span></span><span style="display:flex;"><span>        orphanRemoval = <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>        cascade = [ALL],
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 양방향일 경우 mappedBy 파라미터를 사용할 수 있다.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#75715e">// 이 프로퍼티를 사용하면 mapping table이 생성되지 않고 foreign key 가 사용된다.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//        mappedBy = &#34;team&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    )
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> members: MutableList&lt;Member&gt;,
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Member</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Id</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@GeneratedValue</span>(strategy = <span style="color:#a6e22e">GenerationType</span>.SEQUENCE)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> id: Long = <span style="color:#ae81ff">0L</span>,
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> name: String,
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//    아래 코드를 활성화하면 bidirectional, 활성화하지 않으면 unidirectional OneToMany relationship.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//    @ManyToOne
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//    var team: Team,
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>)
+</span></span></code></pre></div><p>실험을 시작하기 전에 테이블에 미리 저장한 데이터는 아래와 같다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>team TABLE
+</span></span><span style="display:flex;"><span>| id |
+</span></span><span style="display:flex;"><span>|----|
+</span></span><span style="display:flex;"><span>| 1  |
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>member TABLE
+</span></span><span style="display:flex;"><span>| id | name                |
+</span></span><span style="display:flex;"><span>|----|---------------------|
+</span></span><span style="display:flex;"><span>| 2  | 1st member: default |
+</span></span><span style="display:flex;"><span>| 3  | 2st member: default |
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>team_members TABLE
+</span></span><span style="display:flex;"><span>unidirectional @OneToMany 의 경우 꼭 필요한 mapping table이며, ddl-auto 설정에 따라 hibernate 가 자동 생성한다.
+</span></span><span style="display:flex;"><span>| team_id | members_id |
+</span></span><span style="display:flex;"><span>|---------|------------|
+</span></span><span style="display:flex;"><span>| 1       | 2          |
+</span></span><span style="display:flex;"><span>| 1       | 3          |
+</span></span></code></pre></div><p>왜 단방향 <code>@OneToMany</code>를 사용하면 안 되는지 이미 어느 정도 힌트가 제공됐다. <strong>단방향일 경우, <code>team_members</code> 라는 테이블이 추가적으로 필요해진다.</strong></p>
+<p>이제 실험을 위해 같은 엔드포인트 및 서비스 로직을 실행하고 hibernate가 어떤 쿼리를 생성하는지 살펴보자.
+참고로 RESTful 설계를 고려하지 않았다. 실험의 편의성을 위해 모두 GET method를 사용했다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#a6e22e">@RestController</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@RequestMapping</span>(<span style="color:#e6db74">&#34;/demo&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TeamController</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">val</span> teamService: TeamService,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">val</span> teamRepository: TeamRepository,
+</span></span><span style="display:flex;"><span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@GetMapping</span>(<span style="color:#e6db74">&#34;/save-another&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">saveAnother</span>() {
+</span></span><span style="display:flex;"><span>        println(<span style="color:#e6db74">&#34;---- save one ----&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> team = teamRepository.findAll().first()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> anotherMember = Member(name = <span style="color:#e6db74">&#34;2nd member&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//        아래 코드를 활성화하면 bidirectional, 활성화하지 않으면 unidirectional OneToMany relationship.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//        val anotherMember = Member(name = &#34;2nd member&#34;, team = team)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        teamService.insertMember(team = team, member = anotherMember)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@GetMapping</span>(<span style="color:#e6db74">&#34;/delete-first&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">deleteFirst</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> team = teamRepository.findAll().first()
+</span></span><span style="display:flex;"><span>        teamService.deleteMember(team, team.members.first())
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@GetMapping</span>(<span style="color:#e6db74">&#34;/delete-last&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">deleteLast</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> team = teamRepository.findAll().first()
+</span></span><span style="display:flex;"><span>        teamService.deleteMember(team, team.members.last())
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Service</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TeamService</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Transactional</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">insertMember</span>(
+</span></span><span style="display:flex;"><span>        team: Team,
+</span></span><span style="display:flex;"><span>        member: Member,
+</span></span><span style="display:flex;"><span>    ) {
+</span></span><span style="display:flex;"><span>        team.members.add(member)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Transactional</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">deleteMember</span>(
+</span></span><span style="display:flex;"><span>        team: Team,
+</span></span><span style="display:flex;"><span>        member: Member,
+</span></span><span style="display:flex;"><span>    ) {
+</span></span><span style="display:flex;"><span>        team.members.remove(member)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">TeamRepository</span> : JpaRepository&lt;Team, Long&gt;
+</span></span></code></pre></div><h2 id="hibernate-가-생성하는-쿼리">Hibernate 가 생성하는 쿼리<a hidden class="anchor" aria-hidden="true" href="#hibernate-가-생성하는-쿼리">#</a></h2>
+<h3 id="saveanother-호출">saveAnother() 호출<a hidden class="anchor" aria-hidden="true" href="#saveanother-호출">#</a></h3>
+<p><strong>단방향</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>select team0_.id as id1_5_ from team team0_
+</span></span><span style="display:flex;"><span>select members0_.team_id as team_id1_6_0_, members0_.members_id as members_2_6_0_, member1_.id as id1_3_1_, member1_.name as name2_3_1_ from team_members members0_ inner join member member1_ on members0_.members_id=member1_.id where members0_.team_id=?
+</span></span><span style="display:flex;"><span>select nextval (&#39;hibernate_sequence&#39;)
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>insert into member (name, id) values (?, ?)
+</span></span><span style="display:flex;"><span>delete from team_members where team_id=?
+</span></span><span style="display:flex;"><span>insert into team_members (team_id, members_id) values (?, ?)
+</span></span><span style="display:flex;"><span>insert into team_members (team_id, members_id) values (?, ?)
+</span></span><span style="display:flex;"><span>insert into team_members (team_id, members_id) values (?, ?)
+</span></span></code></pre></div><p><strong>양방향</strong><br>
+위의 코드에서 주석 처리한 양방향 관련된 코드를 활성하자. 그 다음 API를 호출하면 다음과 같은 쿼리가 생성된다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>select team0_.id as id1_5_ from team team0_
+</span></span><span style="display:flex;"><span>select nextval (&#39;hibernate_sequence&#39;)
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>insert into member (name, team_id, id) values (?, ?, ?)
+</span></span></code></pre></div><p>단방향 <code>@OneToMany</code>과 양방향의 차이점은 크게 두 가지로 보인다. 첫째, mapping table <code>team_members</code>의 존재 여부다. 단방향은 foreign key를 사용하지 않기 때문에 반드시 mapping table이 필요하다. 그렇기 때문에 mapping table과 child table 둘 다에 insert 쿼리를 실행해야 한다. 둘째, insert query 개수 차이뿐만 아니라 delete query 여부가 다르다. 단방향의 경우 mapping table에서 parent에 해당하는 레코드를 모두 삭제한 후에 기존 children을 insert하고, <code>saveAnother()</code>에서 추가하려고 한 member를 insert한다. <code>deleteFirst()</code>와 <code>deleteLast()</code> 역시 같은 양상을 보인다. 아래를 참고하자.</p>
+<h3 id="deletefirst-호출">deleteFirst() 호출<a hidden class="anchor" aria-hidden="true" href="#deletefirst-호출">#</a></h3>
+<p><strong>단방향</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>select team0_.id as id1_5_ from team team0_
+</span></span><span style="display:flex;"><span>select members0_.team_id as team_id1_6_0_, members0_.members_id as members_2_6_0_, member1_.id as id1_3_1_, member1_.name as name2_3_1_ from team_members members0_ inner join member member1_ on members0_.members_id=member1_.id where members0_.team_id=?
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>delete from team_members where team_id=?
+</span></span><span style="display:flex;"><span>insert into team_members (team_id, members_id) values (?, ?)
+</span></span><span style="display:flex;"><span>delete from member where id=?
+</span></span></code></pre></div><p><strong>양방향</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>select team0_.id as id1_5_ from team team0_
+</span></span><span style="display:flex;"><span>select members0_.team_id as team_id3_3_0_, members0_.id as id1_3_0_, members0_.id as id1_3_1_, members0_.name as name2_3_1_, members0_.team_id as team_id3_3_1_ from member members0_ where members0_.team_id=?
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>delete from member where id=?
+</span></span></code></pre></div><h2 id="deletelast-호출">deleteLast() 호출<a hidden class="anchor" aria-hidden="true" href="#deletelast-호출">#</a></h2>
+<p><strong>단방향</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>select team0_.id as id1_5_ from team team0_
+</span></span><span style="display:flex;"><span>select members0_.team_id as team_id1_6_0_, members0_.members_id as members_2_6_0_, member1_.id as id1_3_1_, member1_.name as name2_3_1_ from team_members members0_ inner join member member1_ on members0_.members_id=member1_.id where members0_.team_id=?
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>delete from team_members where team_id=?
+</span></span><span style="display:flex;"><span>insert into team_members (team_id, members_id) values (?, ?)
+</span></span><span style="display:flex;"><span>delete from member where id=?
+</span></span></code></pre></div><p><strong>양방향</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>select team0_.id as id1_5_ from team team0_
+</span></span><span style="display:flex;"><span>select members0_.team_id as team_id3_3_0_, members0_.id as id1_3_0_, members0_.id as id1_3_1_, members0_.name as name2_3_1_, members0_.team_id as team_id3_3_1_ from member members0_ where members0_.team_id=?
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>delete from member where id=?
+</span></span></code></pre></div><h2 id="onetomany-결론-양방향을-쓴다"><code>@OneToMany</code> 결론: 양방향을 쓴다.<a hidden class="anchor" aria-hidden="true" href="#onetomany-결론-양방향을-쓴다">#</a></h2>
+<p>단방향 <code>@OneToMany</code>를 쓰지 말자. <code>@OneToMany</code>를 사용해야 한다면 양방향으로 설정하자.</p>
+<h1 id="애초에-onetomany를-쓰지-말자">애초에 <code>@OneToMany</code>를 쓰지 말자.<a hidden class="anchor" aria-hidden="true" href="#애초에-onetomany를-쓰지-말자">#</a></h1>
+<h2 id="나는-왜-onetomany를-쓰는가">나는 왜 <code>@OneToMany</code>를 쓰는가?<a hidden class="anchor" aria-hidden="true" href="#나는-왜-onetomany를-쓰는가">#</a></h2>
+<p>위에서 <code>@OneToMany</code>를 써야 한다면 양방향으로 설정해야 한다고 결론을 내렸다. 그런데 언제 <code>@OneToMany</code>가 필요할까? 이미 단방향 <code>@ManyToOne</code>으로도 웬만하면 모든 상황을 커버할 수 있는데, 굳이 왜 <code>@OneToMany</code>를 설정해야 할까?</p>
+<p>필자가 생각하는 이유는 엔티티 클래스 설정에서 <code>cascade</code> 때문이다. 특히 이 중에서도 <code>REMOVE</code> 때문이다. 여기에 추가로 <code>orphanRemoval</code> 설정도 포함하자.
+이 두 가지 설정으로, 부모 엔티티를 삭제하거나, 자식 엔티티를 부모 엔티티에서 떼어낼 경우 자식 엔티티가 모두 삭제된다.</p>
+<p>프로그래머는 따로 로직을 짤 필요 없이 부모 엔티티의 로직만 구현하면 되기 때문에 편리하다.</p>
+<h2 id="실험-cascade-orphanremoval-설정이-만드는-쿼리">실험: <code>cascade</code>, <code>orphanRemoval</code> 설정이 만드는 쿼리<a hidden class="anchor" aria-hidden="true" href="#실험-cascade-orphanremoval-설정이-만드는-쿼리">#</a></h2>
+<p>정말 <code>cascade</code> 와 <code>orphanRemoval</code> 조합은 편할까? 혹시 비효율적인 쿼리가 발생할까? <strong>발생한다</strong>. 실험을 통해 이를 확인하자.</p>
+<p>다음과 같은 양방향 <code>@OneToMany</code>가 있다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Team</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Id</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@GeneratedValue</span>(strategy = <span style="color:#a6e22e">GenerationType</span>.SEQUENCE)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> id: Long = <span style="color:#ae81ff">0L</span>,
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@OneToMany</span>(
+</span></span><span style="display:flex;"><span>        orphanRemoval = <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>        cascade = [ALL],
+</span></span><span style="display:flex;"><span>        mappedBy = <span style="color:#e6db74">&#34;team&#34;</span>,
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> members: MutableList&lt;Member&gt;,
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Member</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Id</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@GeneratedValue</span>(strategy = <span style="color:#a6e22e">GenerationType</span>.SEQUENCE)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">val</span> id: Long = <span style="color:#ae81ff">0L</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> name: String,
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@ManyToOne</span>(fetch = LAZY)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> team: Team,
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><p>실험을 시작하기 전에 테이블에 미리 저장한 데이터는 아래와 같다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>team TABLE
+</span></span><span style="display:flex;"><span>| id |
+</span></span><span style="display:flex;"><span>|----|
+</span></span><span style="display:flex;"><span>| 1  |
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>member TABLE
+</span></span><span style="display:flex;"><span>| id | name                |
+</span></span><span style="display:flex;"><span>|----|---------------------|
+</span></span><span style="display:flex;"><span>| 2  | 1st member: default |
+</span></span><span style="display:flex;"><span>| 3  | 2st member: default |
+</span></span></code></pre></div><p>이제 실험을 위해 같은 엔드포인트 및 서비스 로직을 실행하고 hibernate가 어떤 쿼리를 생성하는지 살펴보자.
+참고로 RESTful 설계를 고려하지 않았다. 실험의 편의성을 위해 모두 GET method를 사용했다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#a6e22e">@RestController</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@RequestMapping</span>(<span style="color:#e6db74">&#34;/demo&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TeamController</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">val</span> teamService: TeamService,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">val</span> teamRepository: TeamRepository,
+</span></span><span style="display:flex;"><span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@GetMapping</span>(<span style="color:#e6db74">&#34;/delete-team&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Transactional</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">deleteTeam</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> team = teamRepository.findAll().first()
+</span></span><span style="display:flex;"><span>        teamRepository.delete(team)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@GetMapping</span>(<span style="color:#e6db74">&#34;/detach-members&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Transactional</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">detachMembers</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">val</span> team = teamRepository.findAll().first()
+</span></span><span style="display:flex;"><span>        team.members.clear()
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="hibernate-가-생성하는-쿼리-1">Hibernate 가 생성하는 쿼리<a hidden class="anchor" aria-hidden="true" href="#hibernate-가-생성하는-쿼리-1">#</a></h2>
+<p><code>deleteTeam()</code>와 <code>detachMembers()</code> 모두 <code>delete</code> 쿼리가 레코드 개수만큼 발생하는 것을 아래와 같이 확인할 수 있다.</p>
+<h3 id="deleteteam-호출">deleteTeam() 호출<a hidden class="anchor" aria-hidden="true" href="#deleteteam-호출">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>select team0_.id as id1_5_ from team team0_
+</span></span><span style="display:flex;"><span>select members0_.team_id as team_id3_3_0_, members0_.id as id1_3_0_, members0_.id as id1_3_1_, members0_.name as name2_3_1_, members0_.team_id as team_id3_3_1_ from member members0_ where members0_.team_id=?
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>delete from member where id=?
+</span></span><span style="display:flex;"><span>delete from member where id=?
+</span></span><span style="display:flex;"><span>delete from team where id=?
+</span></span></code></pre></div><h3 id="detachmembers-호출">detachMembers() 호출<a hidden class="anchor" aria-hidden="true" href="#detachmembers-호출">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>select team0_.id as id1_5_ from team team0_
+</span></span><span style="display:flex;"><span>select members0_.team_id as team_id3_3_0_, members0_.id as id1_3_0_, members0_.id as id1_3_1_, members0_.name as name2_3_1_, members0_.team_id as team_id3_3_1_ from member members0_ where members0_.team_id=?
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>delete from member where id=?
+</span></span><span style="display:flex;"><span>delete from member where id=?
+</span></span></code></pre></div><h2 id="onetomany를-써도-유용한-상황-many가-아니라-few인-경우"><code>@OneToMany</code>를 써도 유용한 상황: many가 아니라 few인 경우<a hidden class="anchor" aria-hidden="true" href="#onetomany를-써도-유용한-상황-many가-아니라-few인-경우">#</a></h2>
+<p><a href="https://vladmihalcea.com/the-best-way-to-map-a-onetomany-association-with-jpa-and-hibernate/">Vlad Mihalcea가 쓴 글</a>을 보면 자식 엔티티의 레코드 개수가 제한적일 경우에만 <code>@OneToMany</code>가 유용히다고 한다. 그렇기 때문에 <code>@OneToMany</code>가 아니라 <code>@OneToFew</code>라는 명칭이 더 적합한 거 같다고 서술한다.</p>
+<p>사실 위의 실험에서 알 수 있듯이, delete 쿼리가 자식 레코드 개수만큼 발생하기 때문에, 자식 레코드 개수가 적으면 적을수록 쿼리의 효율성을 덜 신경 써도 된다. 이 상황에서는 별도의 로직 없이 <code>cascade</code>, <code>orphanRemoval</code> 설정만으로 자식 레코드를 삭제하는 게 좋을 수도 있다.
+또한 삭제가 거의 일어나지 않는 도메인에서 사용하기에도 좋을 거 같다. 하지만 이런 확신이 없다면 <code>@OneToMany</code>는 피하자.</p>
+<h1 id="rule-of-thumb-단방향-manytoone">Rule of Thumb: 단방향 <code>@ManyToOne</code><a hidden class="anchor" aria-hidden="true" href="#rule-of-thumb-단방향-manytoone">#</a></h1>
+<p>특별한 상황이 아니라면 단방향 <code>@ManyToOne</code>를 사용하자.
+참고로, <code>@ManyToOne</code>은 단방향으로 설정해도 괜찮다. 자세한 건 <em>Spring Boot Persistence Best Practices</em> 책을 참고하자.</p>
+<h1 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">#</a></h1>
+<ul>
+<li>Anghel Leonard. (2020) Spring Boot Persistence Best Practices. Apress</li>
+<li><a href="https://vladmihalcea.com/the-best-way-to-map-a-onetomany-association-with-jpa-and-hibernate/">The best way to map a @OneToMany relationship with JPA and Hibernate, Vlad Mihalcea</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2023 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

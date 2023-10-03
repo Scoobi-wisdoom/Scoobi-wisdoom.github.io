@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Interface vs Abstract Class | wisdoom</title>
+<meta name="keywords" content="">
+<meta name="description" content="Interface와 abstract class의 차이를 알아보자.
+Java 8부터 interface에는 default method가 생겼다. 이로 인해 interface와 abstract class의 차이가 하나 줄었다.
+Interface와 abstract class의 차이는 크게 두 가지다.
+Abstract class는 interface와 달리 다중 상속의 대상이 될 수 없다. Abstract class는 state를 가질 수 있지만 interface는 state를 가질 수 없다. 이외에도 lambda expression과 관련한 차이도 있다. 하지만 여기서는 다루지 않는다. 위에 명시한 두 가지 차이에 대해서 알아보자.
+다중 상속 Effective Java를 보면 abstract class보다는 interface를 사용하라고 한다.">
+<meta name="author" content="">
+<link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/interface-vs-abstract-class/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.5c25c975546c048d1a5600aadb48425ae1bc921a9a18fe67d6955c9535260811.css" integrity="sha256-XCXJdVRsBI0aVgCq20hCWuG8khqaGP5n1pVclTUmCBE=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.acb54fd32bbc1982428b8850317e45d076b95012730a5936667e6bc21777692a.js" integrity="sha256-rLVP0yu8GYJCi4hQMX5F0Ha5UBJzClk2Zn5rwhd3aSo="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Scoobi-wisdoom.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:title" content="Interface vs Abstract Class" />
+<meta property="og:description" content="Interface와 abstract class의 차이를 알아보자.
+Java 8부터 interface에는 default method가 생겼다. 이로 인해 interface와 abstract class의 차이가 하나 줄었다.
+Interface와 abstract class의 차이는 크게 두 가지다.
+Abstract class는 interface와 달리 다중 상속의 대상이 될 수 없다. Abstract class는 state를 가질 수 있지만 interface는 state를 가질 수 없다. 이외에도 lambda expression과 관련한 차이도 있다. 하지만 여기서는 다루지 않는다. 위에 명시한 두 가지 차이에 대해서 알아보자.
+다중 상속 Effective Java를 보면 abstract class보다는 interface를 사용하라고 한다." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/interface-vs-abstract-class/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-08-07T16:44:53+09:00" />
+<meta property="article:modified_time" content="2022-08-07T16:44:53+09:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Interface vs Abstract Class"/>
+<meta name="twitter:description" content="Interface와 abstract class의 차이를 알아보자.
+Java 8부터 interface에는 default method가 생겼다. 이로 인해 interface와 abstract class의 차이가 하나 줄었다.
+Interface와 abstract class의 차이는 크게 두 가지다.
+Abstract class는 interface와 달리 다중 상속의 대상이 될 수 없다. Abstract class는 state를 가질 수 있지만 interface는 state를 가질 수 없다. 이외에도 lambda expression과 관련한 차이도 있다. 하지만 여기서는 다루지 않는다. 위에 명시한 두 가지 차이에 대해서 알아보자.
+다중 상속 Effective Java를 보면 abstract class보다는 interface를 사용하라고 한다."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Scoobi-wisdoom.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Interface vs Abstract Class",
+      "item": "https://Scoobi-wisdoom.github.io/posts/interface-vs-abstract-class/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Interface vs Abstract Class",
+  "name": "Interface vs Abstract Class",
+  "description": "Interface와 abstract class의 차이를 알아보자.\nJava 8부터 interface에는 default method가 생겼다. 이로 인해 interface와 abstract class의 차이가 하나 줄었다.\nInterface와 abstract class의 차이는 크게 두 가지다.\nAbstract class는 interface와 달리 다중 상속의 대상이 될 수 없다. Abstract class는 state를 가질 수 있지만 interface는 state를 가질 수 없다. 이외에도 lambda expression과 관련한 차이도 있다. 하지만 여기서는 다루지 않는다. 위에 명시한 두 가지 차이에 대해서 알아보자.\n다중 상속 Effective Java를 보면 abstract class보다는 interface를 사용하라고 한다.",
+  "keywords": [
+    
+  ],
+  "articleBody": "Interface와 abstract class의 차이를 알아보자.\nJava 8부터 interface에는 default method가 생겼다. 이로 인해 interface와 abstract class의 차이가 하나 줄었다.\nInterface와 abstract class의 차이는 크게 두 가지다.\nAbstract class는 interface와 달리 다중 상속의 대상이 될 수 없다. Abstract class는 state를 가질 수 있지만 interface는 state를 가질 수 없다. 이외에도 lambda expression과 관련한 차이도 있다. 하지만 여기서는 다루지 않는다. 위에 명시한 두 가지 차이에 대해서 알아보자.\n다중 상속 Effective Java를 보면 abstract class보다는 interface를 사용하라고 한다. 여러 이유가 있는데 그 중 위에서 언급한 첫 번째 이유가 있다. Abstract class 다중 상속의 대상이 될 수 없다. 결국, abstract class는 hierarchy와 관련된다. 하지만 hierarchy가 부적절한 경우가 많다. 예를 들어 interface Husband와 interface Son을 조합해 class MarriedMan을 정의할 수 있다. MarriedMan은 Husband이면서 Son이다. Hierarchy로 이 셋의 관계를 정의하는 건 부적절하다.\nclass MarriedMan() : Husband, Son { override fun actAsHusband() {} override fun actAsSon() {} } interface Husband { fun actAsHusband() } interface Son { fun actAsSon() } 만약 Husband와 Son이 interface가 아닌 abstract class였다면 위처럼 MarriedMan을 정의할 수 없다.\nState Interface: stateless Interface는 state를 가질 수 없기 때문에 mutable instance variables를 사용할 수 없다. 즉, instance fields가 없거나 final variables만 가질 수 있다. 아래 예시는 final variables만 가진 경우다.\npublic interface Son { String nameOfFather = \"John\"; String nameOfMother = \"Joan\"; } 실제로 아래 코드는 컴파일 에러를 낸다.\npublic class Demo { public static void main(String[] args) { Son.nameOfMother = \"Anne\"; } } java: cannot assign a value to final variable nameOfMother Abstract class: stateful Abstract class는 여느 클래스와 마찬가지로 state를 가질 수 있다. 즉, mutable instance variables를 사용할 수 있다.\nabstract class AbstractSon { String nameOfMother = \"Joan\"; } public class ConcreteSon extends AbstractSon { } 그렇기 때문에 아래 코드는 컴파일이 된다.\npublic class Demo { public static void main(String[] args) { AbstractSon son = new ConcreteSon(); son.nameOfMother = \"Anne\"; } } Skeletal implementation = abstract class + interface 위에서 interface의 특징에 대해 언급했다. Interface에는 또 다른 제약 사항이 있다. Interface는 Object class의 메서드인 hashCode(), toString() equals() 등에 대해 default method를 정의할 수 없다. 또한 interface는 public이 아닌 static members를 가질 수 없다 (private static 메서드 제외).\nSkeletal implementation은 interface의 특징과 abstract class의 특징을 조합하기 위한 방법으로, interface를 상속하는 abstract class를 정의한다. 예를 들어, java.util.AbstractList, java.util.AbstractMap 등이 있다.\nAbstractList 코드 일부를 보자.\npackage java.util; public abstract class AbstractList\u003cE\u003e extends AbstractCollection\u003cE\u003e implements List\u003cE\u003e { // 생략 public boolean equals(Object o) { if (o == this) return true; if (!(o instanceof List)) return false; // 생략 } } 위 코드에서 equals()가 정의돼 있다. 위에서 언급했듯이, interface인 List는 equals() 이름의 default method를 만들 수 없다. Skeletal implementation은 이를 극복했다.\n이 Skeletal implementation은 어떻게 사용될까? 예시로 AbstractList를 상속하는 ArrayList를 살펴보자.\npublic class ArrayList\u003cE\u003e extends AbstractList\u003cE\u003e implements List\u003cE\u003e, RandomAccess, Cloneable, java.io.Serializable { // 생략 } ArrayList의 equals() 메서드는 AbstractList의 것이다. ArrayList class는 AbstractList를 상속하기 때문이다. 추가로 위 코드에서 알 수 있듯이 ArrayList는 다른 여러 interfaces를 다중 상속한다.\n덕분에 interface에 default method equals()가 없지만 아래와 같이 코드가 잘 작동한다.\npublic class Demo { public static void main(String[] args) { List a = new ArrayList\u003cInteger\u003e(1); List b = new ArrayList\u003cInteger\u003e(1); System.out.println(a.equals(b)); } } true 의문점: Kotlin interface 서두에서 정의한 son interface를 보자.\npublic interface Son { String nameOfFather = \"John\"; String nameOfMother = \"Joan\"; } Kotlin으로 표현하면 아래와 같이 표현할 수 있다 (IntelliJ의 java -\u003e kotlin 자동 변환 사용).\ninterface Son { companion object { const val NAME_OF_FATHER = \"John\" const val NAME_OF_MOTHER = \"Joan\" } } 참고로 kotlin의 성질상 아래와 같이 interface를 정의하면 아래와 같은 컴파일 오류가 발생한다.\ninterface Son { val NAME_OF_FATHER = \"John\" val NAME_OF_MOTHER = \"Joan\" } Property initializers are not allowed in interfaces Kotlin에서 const val 대신에 var를 사용하면 interface가 state를 가질 수 있는 것으로 보인다. 아래와 같이 말이다.\ninterface Son { companion object { var NAME_OF_FATHER = \"John\" var NAME_OF_MOTHER = \"Joan\" } } 진짜 그런가? 그렇다면 이렇게 코딩하는 건 바람직할까?\n답은 No다. IntelliJ에서 위 코드를 java로 decompile해보면 아래와 같이 나온다.\npublic interface Son { // 생략 public static final class Companion { // 생략 static { $$INSTANCE = new Companion(); NAME_OF_FATHER = \"John\"; NAME_OF_MOTHER = \"Joan\"; } } } 즉, 애초에 java interface fields에 속하지 않는다.\nReference Abstract classes vs. interfaces in Java, Rafael del Nero - InfoWorld Joshua Bloch. (2018) Effective Java (3rd ed.). Addison-Wesley What is Stateless Object in Java? - Stackoverflow Companion Objects in Kotlin Interfaces - Stackoverflow ",
+  "wordCount" : "707",
+  "inLanguage": "en",
+  "datePublished": "2022-08-07T16:44:53+09:00",
+  "dateModified": "2022-08-07T16:44:53+09:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Scoobi-wisdoom.github.io/posts/interface-vs-abstract-class/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "wisdoom",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Scoobi-wisdoom.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://Scoobi-wisdoom.github.io/" accesskey="h" title="wisdoom (Alt + H)">wisdoom</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title">
+      Interface vs Abstract Class
+    </h1>
+    <div class="post-meta"><span title='2022-08-07 16:44:53 +0900 KST'>August 7, 2022</span>
+
+</div>
+  </header> 
+  <div class="post-content"><p>Interface와 abstract class의 차이를 알아보자.</p>
+<p>Java 8부터 interface에는 default method가 생겼다. 이로 인해 interface와 abstract class의 차이가 하나 줄었다.</p>
+<p>Interface와 abstract class의 차이는 크게 두 가지다.</p>
+<ul>
+<li>Abstract class는 interface와 달리 다중 상속의 대상이 될 수 없다.</li>
+<li>Abstract class는 state를 가질 수 있지만 interface는 state를 가질 수 없다.</li>
+</ul>
+<p>이외에도 lambda expression과 관련한 차이도 있다. 하지만 여기서는 다루지 않는다. 위에 명시한 두 가지 차이에 대해서 알아보자.</p>
+<h2 id="다중-상속">다중 상속<a hidden class="anchor" aria-hidden="true" href="#다중-상속">#</a></h2>
+<p>Effective Java를 보면 abstract class보다는 interface를 사용하라고 한다. 여러 이유가 있는데 그 중 위에서 언급한 첫 번째 이유가 있다. Abstract class 다중 상속의 대상이 될 수 없다. 결국, abstract class는 hierarchy와 관련된다. 하지만 hierarchy가 부적절한 경우가 많다. 예를 들어 <code>interface Husband</code>와 <code>interface Son</code>을 조합해 <code>class MarriedMan</code>을 정의할 수 있다. MarriedMan은 Husband이면서 Son이다. Hierarchy로 이 셋의 관계를 정의하는 건 부적절하다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MarriedMan</span>() : Husband, Son {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">actAsHusband</span>() {}
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">actAsSon</span>() {}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">Husband</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">actAsHusband</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">Son</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">actAsSon</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>만약 <code>Husband</code>와 <code>Son</code>이 interface가 아닌 abstract class였다면 위처럼 <code>MarriedMan</code>을 정의할 수 없다.</p>
+<h2 id="state">State<a hidden class="anchor" aria-hidden="true" href="#state">#</a></h2>
+<h3 id="interface-stateless">Interface: stateless<a hidden class="anchor" aria-hidden="true" href="#interface-stateless">#</a></h3>
+<p>Interface는 state를 가질 수 없기 때문에 mutable instance variables를 사용할 수 없다. 즉, instance fields가 없거나 final variables만 가질 수 있다. 아래 예시는 final variables만 가진 경우다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">Son</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>  String nameOfFather <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;John&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>  String nameOfMother <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Joan&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p>실제로 아래 코드는 컴파일 에러를 낸다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        Son<span style="color:#f92672">.</span><span style="color:#a6e22e">nameOfMother</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Anne&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>java: cannot assign a value to final variable nameOfMother
+</span></span></code></pre></div><h3 id="abstract-class-stateful">Abstract class: stateful<a hidden class="anchor" aria-hidden="true" href="#abstract-class-stateful">#</a></h3>
+<p>Abstract class는 여느 클래스와 마찬가지로 state를 가질 수 있다. 즉, mutable instance variables를 사용할 수 있다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">abstract</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AbstractSon</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    String nameOfMother <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Joan&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ConcreteSon</span> <span style="color:#66d9ef">extends</span> AbstractSon <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p>그렇기 때문에 아래 코드는 컴파일이 된다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        AbstractSon son <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ConcreteSon<span style="color:#f92672">();</span>
+</span></span><span style="display:flex;"><span>        son<span style="color:#f92672">.</span><span style="color:#a6e22e">nameOfMother</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Anne&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><h2 id="skeletal-implementation--abstract-class--interface">Skeletal implementation = abstract class + interface<a hidden class="anchor" aria-hidden="true" href="#skeletal-implementation--abstract-class--interface">#</a></h2>
+<p>위에서 interface의 특징에 대해 언급했다. Interface에는 또 다른 제약 사항이 있다. Interface는 Object class의 메서드인 <code>hashCode()</code>, <code>toString()</code> <code>equals()</code> 등에 대해 default method를 정의할 수 없다. 또한 interface는 public이 아닌 static members를 가질 수 없다 (private static 메서드 제외).</p>
+<p>Skeletal implementation은 interface의 특징과 abstract class의 특징을 조합하기 위한 방법으로, interface를 상속하는 abstract class를 정의한다. 예를 들어, <code>java.util.AbstractList</code>, <code>java.util.AbstractMap</code> 등이 있다.</p>
+<p><code>AbstractList</code> 코드 일부를 보자.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> java.util<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">abstract</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AbstractList</span><span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">extends</span> AbstractCollection<span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">implements</span> List<span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 생략
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">equals</span><span style="color:#f92672">(</span>Object o<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>o <span style="color:#f92672">==</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(!(</span>o <span style="color:#66d9ef">instanceof</span> List<span style="color:#f92672">))</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 생략
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p>위 코드에서 <code>equals()</code>가 정의돼 있다. 위에서 언급했듯이, interface인 <code>List</code>는 <code>equals()</code> 이름의 default method를 만들 수 없다. Skeletal implementation은 이를 극복했다.</p>
+<p>이 Skeletal implementation은 어떻게 사용될까? 예시로 <code>AbstractList</code>를 상속하는 <code>ArrayList</code>를 살펴보자.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ArrayList</span><span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">extends</span> AbstractList<span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">implements</span> List<span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;,</span> RandomAccess<span style="color:#f92672">,</span> Cloneable<span style="color:#f92672">,</span> java<span style="color:#f92672">.</span><span style="color:#a6e22e">io</span><span style="color:#f92672">.</span><span style="color:#a6e22e">Serializable</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 생략
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p><code>ArrayList</code>의 <code>equals()</code> 메서드는 <code>AbstractList</code>의 것이다. <code>ArrayList</code> class는 <code>AbstractList</code>를 상속하기 때문이다. 추가로 위 코드에서 알 수 있듯이 <code>ArrayList</code>는 다른 여러 interfaces를 다중 상속한다.</p>
+<p>덕분에 interface에 default method <code>equals()</code>가 없지만 아래와 같이 코드가 잘 작동한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Demo</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        List a <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;(</span><span style="color:#ae81ff">1</span><span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        List b <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;(</span><span style="color:#ae81ff">1</span><span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>a<span style="color:#f92672">.</span><span style="color:#a6e22e">equals</span><span style="color:#f92672">(</span>b<span style="color:#f92672">));</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>true
+</span></span></code></pre></div><h2 id="의문점-kotlin-interface">의문점: Kotlin interface<a hidden class="anchor" aria-hidden="true" href="#의문점-kotlin-interface">#</a></h2>
+<p>서두에서 정의한 son interface를 보자.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">Son</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>  String nameOfFather <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;John&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>  String nameOfMother <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Joan&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p>Kotlin으로 표현하면 아래와 같이 표현할 수 있다 (IntelliJ의 java -&gt; kotlin 자동 변환 사용).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">Son</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">companion</span> <span style="color:#66d9ef">object</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">val</span> NAME_OF_FATHER = <span style="color:#e6db74">&#34;John&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">val</span> NAME_OF_MOTHER = <span style="color:#e6db74">&#34;Joan&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>참고로 kotlin의 성질상 아래와 같이 interface를 정의하면 아래와 같은 컴파일 오류가 발생한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">Son</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">val</span> NAME_OF_FATHER = <span style="color:#e6db74">&#34;John&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">val</span> NAME_OF_MOTHER = <span style="color:#e6db74">&#34;Joan&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>Property initializers are not allowed in interfaces
+</span></span></code></pre></div><p>Kotlin에서 <code>const val</code> 대신에 <code>var</code>를 사용하면 interface가 state를 가질 수 있는 것으로 보인다. 아래와 같이 말이다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">Son</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">companion</span> <span style="color:#66d9ef">object</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> NAME_OF_FATHER = <span style="color:#e6db74">&#34;John&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> NAME_OF_MOTHER = <span style="color:#e6db74">&#34;Joan&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>진짜 그런가? 그렇다면 이렇게 코딩하는 건 바람직할까?</strong></p>
+<p>답은 No다. IntelliJ에서 위 코드를 java로 decompile해보면 아래와 같이 나온다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">Son</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 생략
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Companion</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 생략
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>         $$INSTANCE <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Companion<span style="color:#f92672">();</span>
+</span></span><span style="display:flex;"><span>         NAME_OF_FATHER <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;John&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>         NAME_OF_MOTHER <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Joan&#34;</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>     <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p>즉, 애초에 java interface fields에 속하지 않는다.</p>
+<h2 id="reference">Reference<a hidden class="anchor" aria-hidden="true" href="#reference">#</a></h2>
+<ul>
+<li><a href="https://www.infoworld.com/article/2077421/abstract-classes-vs-interfaces-in-java.html">Abstract classes vs. interfaces in Java, Rafael del Nero - InfoWorld</a></li>
+<li>Joshua Bloch. (2018) Effective Java (3rd ed.). Addison-Wesley</li>
+<li><a href="https://stackoverflow.com/a/9735625">What is Stateless Object in Java? - Stackoverflow</a></li>
+<li><a href="https://stackoverflow.com/a/35338099">Companion Objects in Kotlin Interfaces - Stackoverflow</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2023 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

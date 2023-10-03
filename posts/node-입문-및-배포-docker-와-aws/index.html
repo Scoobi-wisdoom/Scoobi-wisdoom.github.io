@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Node 입문 및 배포 (Docker 와 Aws) | wisdoom</title>
+<meta name="keywords" content="">
+<meta name="description" content="NodeJS, ExpressJS 와 Docker nodeJS 앱 만들기 프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.
+app.js
+const express = require(&#39;express&#39;); const app = express(); app.get(&#39;/&#39;, (req, res) =&gt; res.send(&#39;hello world&#39;)); app.listen(80, () =&gt; { console.log(&#39;My REST API running on port 80!&#39;); }); Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.
+npm install express 이제 package.">
+<meta name="author" content="">
+<link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/node-%EC%9E%85%EB%AC%B8-%EB%B0%8F-%EB%B0%B0%ED%8F%AC-docker-%EC%99%80-aws/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.5c25c975546c048d1a5600aadb48425ae1bc921a9a18fe67d6955c9535260811.css" integrity="sha256-XCXJdVRsBI0aVgCq20hCWuG8khqaGP5n1pVclTUmCBE=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.acb54fd32bbc1982428b8850317e45d076b95012730a5936667e6bc21777692a.js" integrity="sha256-rLVP0yu8GYJCi4hQMX5F0Ha5UBJzClk2Zn5rwhd3aSo="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Scoobi-wisdoom.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:title" content="Node 입문 및 배포 (Docker 와 Aws)" />
+<meta property="og:description" content="NodeJS, ExpressJS 와 Docker nodeJS 앱 만들기 프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.
+app.js
+const express = require(&#39;express&#39;); const app = express(); app.get(&#39;/&#39;, (req, res) =&gt; res.send(&#39;hello world&#39;)); app.listen(80, () =&gt; { console.log(&#39;My REST API running on port 80!&#39;); }); Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.
+npm install express 이제 package." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/node-%EC%9E%85%EB%AC%B8-%EB%B0%8F-%EB%B0%B0%ED%8F%AC-docker-%EC%99%80-aws/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-04-06T23:36:09+09:00" />
+<meta property="article:modified_time" content="2021-04-06T23:36:09+09:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Node 입문 및 배포 (Docker 와 Aws)"/>
+<meta name="twitter:description" content="NodeJS, ExpressJS 와 Docker nodeJS 앱 만들기 프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.
+app.js
+const express = require(&#39;express&#39;); const app = express(); app.get(&#39;/&#39;, (req, res) =&gt; res.send(&#39;hello world&#39;)); app.listen(80, () =&gt; { console.log(&#39;My REST API running on port 80!&#39;); }); Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.
+npm install express 이제 package."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Scoobi-wisdoom.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Node 입문 및 배포 (Docker 와 Aws)",
+      "item": "https://Scoobi-wisdoom.github.io/posts/node-%EC%9E%85%EB%AC%B8-%EB%B0%8F-%EB%B0%B0%ED%8F%AC-docker-%EC%99%80-aws/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Node 입문 및 배포 (Docker 와 Aws)",
+  "name": "Node 입문 및 배포 (Docker 와 Aws)",
+  "description": "NodeJS, ExpressJS 와 Docker nodeJS 앱 만들기 프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.\napp.js\nconst express = require(\u0026#39;express\u0026#39;); const app = express(); app.get(\u0026#39;/\u0026#39;, (req, res) =\u0026gt; res.send(\u0026#39;hello world\u0026#39;)); app.listen(80, () =\u0026gt; { console.log(\u0026#39;My REST API running on port 80!\u0026#39;); }); Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.\nnpm install express 이제 package.",
+  "keywords": [
+    
+  ],
+  "articleBody": "NodeJS, ExpressJS 와 Docker nodeJS 앱 만들기 프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.\napp.js\nconst express = require('express'); const app = express(); app.get('/', (req, res) =\u003e res.send('hello world')); app.listen(80, () =\u003e { console.log('My REST API running on port 80!'); }); Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.\nnpm install express 이제 package.json 의 script 에 start command 를 추가한다. 이는 app.js 를 run 하기 위해서다.\npackage.json\n\"scripts\": { \"start\": \"node app.js\", \"test\": \"echo \\\"Error: no test specified\\\" \u0026\u0026 exit 1\" }, start command 가 제대로 작동하는지 확인하기 위해 terminal 에서 다음과 같이 명령어를 입력한 후에 웹브라우저에서 localhost 로 접속한다.\nnpm start Docker 활용 프로젝트 디렉토리에 파일을 새로 만들고, 이름을 Dockerfile 이라고 한다. 아래와 같이 코드를 작성해준다.\nDockerfile\nFROM node:14-slim WORKDIR /app COPY package.json /app RUN npm install COPY . /app CMD [\"npm\", \"start\"] 위의 코드에서 FROM, WORKDIR, COPY, RUN, CMD 는 Instruction 로 통칭한다. 각 instruction 의 뜻을 살펴보자.\nFROM instruction 은 DockerHub 에서 불러와 Container 안에서 사용할 Docker image 지정한다. 여기서 말하는 Docker image 는 node, python, ubuntu 등으로, DockerHub 에 이미 공식적으로 등록돼 있다. 위의 코드에서 FROM instruction 은 terminal 에서 install node 명령어를 실행한 것과 같다. 즉, FROM instruction 덕분에 따로 node 를 설치하지 않아도 되는 것이다. node:14-slim 에서 14-slim 은 tag 로, node 의 버전이다. slim, alpine, buster 등 버전 차이는 reference 를 참고하자.\nWORKDIR 는 Container 의 working directory 를 의미한다. 위의 코드에서는 WORKDIR /app 이 입력돼 있다. 그렇기 때문에 아래에 있는 두 개의 COPY instructions 에서 “/app” 대신에 “.” 를 써도 된다.\nCOPY instruction 은 Host 에 있는 local 파일을 Container 에 복사하는 기능을 한다. COPY 는 RUN 과 다르게 Host 에서 명령어를 실행한다. COPY 가 instruction 형식으로, 위의 코드에서는 “COPY . /app” 이 입력돼 있다. 이 코드는 Host 의 directory “.” 에 있는 파일을 Container 의 “/app” directory 에 복사한다는 뜻이다.\nRUN instruction 은 리눅스 명령어를 Container 내부에서 실행하는 기능을 한다. 즉, 위의 코드에서 RUN npm install 은 Container 내부에서만 실행될뿐, Host 나 local 에서는 실행되지 않는다.\nCMD instruction 은 Container 안에서 무슨 linux 명령어를 실행할지 지정하는 기능이다. 위의 코드에서는 “CMD [“npm”, “start”]” 가 입력돼 있다. 이 코드는\nnpm start 를 입력한 것과 동일하다. “1. nodeJS 앱 만들기” 에서 package.json 에 아래와 같은 설정을 한 바 있다.\n\"scripts\": { \"start\": \"node app.js\", 위의 설정으로 인해 “npm start” 는 “node app.js” 를 Terminal 에 입력하는 것과 동일하다.\nAWS 를 통해 배포하는 것은 여기를 참조하자.\nReference Docker-izing a NodeJS ExpressJS API - Tutorial, TutorialEdge - Youtube Best practices for writing Dockerfiles , docker docs - Docker Inc. Dockerfile Tutorial - Docker in Practice || Docker Tutorial 10 , TechWorld with Nana - Youtube Dockerfile copy command, Richard Chesterwood - Youtube Alpine, Slim, Stretch, Buster, Jessie, Bullseye — What are the Differences in Docker Images?, Julie Perilla Garcia - Medium NodeJS Crash Course 정리 node js 를 설치한 후에 visual studio terminal 에서\nnpm init 을 입력한다. 필자는 여기서 author 만 설정하고 나머지는 모두 default 로 두었다.\n추후에 dependenices 와 devDependencies 를 추가하기 위해 각각 아래와 같은 명령어를 terminal 에 입력한다.\nnpm install uuid npm install -D nodemon package.json 에 dependencies 가 추가된 것을 확인할 수 있다. package.json 로 dependencies 를 설정할 수 있으며, deploy 할 때는 node_modules 로 하지 않고 package.json 으로 한다.\n이제 main file 을 생성한다. package.json 을 보면 “main” 이 “index.js” 로 설정돼 있다. 그러므로 main file 의 이름을 index.js 로 생성한다.\n참고로 module 에는 Module Wrapper Function 이 존재한다. 미리 생성돼 있기 때문에 우리가 써줄 필요는 없다. 아래와 같은 함수다.\n(function (exports, require, module, __filename, __dirname) { }) 그렇기 때문에 아래와 같은 코드를 입력해도 에러 없이 작동한다.\nconsole.log(__dirname, __filename) 서버를 돌릴 경우 .js 파일이 변경될 때마다 서버를 중지하고 다시 실행해야 반영된다. 서버를 중지할 필요 없이 .js 파일의 변경 사항이 즉시 반영되게 하는 방법은 nodemon 이다. package.json 의 Debug 항목에 다음과 같이 “dev” 항목을 추가한다.\n\"scripts\": { \"start\": \"node index\", \"dev\": \"nodemon index\" } 그 다음에 terminal 에서 다음과 같은 명령어를 실행하면, 서버를 중지할 필요 없이 즉시 변경사항이 반영된다.\nnpm run dev index.js\nconst PORT = process.env.PORT || 5000; package.json\n\"start\": \"node index\" Reference Node.js Crash Course, Traversy Media - Youtube\n",
+  "wordCount" : "703",
+  "inLanguage": "en",
+  "datePublished": "2021-04-06T23:36:09+09:00",
+  "dateModified": "2021-04-06T23:36:09+09:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Scoobi-wisdoom.github.io/posts/node-%EC%9E%85%EB%AC%B8-%EB%B0%8F-%EB%B0%B0%ED%8F%AC-docker-%EC%99%80-aws/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "wisdoom",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Scoobi-wisdoom.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://Scoobi-wisdoom.github.io/" accesskey="h" title="wisdoom (Alt + H)">wisdoom</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title">
+      Node 입문 및 배포 (Docker 와 Aws)
+    </h1>
+    <div class="post-meta"><span title='2021-04-06 23:36:09 +0900 KST'>April 6, 2021</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h2 id="nodejs-expressjs-와-docker">NodeJS, ExpressJS 와 Docker<a hidden class="anchor" aria-hidden="true" href="#nodejs-expressjs-와-docker">#</a></h2>
+<h3 id="nodejs-앱-만들기">nodeJS 앱 만들기<a hidden class="anchor" aria-hidden="true" href="#nodejs-앱-만들기">#</a></h3>
+<p>프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.<br>
+<strong>app.js</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">express</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;express&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">app</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">express</span>();
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;/&#39;</span>, (<span style="color:#a6e22e">req</span>, <span style="color:#a6e22e">res</span>) =&gt; <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">&#39;hello world&#39;</span>));
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">listen</span>(<span style="color:#ae81ff">80</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;My REST API running on port 80!&#39;</span>);
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><p>Express 를 <strong>app.js</strong> 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>npm install express
+</span></span></code></pre></div><p>이제 <strong>package.json</strong> 의 <strong>script</strong> 에 start command 를 추가한다. 이는 <strong>app.js</strong> 를 run 하기 위해서다.<br>
+<strong>package.json</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#e6db74">&#34;scripts&#34;</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;start&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;node app.js&#34;</span>,
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;test&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;echo \&#34;Error: no test specified\&#34; &amp;&amp; exit 1&#34;</span>
+</span></span><span style="display:flex;"><span>},
+</span></span></code></pre></div><p>start command 가 제대로 작동하는지 확인하기 위해 terminal 에서 다음과 같이 명령어를 입력한 후에 웹브라우저에서 localhost 로 접속한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>npm start
+</span></span></code></pre></div><h3 id="docker-활용">Docker 활용<a hidden class="anchor" aria-hidden="true" href="#docker-활용">#</a></h3>
+<p>프로젝트 디렉토리에 파일을 새로 만들고, 이름을 Dockerfile 이라고 한다. 아래와 같이 코드를 작성해준다.<br>
+<strong>Dockerfile</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> node:14-slim</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">WORKDIR</span><span style="color:#e6db74"> /app</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> package.json /app<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>&lt;!-- COPY package.json . --&gt;<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> npm install<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> . /app<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>&lt;!-- COPY . . --&gt;<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;npm&#34;</span>, <span style="color:#e6db74">&#34;start&#34;</span>]<span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>위의 코드에서 <strong>FROM, WORKDIR, COPY, RUN, CMD</strong> 는 Instruction 로 통칭한다. 각 instruction 의 뜻을 살펴보자.</p>
+<p><strong>FROM</strong> instruction 은 DockerHub 에서 불러와 Container 안에서 사용할 Docker image 지정한다. 여기서 말하는 Docker image 는 node, python, ubuntu 등으로, DockerHub 에 이미 공식적으로 등록돼 있다. 위의 코드에서 <strong>FROM</strong> instruction 은 terminal 에서 <strong>install node</strong> 명령어를 실행한 것과 같다. 즉, <strong>FROM</strong> instruction 덕분에 따로 node 를 설치하지 않아도 되는 것이다. node:14-slim 에서 14-slim 은 tag 로, node 의 버전이다. slim, alpine, buster 등 버전 차이는 reference 를 참고하자.</p>
+<p><strong>WORKDIR</strong> 는 Container 의 working directory 를 의미한다. 위의 코드에서는 <strong>WORKDIR</strong> /app 이 입력돼 있다. 그렇기 때문에 아래에 있는 두 개의 <strong>COPY</strong> instructions 에서 &ldquo;/app&rdquo; 대신에 &ldquo;.&rdquo; 를 써도 된다.</p>
+<p><strong>COPY</strong> instruction 은 Host 에 있는 local 파일을 Container 에 복사하는 기능을 한다. <strong>COPY</strong> 는 <strong>RUN</strong> 과 다르게 Host 에서 명령어를 실행한다. <strong>COPY &lt;source&gt; &lt;target&gt;</strong> 가 instruction 형식으로, 위의 코드에서는 &ldquo;<strong>COPY</strong> . /app&rdquo; 이 입력돼 있다. 이 코드는 Host 의 directory &ldquo;.&rdquo; 에 있는 파일을 Container 의 &ldquo;/app&rdquo; directory 에 복사한다는 뜻이다.</p>
+<p><strong>RUN</strong> instruction 은 리눅스 명령어를 Container 내부에서 실행하는 기능을 한다. 즉, 위의 코드에서 <strong>RUN</strong> npm install 은 Container 내부에서만 실행될뿐, Host 나 local 에서는 실행되지 않는다.</p>
+<p><strong>CMD</strong> instruction 은 Container 안에서 무슨 linux 명령어를 실행할지 지정하는 기능이다. 위의 코드에서는 &ldquo;<strong>CMD</strong> [&ldquo;npm&rdquo;, &ldquo;start&rdquo;]&rdquo; 가 입력돼 있다. 이 코드는</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>npm start
+</span></span></code></pre></div><p>를 입력한 것과 동일하다. &ldquo;1. nodeJS 앱 만들기&rdquo; 에서 <strong>package.json</strong> 에 아래와 같은 설정을 한 바 있다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#e6db74">&#34;scripts&#34;</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;start&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;node app.js&#34;</span>,
+</span></span></code></pre></div><p>위의 설정으로 인해 &ldquo;npm start&rdquo; 는 &ldquo;node app.js&rdquo; 를 Terminal 에 입력하는 것과 동일하다.</p>
+<p>AWS 를 통해 배포하는 것은 <a href="https://scoobi-wisdoom.github.io/posts/docker%EC%99%80-aws-ec2/">여기</a>를 참조하자.</p>
+<h3 id="reference">Reference<a hidden class="anchor" aria-hidden="true" href="#reference">#</a></h3>
+<ul>
+<li><a href="https://youtu.be/CsWoMpK3EtE">Docker-izing a NodeJS ExpressJS API - Tutorial, TutorialEdge - Youtube</a></li>
+<li><a href="https://docs.docker.com/develop/develop-images/dockerfile_best-practices/">Best practices for writing Dockerfiles
+, docker docs - Docker Inc.</a></li>
+<li><a href="https://youtu.be/WmcdMiyqfZs?t=153">Dockerfile Tutorial - Docker in Practice || Docker Tutorial 10
+, TechWorld with Nana - Youtube</a></li>
+<li><a href="https://youtu.be/UyHjZBoe194?t=329">Dockerfile copy command, Richard Chesterwood - Youtube</a></li>
+<li><a href="https://medium.com/swlh/alpine-slim-stretch-buster-jessie-bullseye-bookworm-what-are-the-differences-in-docker-62171ed4531d">Alpine, Slim, Stretch, Buster, Jessie, Bullseye — What are the Differences in Docker Images?, Julie Perilla Garcia - Medium</a></li>
+</ul>
+<h2 id="nodejs-crash-course-정리">NodeJS Crash Course 정리<a hidden class="anchor" aria-hidden="true" href="#nodejs-crash-course-정리">#</a></h2>
+<p>node js 를 설치한 후에 visual studio terminal 에서</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>npm init
+</span></span></code></pre></div><p>을 입력한다. 필자는 여기서 <strong>author</strong> 만 설정하고 나머지는 모두 default 로 두었다.</p>
+<p>추후에 dependenices 와 devDependencies 를 추가하기 위해 각각 아래와 같은 명령어를 terminal 에 입력한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>npm install uuid
+</span></span><span style="display:flex;"><span>npm install -D nodemon
+</span></span></code></pre></div><p><strong>package.json</strong> 에 dependencies 가 추가된 것을 확인할 수 있다. <strong>package.json</strong> 로 dependencies 를 설정할 수 있으며, deploy 할 때는 <strong>node_modules</strong> 로 하지 않고 <strong>package.json</strong> 으로 한다.</p>
+<p>이제 main file 을 생성한다. <strong>package.json</strong> 을 보면 <strong>&ldquo;main&rdquo;</strong> 이 <strong>&ldquo;index.js&rdquo;</strong> 로 설정돼 있다. 그러므로 main file 의 이름을 <strong>index.js</strong> 로 생성한다.</p>
+<p>참고로 module 에는 <strong>Module Wrapper Function</strong> 이 존재한다. 미리 생성돼 있기 때문에 우리가 써줄 필요는 없다. 아래와 같은 함수다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span>(<span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">exports</span>, <span style="color:#a6e22e">require</span>, <span style="color:#a6e22e">module</span>, <span style="color:#a6e22e">__filename</span>, <span style="color:#a6e22e">__dirname</span>) {
+</span></span><span style="display:flex;"><span>    })
+</span></span></code></pre></div><p>그렇기 때문에 아래와 같은 코드를 입력해도 에러 없이 작동한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">__dirname</span>, <span style="color:#a6e22e">__filename</span>)
+</span></span></code></pre></div><p>서버를 돌릴 경우 .js 파일이 변경될 때마다 서버를 중지하고 다시 실행해야 반영된다. 서버를 중지할 필요 없이 .js 파일의 변경 사항이 즉시 반영되게 하는 방법은 nodemon 이다. <strong>package.json</strong> 의 Debug 항목에 다음과 같이 <strong>&ldquo;dev&rdquo;</strong> 항목을 추가한다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#e6db74">&#34;scripts&#34;</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;start&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;node index&#34;</span>,
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;dev&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;nodemon index&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>그 다음에 terminal 에서 다음과 같은 명령어를 실행하면, 서버를 중지할 필요 없이 즉시 변경사항이 반영된다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>npm run dev
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<p><strong>index.js</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">PORT</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">process</span>.<span style="color:#a6e22e">env</span>.<span style="color:#a6e22e">PORT</span> <span style="color:#f92672">||</span> <span style="color:#ae81ff">5000</span>;
+</span></span></code></pre></div><p><strong>package.json</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#e6db74">&#34;start&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;node index&#34;</span>
+</span></span></code></pre></div><h3 id="reference-1">Reference<a hidden class="anchor" aria-hidden="true" href="#reference-1">#</a></h3>
+<ul>
+<li><a href="https://youtu.be/fBNz5xF-Kx4">Node.js Crash Course, Traversy Media - Youtube</a><br>
+<!-- raw HTML omitted --></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2023 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>
