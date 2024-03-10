@@ -2,13 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://Scoobi-wisdoom.github.io/posts/kotlin-coroutines/</loc>
-    <lastmod>2023-09-26T00:41:11+09:00</lastmod>
+    <loc>https://Scoobi-wisdoom.github.io/posts/aws-%EC%9D%B4%EA%B2%83%EB%A7%8C-%EC%99%B8%EC%9A%B0%EC%9E%90/</loc>
+    <lastmod>2024-03-09T19:13:35+09:00</lastmod>
   </url><url>
     <loc>https://Scoobi-wisdoom.github.io/posts/</loc>
-    <lastmod>2023-09-26T00:41:11+09:00</lastmod>
+    <lastmod>2024-03-09T19:13:35+09:00</lastmod>
   </url><url>
     <loc>https://Scoobi-wisdoom.github.io/</loc>
+    <lastmod>2024-03-09T19:13:35+09:00</lastmod>
+  </url><url>
+    <loc>https://Scoobi-wisdoom.github.io/posts/kotlin-coroutines/</loc>
     <lastmod>2023-09-26T00:41:11+09:00</lastmod>
   </url><url>
     <loc>https://Scoobi-wisdoom.github.io/posts/jpa-direction-of-onetomany/</loc>

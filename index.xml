@@ -6,7 +6,17 @@
     <description>Recent content on wisdoom</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 26 Sep 2023 00:41:11 +0900</lastBuildDate><atom:link href="https://Scoobi-wisdoom.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 09 Mar 2024 19:13:35 +0900</lastBuildDate><atom:link href="https://Scoobi-wisdoom.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>AWS 이것만 외우자</title>
+      <link>https://Scoobi-wisdoom.github.io/posts/aws-%EC%9D%B4%EA%B2%83%EB%A7%8C-%EC%99%B8%EC%9A%B0%EC%9E%90/</link>
+      <pubDate>Sat, 09 Mar 2024 19:13:35 +0900</pubDate>
+      
+      <guid>https://Scoobi-wisdoom.github.io/posts/aws-%EC%9D%B4%EA%B2%83%EB%A7%8C-%EC%99%B8%EC%9A%B0%EC%9E%90/</guid>
+      <description>로컬 vs 클라우드 차이: Networking 백엔드 개발을 처음 배울 때, Hello World 를 출력하는 앱을 만들어본다. 예를 들어, 아래와 같이 요청에 대해 &amp;ldquo;Hello World&amp;rdquo; 를 응답하는 것이다 (Spring Boot 사용).
+@RestController class DemoController { @GetMapping fun getDemo() = &amp;#34;Hello World&amp;#34; } 이 애플리케이션을 로컬 컴퓨터에서 구동한 후, 로컬 브라우저에서 localhost:8080 을 입력해 Hello World 를 브라우저 화면에서 확인할 수 있다. 애플리케이션을 AWS 에서 구동하는 것 역시 이와 거의 동일하다. 로컬 환경이 클라우드 환경으로 변한 것뿐이다.</description>
+    </item>
+    
     <item>
       <title>Kotlin Coroutines</title>
       <link>https://Scoobi-wisdoom.github.io/posts/kotlin-coroutines/</link>
