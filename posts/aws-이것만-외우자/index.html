@@ -7,12 +7,19 @@
 <meta name="robots" content="index, follow">
 <title>AWS 이것만 외우자 | wisdoom</title>
 <meta name="keywords" content="">
-<meta name="description" content="로컬 vs 클라우드 차이: Networking 백엔드 개발을 처음 배울 때, Hello World 를 출력하는 앱을 만들어본다. 예를 들어, 아래와 같이 요청에 대해 &ldquo;Hello World&rdquo; 를 응답하는 것이다 (Spring Boot 사용).
-@RestController class DemoController { @GetMapping fun getDemo() = &#34;Hello World&#34; } 이 애플리케이션을 로컬 컴퓨터에서 구동한 후, 로컬 브라우저에서 localhost:8080 을 입력해 Hello World 를 브라우저 화면에서 확인할 수 있다. 애플리케이션을 AWS 에서 구동하는 것 역시 이와 거의 동일하다. 로컬 환경이 클라우드 환경으로 변한 것뿐이다.">
+<meta name="description" content="로컬 vs 클라우드 차이: Networking
+백엔드 개발을 처음 배울 때, Hello World 를 출력하는 앱을 만들어본다. 예를 들어, 아래와 같이 요청에 대해 &ldquo;Hello World&rdquo; 를 응답하는 것이다 (Spring Boot 사용).
+@RestController
+class DemoController { 
+    @GetMapping
+    fun getDemo() = &#34;Hello World&#34;
+}
+이 애플리케이션을 로컬 컴퓨터에서 구동한 후, 로컬 브라우저에서 localhost:8080 을 입력해 Hello World 를 브라우저 화면에서 확인할 수 있다. 애플리케이션을 AWS 에서 구동하는 것 역시 이와 거의 동일하다. 로컬 환경이 클라우드 환경으로 변한 것뿐이다. 아래 그림처럼 말이다.
+
+그림에서 로컬 환경과 클라우드 환경을 비교해보면 크게 두 가지가 다르다.">
 <meta name="author" content="">
 <link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/aws-%EC%9D%B4%EA%B2%83%EB%A7%8C-%EC%99%B8%EC%9A%B0%EC%9E%90/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
@@ -20,6 +27,7 @@
 <link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/posts/aws-%EC%9D%B4%EA%B2%83%EB%A7%8C-%EC%99%B8%EC%9A%B0%EC%9E%90/">
 <noscript>
     <style>
         #theme-toggle,
@@ -37,7 +45,7 @@
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -56,18 +64,28 @@
         }
 
     </style>
-</noscript><meta property="og:title" content="AWS 이것만 외우자" />
-<meta property="og:description" content="로컬 vs 클라우드 차이: Networking 백엔드 개발을 처음 배울 때, Hello World 를 출력하는 앱을 만들어본다. 예를 들어, 아래와 같이 요청에 대해 &ldquo;Hello World&rdquo; 를 응답하는 것이다 (Spring Boot 사용).
-@RestController class DemoController { @GetMapping fun getDemo() = &#34;Hello World&#34; } 이 애플리케이션을 로컬 컴퓨터에서 구동한 후, 로컬 브라우저에서 localhost:8080 을 입력해 Hello World 를 브라우저 화면에서 확인할 수 있다. 애플리케이션을 AWS 에서 구동하는 것 역시 이와 거의 동일하다. 로컬 환경이 클라우드 환경으로 변한 것뿐이다." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/aws-%EC%9D%B4%EA%B2%83%EB%A7%8C-%EC%99%B8%EC%9A%B0%EC%9E%90/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2024-03-09T19:13:35+09:00" />
-<meta property="article:modified_time" content="2024-03-09T19:13:35+09:00" />
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/aws-%EC%9D%B4%EA%B2%83%EB%A7%8C-%EC%99%B8%EC%9A%B0%EC%9E%90/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="AWS 이것만 외우자">
+  <meta property="og:description" content="로컬 vs 클라우드 차이: Networking 백엔드 개발을 처음 배울 때, Hello World 를 출력하는 앱을 만들어본다. 예를 들어, 아래와 같이 요청에 대해 “Hello World” 를 응답하는 것이다 (Spring Boot 사용).
+@RestController class DemoController { @GetMapping fun getDemo() = &#34;Hello World&#34; } 이 애플리케이션을 로컬 컴퓨터에서 구동한 후, 로컬 브라우저에서 localhost:8080 을 입력해 Hello World 를 브라우저 화면에서 확인할 수 있다. 애플리케이션을 AWS 에서 구동하는 것 역시 이와 거의 동일하다. 로컬 환경이 클라우드 환경으로 변한 것뿐이다. 아래 그림처럼 말이다. 그림에서 로컬 환경과 클라우드 환경을 비교해보면 크게 두 가지가 다르다.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-03-09T19:13:35+09:00">
+    <meta property="article:modified_time" content="2024-03-09T19:13:35+09:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AWS 이것만 외우자">
+<meta name="twitter:description" content="로컬 vs 클라우드 차이: Networking
+백엔드 개발을 처음 배울 때, Hello World 를 출력하는 앱을 만들어본다. 예를 들어, 아래와 같이 요청에 대해 &ldquo;Hello World&rdquo; 를 응답하는 것이다 (Spring Boot 사용).
+@RestController
+class DemoController { 
+    @GetMapping
+    fun getDemo() = &#34;Hello World&#34;
+}
+이 애플리케이션을 로컬 컴퓨터에서 구동한 후, 로컬 브라우저에서 localhost:8080 을 입력해 Hello World 를 브라우저 화면에서 확인할 수 있다. 애플리케이션을 AWS 에서 구동하는 것 역시 이와 거의 동일하다. 로컬 환경이 클라우드 환경으로 변한 것뿐이다. 아래 그림처럼 말이다.
 
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="AWS 이것만 외우자"/>
-<meta name="twitter:description" content="로컬 vs 클라우드 차이: Networking 백엔드 개발을 처음 배울 때, Hello World 를 출력하는 앱을 만들어본다. 예를 들어, 아래와 같이 요청에 대해 &ldquo;Hello World&rdquo; 를 응답하는 것이다 (Spring Boot 사용).
-@RestController class DemoController { @GetMapping fun getDemo() = &#34;Hello World&#34; } 이 애플리케이션을 로컬 컴퓨터에서 구동한 후, 로컬 브라우저에서 localhost:8080 을 입력해 Hello World 를 브라우저 화면에서 확인할 수 있다. 애플리케이션을 AWS 에서 구동하는 것 역시 이와 거의 동일하다. 로컬 환경이 클라우드 환경으로 변한 것뿐이다."/>
+그림에서 로컬 환경과 클라우드 환경을 비교해보면 크게 두 가지가 다르다.">
 
 
 <script type="application/ld+json">
@@ -96,7 +114,7 @@
   "@type": "BlogPosting",
   "headline": "AWS 이것만 외우자",
   "name": "AWS 이것만 외우자",
-  "description": "로컬 vs 클라우드 차이: Networking 백엔드 개발을 처음 배울 때, Hello World 를 출력하는 앱을 만들어본다. 예를 들어, 아래와 같이 요청에 대해 \u0026ldquo;Hello World\u0026rdquo; 를 응답하는 것이다 (Spring Boot 사용).\n@RestController class DemoController { @GetMapping fun getDemo() = \u0026#34;Hello World\u0026#34; } 이 애플리케이션을 로컬 컴퓨터에서 구동한 후, 로컬 브라우저에서 localhost:8080 을 입력해 Hello World 를 브라우저 화면에서 확인할 수 있다. 애플리케이션을 AWS 에서 구동하는 것 역시 이와 거의 동일하다. 로컬 환경이 클라우드 환경으로 변한 것뿐이다.",
+  "description": "로컬 vs 클라우드 차이: Networking 백엔드 개발을 처음 배울 때, Hello World 를 출력하는 앱을 만들어본다. 예를 들어, 아래와 같이 요청에 대해 \u0026ldquo;Hello World\u0026rdquo; 를 응답하는 것이다 (Spring Boot 사용).\n@RestController class DemoController { @GetMapping fun getDemo() = \u0026#34;Hello World\u0026#34; } 이 애플리케이션을 로컬 컴퓨터에서 구동한 후, 로컬 브라우저에서 localhost:8080 을 입력해 Hello World 를 브라우저 화면에서 확인할 수 있다. 애플리케이션을 AWS 에서 구동하는 것 역시 이와 거의 동일하다. 로컬 환경이 클라우드 환경으로 변한 것뿐이다. 아래 그림처럼 말이다. 그림에서 로컬 환경과 클라우드 환경을 비교해보면 크게 두 가지가 다르다.\n",
   "keywords": [
     
   ],
@@ -169,7 +187,7 @@
 <article class="post-single">
   <header class="post-header">
     
-    <h1 class="post-title">
+    <h1 class="post-title entry-hint-parent">
       AWS 이것만 외우자
     </h1>
     <div class="post-meta"><span title='2024-03-09 19:13:35 +0900 KST'>March 9, 2024</span>
@@ -184,8 +202,7 @@
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">getDemo</span>() = <span style="color:#e6db74">&#34;Hello World&#34;</span>
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>이 애플리케이션을 로컬 컴퓨터에서 구동한 후, 로컬 브라우저에서 <code>localhost:8080</code> 을 입력해 Hello World 를 브라우저 화면에서 확인할 수 있다. 애플리케이션을 AWS 에서 구동하는 것 역시 이와 거의 동일하다. 로컬 환경이 클라우드 환경으로 변한 것뿐이다. 아래 그림처럼 말이다.
-<img loading="lazy" src="/images/was_in_cloud/was_in_cloud_03.jpg" alt="local vs cloud"  />
-
+<img alt="local vs cloud" loading="lazy" src="/images/was_in_cloud/was_in_cloud_03.jpg">
 그림에서 로컬 환경과 클라우드 환경을 비교해보면 크게 두 가지가 다르다.</p>
 <ul>
 <li>로컬 환경에서는 클라이언트와 서버 모두 <strong>동일한 네트워크</strong>에 속한다. 반면에, 실제 서비스에서는 당연히 클라이언트와 서버는 <strong>다른 네트워크</strong>에 속한다.</li>
@@ -196,13 +213,11 @@
 <h1 id="vpc">VPC<a hidden class="anchor" aria-hidden="true" href="#vpc">#</a></h1>
 <h2 id="region--az">Region &amp; AZ<a hidden class="anchor" aria-hidden="true" href="#region--az">#</a></h2>
 <p>AWS Region, AZ(Availability Zone), VPC 에 대해 알아보자. 아래 그림에서 알 수 있듯이, Region 은 지리적 위치를, AZ 는 Region 에 속한 데이터 센터를, VPC 는 가상 네트워크를 의미하며, VPC 는 최소 한 개의 AZ 를 가진다.
-<img loading="lazy" src="/images/was_in_cloud/was_in_cloud_04.jpg" alt="regions, availabiliy zones and vpcs"  />
-
+<img alt="regions, availabiliy zones and vpcs" loading="lazy" src="/images/was_in_cloud/was_in_cloud_04.jpg">
 VPC 와 관련된 Region, AZ 에 대해서는 알았으니, 다음은 네트워크 설정을 알아볼 차례다.</p>
 <h2 id="subnet-route-table">Subnet: Route Table<a hidden class="anchor" aria-hidden="true" href="#subnet-route-table">#</a></h2>
 <p>Subnet 은 VPC 에 속한 네트워크의 범위이며, 최소 한 개의 AZ 를 가진다. 참고로 AZ 와 subnet 이 일대일 대응이어야 한다는 건 아니다. 즉, 아래 그림의 AZ 가 모두 동일할 수도 있다.
-<img loading="lazy" src="/images/was_in_cloud/was_in_cloud_05.jpg" alt="subnet"  />
-
+<img alt="subnet" loading="lazy" src="/images/was_in_cloud/was_in_cloud_05.jpg">
 위 그림에서 <strong>Implicit VPC router</strong> 를 회색으로 표시했다. 이유는 AWS 사용자가 VPC router 를 설치/삭제하는 것이 불가능하기 때문이다. AWS 가 VPC router 를 VPC 에 자동으로 할당하며, AWS 사용자는 <strong>Route Tables</strong> 를 통해서만 VPC router 를 이용할 수 있다. Route Table 에는 ip 주소와 target 을 등록하는데, 이는 target 이 ip 주소로 <strong>outbound traffic</strong> 을 보낼 수 있도록 하는 설정이다 (inbound traffic 과 Route Table 은 무관하다).
  </p>
 <p>위 그림에서 어떤 outbound traffic 이 가능한지 살펴보자. Route Tables 를 보면, <code>172.16.0.4 ~ local target</code> 을 확인할 수 있다. 즉, <code>local</code> → <code>172.16.0.4</code> traffic 이 가능하다. 그렇기 때문에 <code>172.16.0.5</code> → <code>172.16.0.4</code> traffic 이 가능하다.
@@ -210,8 +225,7 @@ VPC 와 관련된 Region, AZ 에 대해서는 알았으니, 다음은 네트워�
 <p>Route Tables 는 inbound traffic 과 무관하기 때문에 클라이언트의 요청과도 무관하다. 그렇다면 클라이언트의 요청을 받으려면, 어떤 설정을 해야 할까?</p>
 <h2 id="subnet-public-vs-private">Subnet: public vs private<a hidden class="anchor" aria-hidden="true" href="#subnet-public-vs-private">#</a></h2>
 <p>VPC 밖에서 traffic 이 들어오고 VPC 로부터 traffic 이 밖으로 나가기 위해서는 <strong>Internet Gateway</strong> 가 필요하다. 아래 그림에서 알 수 있듯이, Route Table 을 통해 Internet Gateway 에 연결된 subnet 은 <strong>public subnet</strong> 이고, 그렇지 않으면 <strong>private subnet</strong> 이다.
-<img loading="lazy" src="/images/was_in_cloud/was_in_cloud_06.jpg" alt="public vs private subnet"  />
-</p>
+<img alt="public vs private subnet" loading="lazy" src="/images/was_in_cloud/was_in_cloud_06.jpg"></p>
 <p>여기서 의문이 하나 생긴다. Private subnet 과 클라이언트간 traffic 이 오고 가려면 어떻게 해야 할까? 결론부터 말하자면 <strong>NAT Gateway</strong> 를 통해서다 (NAT Gateway 는 2015년에 출시됐다. 그 전에는 AWS 사용자가 직접 NAT 용 EC2 인스턴스를 만들었다고 한다). 그림에서 확인할 수 있듯이, Internet Gateway 와 연결된 subnet (public subnet) 에 NAT Gateway 를 위치시키고, Route Tables 를 통해 <code>private subnet</code> → <code>public subnet</code> 및 <code>NAT Gateway</code> → <code>0.0.0.0/0 (모든 ip 주소)</code> traffic 이 가능하도록 한다. 이렇게 하면 클라이언트와 private subnet 간 traffic 이 오고 간다.
  </p>
 <p>위 그림에서는 NAT Gateway 가 하나만 있지만, public subnet 마다 NAT Gateway 를 만들 수도 있다. 하지만 NAT Gateway 의 사용료는 비싼 편이기 때문에 주의하자.</p>
@@ -221,8 +235,7 @@ VPC 와 관련된 Region, AZ 에 대해서는 알았으니, 다음은 네트워�
 <h1 id="alb">ALB<a hidden class="anchor" aria-hidden="true" href="#alb">#</a></h1>
 <h2 id="server-app--alb">Server App &amp; ALB<a hidden class="anchor" aria-hidden="true" href="#server-app--alb">#</a></h2>
 <p>Server App 에 클라이언트가 요청을 직접 보낼 수도 있다. 하지만 더 좋은 방법은 클라이언트가 <strong>Application Load Balancer (ALB)</strong> 에 요청을 보내게 하는 것이다. 이 방법이 더 좋은 이유는 크게 두 가지가 있다. <strong>SSL certificate 를 load balancer 에만 설치</strong>해 클라이언트와의 통신을 HTTPS 로 할 수 있다. Load balancer 가 없다면 각각의 서버에 SSL certificate 에 설치해야 한다. 또한 요청이 하나의 서버에 몰리지 않도록 부하를 분산할 수 있다.<br>
-<img loading="lazy" src="/images/was_in_cloud/was_in_cloud_08.jpg" alt="alb with target group"  />
-
+<img alt="alb with target group" loading="lazy" src="/images/was_in_cloud/was_in_cloud_08.jpg">
 위 그림을 살펴보자. 클라이언트는 ALB 의 ip 주소를 DNS 로부터 획득한다. 그 다음 클라이언트는 획득한 ip 주소로, ALB 로 요청을 보낸다. ALB 는 클라이언트의 요청을 <strong>지정된 규칙 Listener&rsquo;s rule</strong> 에 따라 처리한다.</p>
 <p>예를 들어, alb 의 <strong>Listener&rsquo;s rule</strong> 이 다음과 같다고 하자.</p>
 <ul>
@@ -234,8 +247,7 @@ VPC 와 관련된 Region, AZ 에 대해서는 알았으니, 다음은 네트워�
 <p>이 때 클라이언트가 <code>https://www.example.com:443</code> 로 요청을 보내면, 클라이언트는 DNS 를 조회해 <code>www.example.com</code> 의 ip 주소를 획득한다. 획득한 ip 주소 (alb 의 ip 주소) 를 <code>xxx.xxx.xxx.xxx</code> 라 하면, 클라이언트는 <code>https://xxx.xxx.xxx.xxx:443</code> 으로 요청을 보낸다. Alb 는 이 요청을 Spring boot app 이 실행되고 있는 EC2 instance 로 넘긴다. 그리고 alb 는 EC2 instance 로부터 응답을 받아 클라이언트에 넘긴다.</p>
 <h2 id="alb--auto-scaling-group">ALB &amp; Auto Scaling Group<a hidden class="anchor" aria-hidden="true" href="#alb--auto-scaling-group">#</a></h2>
 <p>Auto scaling group 의 이름을 보면 무엇이 생각날까? 마치 target group 처럼 EC2 instance 와 관련이 돼 있는 것 같다. 하지만 직접적으로는 상관이 없다. Auto scaling group 은 configuration 일뿐이다. Auto scaling group 을 생성할 때, 관련된 target group 과 alb 를 지정하는 식이다.
-<img loading="lazy" src="/images/was_in_cloud/was_in_cloud_09.jpg" alt="alb with auto scaling"  />
-
+<img alt="alb with auto scaling" loading="lazy" src="/images/was_in_cloud/was_in_cloud_09.jpg">
 위 예시에서는 target group 이 EC2 instance 이다. Auto scaling group 설정에 따라 EC2 instance 의 이상이 감지될 경우, auto scaling group 은 target group 에 <strong>EC2 instance 를 추가로 생성</strong>한다. 추가된 EC2 instance 는 auto scaling group 에 의해 <strong>alb 와 연결</strong>된다.</p>
 <h1 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">#</a></h1>
 <ul>
@@ -264,7 +276,8 @@ VPC 와 관련된 Region, AZ 에 대해서는 알았으니, 다음은 네트워�
     </main>
     
 <footer class="footer">
-    <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &

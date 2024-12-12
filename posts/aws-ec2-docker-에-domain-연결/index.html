@@ -7,13 +7,15 @@
 <meta name="robots" content="index, follow">
 <title>AWS Ec2 Docker 에 Domain 연결 | wisdoom</title>
 <meta name="keywords" content="">
-<meta name="description" content="사전 준비 사항 EC2 instance 생성 완료, domain 보유 완료.
-주의 사항 EC2 를 stop 했다가 run 하면 두 가지를 신경써야 한다. 첫째로 IPv4 address 와 IPv4 DNS 이 모두 변경된다. 그렇기 때문에 Putty 에 주소 입력을 새롭게 해줘야 한다. 둘째로, Docker 가 inactive 가 된다. 결국 Putty 에서 다시 Docker run 을 실행해야 한다. 링크의 6. AWS EC2 에서 Docker 사용 부터 살펴보자.
-AWS EC2 instance 에 domain 을 부여하자.">
+<meta name="description" content="사전 준비 사항
+EC2 instance 생성 완료, domain 보유 완료.
+주의 사항
+EC2 를 stop 했다가 run 하면 두 가지를 신경써야 한다. 첫째로 IPv4 address 와 IPv4 DNS 이 모두 변경된다. 그렇기 때문에 Putty 에 주소 입력을 새롭게 해줘야 한다. 둘째로, Docker 가 inactive 가 된다. 결국 Putty 에서 다시 Docker run 을 실행해야 한다. 링크의 6. AWS EC2 에서 Docker 사용 부터 살펴보자.
+AWS EC2 instance 에 domain 을 부여하자.
+AWS 홈페이지에서 로그인 한 후에 Dashboard 에서 Compute &gt; EC2 에 접속한다. 사용할 instance 가 running 상태인지 확인하자. Instance 가 running 상태가 아니면 Public IPv4 address 가 없다. Public IPv4 address 를 복사한다.">
 <meta name="author" content="">
 <link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/aws-ec2-docker-%EC%97%90-domain-%EC%97%B0%EA%B2%B0/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
@@ -21,6 +23,7 @@ AWS EC2 instance 에 domain 을 부여하자.">
 <link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/posts/aws-ec2-docker-%EC%97%90-domain-%EC%97%B0%EA%B2%B0/">
 <noscript>
     <style>
         #theme-toggle,
@@ -38,7 +41,7 @@ AWS EC2 instance 에 domain 을 부여하자.">
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -57,20 +60,25 @@ AWS EC2 instance 에 domain 을 부여하자.">
         }
 
     </style>
-</noscript><meta property="og:title" content="AWS Ec2 Docker 에 Domain 연결" />
-<meta property="og:description" content="사전 준비 사항 EC2 instance 생성 완료, domain 보유 완료.
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/aws-ec2-docker-%EC%97%90-domain-%EC%97%B0%EA%B2%B0/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="AWS Ec2 Docker 에 Domain 연결">
+  <meta property="og:description" content="사전 준비 사항 EC2 instance 생성 완료, domain 보유 완료.
 주의 사항 EC2 를 stop 했다가 run 하면 두 가지를 신경써야 한다. 첫째로 IPv4 address 와 IPv4 DNS 이 모두 변경된다. 그렇기 때문에 Putty 에 주소 입력을 새롭게 해줘야 한다. 둘째로, Docker 가 inactive 가 된다. 결국 Putty 에서 다시 Docker run 을 실행해야 한다. 링크의 6. AWS EC2 에서 Docker 사용 부터 살펴보자.
-AWS EC2 instance 에 domain 을 부여하자." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/aws-ec2-docker-%EC%97%90-domain-%EC%97%B0%EA%B2%B0/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2021-04-08T22:35:45+09:00" />
-<meta property="article:modified_time" content="2021-04-08T22:35:45+09:00" />
-
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="AWS Ec2 Docker 에 Domain 연결"/>
-<meta name="twitter:description" content="사전 준비 사항 EC2 instance 생성 완료, domain 보유 완료.
-주의 사항 EC2 를 stop 했다가 run 하면 두 가지를 신경써야 한다. 첫째로 IPv4 address 와 IPv4 DNS 이 모두 변경된다. 그렇기 때문에 Putty 에 주소 입력을 새롭게 해줘야 한다. 둘째로, Docker 가 inactive 가 된다. 결국 Putty 에서 다시 Docker run 을 실행해야 한다. 링크의 6. AWS EC2 에서 Docker 사용 부터 살펴보자.
-AWS EC2 instance 에 domain 을 부여하자."/>
+AWS EC2 instance 에 domain 을 부여하자. AWS 홈페이지에서 로그인 한 후에 Dashboard 에서 Compute &gt; EC2 에 접속한다. 사용할 instance 가 running 상태인지 확인하자. Instance 가 running 상태가 아니면 Public IPv4 address 가 없다. Public IPv4 address 를 복사한다.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-04-08T22:35:45+09:00">
+    <meta property="article:modified_time" content="2021-04-08T22:35:45+09:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AWS Ec2 Docker 에 Domain 연결">
+<meta name="twitter:description" content="사전 준비 사항
+EC2 instance 생성 완료, domain 보유 완료.
+주의 사항
+EC2 를 stop 했다가 run 하면 두 가지를 신경써야 한다. 첫째로 IPv4 address 와 IPv4 DNS 이 모두 변경된다. 그렇기 때문에 Putty 에 주소 입력을 새롭게 해줘야 한다. 둘째로, Docker 가 inactive 가 된다. 결국 Putty 에서 다시 Docker run 을 실행해야 한다. 링크의 6. AWS EC2 에서 Docker 사용 부터 살펴보자.
+AWS EC2 instance 에 domain 을 부여하자.
+AWS 홈페이지에서 로그인 한 후에 Dashboard 에서 Compute &gt; EC2 에 접속한다. 사용할 instance 가 running 상태인지 확인하자. Instance 가 running 상태가 아니면 Public IPv4 address 가 없다. Public IPv4 address 를 복사한다.">
 
 
 <script type="application/ld+json">
@@ -99,7 +107,7 @@ AWS EC2 instance 에 domain 을 부여하자."/>
   "@type": "BlogPosting",
   "headline": "AWS Ec2 Docker 에 Domain 연결",
   "name": "AWS Ec2 Docker 에 Domain 연결",
-  "description": "사전 준비 사항 EC2 instance 생성 완료, domain 보유 완료.\n주의 사항 EC2 를 stop 했다가 run 하면 두 가지를 신경써야 한다. 첫째로 IPv4 address 와 IPv4 DNS 이 모두 변경된다. 그렇기 때문에 Putty 에 주소 입력을 새롭게 해줘야 한다. 둘째로, Docker 가 inactive 가 된다. 결국 Putty 에서 다시 Docker run 을 실행해야 한다. 링크의 6. AWS EC2 에서 Docker 사용 부터 살펴보자.\nAWS EC2 instance 에 domain 을 부여하자.",
+  "description": "사전 준비 사항 EC2 instance 생성 완료, domain 보유 완료.\n주의 사항 EC2 를 stop 했다가 run 하면 두 가지를 신경써야 한다. 첫째로 IPv4 address 와 IPv4 DNS 이 모두 변경된다. 그렇기 때문에 Putty 에 주소 입력을 새롭게 해줘야 한다. 둘째로, Docker 가 inactive 가 된다. 결국 Putty 에서 다시 Docker run 을 실행해야 한다. 링크의 6. AWS EC2 에서 Docker 사용 부터 살펴보자.\nAWS EC2 instance 에 domain 을 부여하자. AWS 홈페이지에서 로그인 한 후에 Dashboard 에서 Compute \u0026gt; EC2 에 접속한다. 사용할 instance 가 running 상태인지 확인하자. Instance 가 running 상태가 아니면 Public IPv4 address 가 없다. Public IPv4 address 를 복사한다.\n",
   "keywords": [
     
   ],
@@ -172,7 +180,7 @@ AWS EC2 instance 에 domain 을 부여하자."/>
 <article class="post-single">
   <header class="post-header">
     
-    <h1 class="post-title">
+    <h1 class="post-title entry-hint-parent">
       AWS Ec2 Docker 에 Domain 연결
     </h1>
     <div class="post-meta"><span title='2021-04-08 22:35:45 +0900 KST'>April 8, 2021</span>
@@ -205,7 +213,8 @@ AWS EC2 instance 에 domain 을 부여하자."/>
     </main>
     
 <footer class="footer">
-    <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &

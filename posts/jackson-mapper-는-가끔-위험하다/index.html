@@ -7,15 +7,27 @@
 <meta name="robots" content="index, follow">
 <title>Jackson Mapper 는 가끔 위험하다 | wisdoom</title>
 <meta name="keywords" content="">
-<meta name="description" content="null 로 설정된 값을 Jackson mapper 가 멋대로 변경하는 현상: Java Primitives Kotlin 스프링 부트를 사용해 API 를 작성 중에 예상치 못한 에러를 경험했다.
+<meta name="description" content="null 로 설정된 값을 Jackson mapper 가 멋대로 변경하는 현상: Java Primitives
+Kotlin 스프링 부트를 사용해 API 를 작성 중에 예상치 못한 에러를 경험했다.
 아래의 RequestBody class 를 보면 알 수 있듯이 blocked 는 not nullable 이다.
 RequestBody data class
-data class ReqBody( val demoId: String, val demoName: String, val openDate: LocalDate?, val blocked: Boolean ) json 으로 request 를 보낼 때, 아래와 같이 보내면 어떻게 될까?
-json 형태의 request">
+data class ReqBody(
+    val demoId: String,
+    val demoName: String,
+    val openDate: LocalDate?,
+    val blocked: Boolean
+)
+json 으로 request 를 보낼 때, 아래와 같이 보내면 어떻게 될까?
+json 형태의 request
+{
+    &#34;demoId&#34;: &#34;demo1&#34;,
+    &#34;demoName&#34;: &#34;demo name&#34;,
+    &#34;openDate&#34;: &#34;2021-10-22&#34;
+}
+not nullable 인 blocked 를 null 로 보내기 때문에, BAD REQUEST 에러가 발생할 것으로 예상한다. 하지만 그렇지 않고 아래와 같이 blocked 는 false 값을 할당받았다.">
 <meta name="author" content="">
 <link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/jackson-mapper-%EB%8A%94-%EA%B0%80%EB%81%94-%EC%9C%84%ED%97%98%ED%95%98%EB%8B%A4/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
@@ -23,6 +35,7 @@ json 형태의 request">
 <link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/posts/jackson-mapper-%EB%8A%94-%EA%B0%80%EB%81%94-%EC%9C%84%ED%97%98%ED%95%98%EB%8B%A4/">
 <noscript>
     <style>
         #theme-toggle,
@@ -40,7 +53,7 @@ json 형태의 request">
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -59,24 +72,40 @@ json 형태의 request">
         }
 
     </style>
-</noscript><meta property="og:title" content="Jackson Mapper 는 가끔 위험하다" />
-<meta property="og:description" content="null 로 설정된 값을 Jackson mapper 가 멋대로 변경하는 현상: Java Primitives Kotlin 스프링 부트를 사용해 API 를 작성 중에 예상치 못한 에러를 경험했다.
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/jackson-mapper-%EB%8A%94-%EA%B0%80%EB%81%94-%EC%9C%84%ED%97%98%ED%95%98%EB%8B%A4/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="Jackson Mapper 는 가끔 위험하다">
+  <meta property="og:description" content="null 로 설정된 값을 Jackson mapper 가 멋대로 변경하는 현상: Java Primitives Kotlin 스프링 부트를 사용해 API 를 작성 중에 예상치 못한 에러를 경험했다.
 아래의 RequestBody class 를 보면 알 수 있듯이 blocked 는 not nullable 이다.
 RequestBody data class
 data class ReqBody( val demoId: String, val demoName: String, val openDate: LocalDate?, val blocked: Boolean ) json 으로 request 를 보낼 때, 아래와 같이 보내면 어떻게 될까?
-json 형태의 request" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/jackson-mapper-%EB%8A%94-%EA%B0%80%EB%81%94-%EC%9C%84%ED%97%98%ED%95%98%EB%8B%A4/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2021-10-27T22:51:13+09:00" />
-<meta property="article:modified_time" content="2021-10-27T22:51:13+09:00" />
-
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Jackson Mapper 는 가끔 위험하다"/>
-<meta name="twitter:description" content="null 로 설정된 값을 Jackson mapper 가 멋대로 변경하는 현상: Java Primitives Kotlin 스프링 부트를 사용해 API 를 작성 중에 예상치 못한 에러를 경험했다.
+json 형태의 request
+{ &#34;demoId&#34;: &#34;demo1&#34;, &#34;demoName&#34;: &#34;demo name&#34;, &#34;openDate&#34;: &#34;2021-10-22&#34; } not nullable 인 blocked 를 null 로 보내기 때문에, BAD REQUEST 에러가 발생할 것으로 예상한다. 하지만 그렇지 않고 아래와 같이 blocked 는 false 값을 할당받았다.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-10-27T22:51:13+09:00">
+    <meta property="article:modified_time" content="2021-10-27T22:51:13+09:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jackson Mapper 는 가끔 위험하다">
+<meta name="twitter:description" content="null 로 설정된 값을 Jackson mapper 가 멋대로 변경하는 현상: Java Primitives
+Kotlin 스프링 부트를 사용해 API 를 작성 중에 예상치 못한 에러를 경험했다.
 아래의 RequestBody class 를 보면 알 수 있듯이 blocked 는 not nullable 이다.
 RequestBody data class
-data class ReqBody( val demoId: String, val demoName: String, val openDate: LocalDate?, val blocked: Boolean ) json 으로 request 를 보낼 때, 아래와 같이 보내면 어떻게 될까?
-json 형태의 request"/>
+data class ReqBody(
+    val demoId: String,
+    val demoName: String,
+    val openDate: LocalDate?,
+    val blocked: Boolean
+)
+json 으로 request 를 보낼 때, 아래와 같이 보내면 어떻게 될까?
+json 형태의 request
+{
+    &#34;demoId&#34;: &#34;demo1&#34;,
+    &#34;demoName&#34;: &#34;demo name&#34;,
+    &#34;openDate&#34;: &#34;2021-10-22&#34;
+}
+not nullable 인 blocked 를 null 로 보내기 때문에, BAD REQUEST 에러가 발생할 것으로 예상한다. 하지만 그렇지 않고 아래와 같이 blocked 는 false 값을 할당받았다.">
 
 
 <script type="application/ld+json">
@@ -105,7 +134,7 @@ json 형태의 request"/>
   "@type": "BlogPosting",
   "headline": "Jackson Mapper 는 가끔 위험하다",
   "name": "Jackson Mapper 는 가끔 위험하다",
-  "description": "null 로 설정된 값을 Jackson mapper 가 멋대로 변경하는 현상: Java Primitives Kotlin 스프링 부트를 사용해 API 를 작성 중에 예상치 못한 에러를 경험했다.\n아래의 RequestBody class 를 보면 알 수 있듯이 blocked 는 not nullable 이다.\nRequestBody data class\ndata class ReqBody( val demoId: String, val demoName: String, val openDate: LocalDate?, val blocked: Boolean ) json 으로 request 를 보낼 때, 아래와 같이 보내면 어떻게 될까?\njson 형태의 request",
+  "description": "null 로 설정된 값을 Jackson mapper 가 멋대로 변경하는 현상: Java Primitives Kotlin 스프링 부트를 사용해 API 를 작성 중에 예상치 못한 에러를 경험했다.\n아래의 RequestBody class 를 보면 알 수 있듯이 blocked 는 not nullable 이다.\nRequestBody data class\ndata class ReqBody( val demoId: String, val demoName: String, val openDate: LocalDate?, val blocked: Boolean ) json 으로 request 를 보낼 때, 아래와 같이 보내면 어떻게 될까?\njson 형태의 request\n{ \u0026#34;demoId\u0026#34;: \u0026#34;demo1\u0026#34;, \u0026#34;demoName\u0026#34;: \u0026#34;demo name\u0026#34;, \u0026#34;openDate\u0026#34;: \u0026#34;2021-10-22\u0026#34; } not nullable 인 blocked 를 null 로 보내기 때문에, BAD REQUEST 에러가 발생할 것으로 예상한다. 하지만 그렇지 않고 아래와 같이 blocked 는 false 값을 할당받았다.\n",
   "keywords": [
     
   ],
@@ -178,7 +207,7 @@ json 형태의 request"/>
 <article class="post-single">
   <header class="post-header">
     
-    <h1 class="post-title">
+    <h1 class="post-title entry-hint-parent">
       Jackson Mapper 는 가끔 위험하다
     </h1>
     <div class="post-meta"><span title='2021-10-27 22:51:13 +0900 KST'>October 27, 2021</span>
@@ -361,7 +390,8 @@ json 형태의 request"/>
     </main>
     
 <footer class="footer">
-    <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &

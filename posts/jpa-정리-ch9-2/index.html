@@ -8,13 +8,59 @@
 <title>Jpa 정리 Ch9 (2) | wisdoom</title>
 <meta name="keywords" content="">
 <meta name="description" content="무슨 이유에서인지 QueryDSL 의 쿼리 결과를 list() 로도, unique() 로도 반환할 수 없다. 원인을 파악해야 한다.
-QueryDSL QueryDSL 환경 설정을 위해 build.gradle.kts 파일에 설정을 추가한다. 추가하는 설정은 이 글 맨 아래에서 확인할 수 있다.
-설정 파일 persistence.xml
-&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt; &lt;!-- xml 네임스페이스와 사용할 버전을 지정한다. --&gt; &lt;!-- jpa 2.1 을 사용하려면 여기에 xmlns 와 2.1 을 쓰면 된다. --&gt; &lt;persistence xmlns=&#34;http://xmlns.jcp.org/xml/ns/persistence&#34; version=&#34;2.2&#34;&gt; &lt;!-- 영속성 유닛. 일반적으로 연결할 데이터베이스당 하나의 영속성 유닛을 등록한다.">
+QueryDSL
+QueryDSL 환경 설정을 위해 build.gradle.kts 파일에 설정을 추가한다. 추가하는 설정은 이 글 맨 아래에서 확인할 수 있다.
+설정 파일
+persistence.xml
+&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;!-- xml 네임스페이스와 사용할 버전을 지정한다. --&gt;
+&lt;!-- jpa 2.1 을 사용하려면 여기에 xmlns 와 2.1 을 쓰면 된다. --&gt;
+&lt;persistence xmlns=&#34;http://xmlns.jcp.org/xml/ns/persistence&#34; version=&#34;2.2&#34;&gt;
+
+    &lt;!-- 영속성 유닛. 일반적으로 연결할 데이터베이스당 하나의 영속성 유닛을 등록한다. --&gt;
+    &lt;!-- 그리고 영속성 이름에는 고유한 이름을 부여해야 한다. 여기서는 jpabook. --&gt;
+    &lt;persistence-unit name=&#34;jpabook&#34;&gt;
+        &lt;!-- @Entity 애너테이션이 들어가는 클래스 목록 --&gt;
+        &lt;class&gt;com.wisdoom.Member&lt;/class&gt;
+        &lt;class&gt;com.wisdoom.Team&lt;/class&gt;
+        &lt;properties&gt;
+
+            &lt;!-- 필수 속성 --&gt;
+            &lt;!-- name 이 javax.persistence 로 시작하는 속성은 JPA 표준 속성으로 특정 구현체에 종속되지 않는다. --&gt;
+            &lt;property name=&#34;javax.persistence.jdbc.driver&#34; value=&#34;org.h2.Driver&#34;/&gt;
+            &lt;property name=&#34;javax.persistence.jdbc.user&#34; value=&#34;sa&#34;/&gt;
+            &lt;property name=&#34;javax.persistence.jdbc.password&#34; value=&#34;&#34;/&gt;
+            &lt;property name=&#34;javax.persistence.jdbc.url&#34; value=&#34;jdbc:h2:tcp://localhost/~/test&#34;/&gt;
+            &lt;!-- 특정 데이터베이스를 활용하기 위해 사용. --&gt;
+            &lt;property name=&#34;hibernate.dialect&#34; value=&#34;org.hibernate.dialect.H2Dialect&#34;/&gt;
+
+            &lt;!-- 옵션 --&gt;
+            &lt;!-- DDL 을 콘솔에 출력한다. --&gt;
+            &lt;property name=&#34;hibernate.show_sql&#34; value=&#34;true&#34;/&gt;
+            &lt;!-- 애플리케이션 실행 시점에 데이터베이스 테이블을 자동으로 생성한다.
+            create: 기존 테이블 삭제 후 생성; create-drop: create 속성과 동일하나, create 한 내용을 애플리케이션 종료 시에 DROP
+            update: 데이터베이스 테이블과 엔티티 매핑 정보를 비교해 변경 사항만 수정
+            validate: 데이터베이스 테이블과 엔티티 매핑 저보를 비교했을 때 차이가 있으면 경고를 남기고 애플리케이션을 실행하지 않는다.
+            --&gt;
+&lt;!--             &lt;property name=&#34;hibernate.hbm2ddl.auto&#34; value=&#34;create&#34;/&gt;--&gt;
+
+            &lt;!--???? 기본 키 생성 전략을 사용하기 위한 설정 ????--&gt;
+            &lt;property name=&#34;hibernate.id.new_generator_mappings&#34; value=&#34;true&#34;/&gt;
+
+            &lt;!-- 실제로 실행되는 sql query 를 다이얼로그에 출력한다 true. --&gt;
+            &lt;property name=&#34;hibernate.use_sql_comments&#34; value=&#34;true&#34;/&gt;
+            &lt;!-- 실제로 실행되는 sql query 를 사람이 보기 좋게 출력한다 true. 보기 좋게 출력하지 않는다 false. --&gt;
+            &lt;property name=&#34;hibernate.format_sql&#34; value=&#34;false&#34;/&gt;
+
+            &lt;!--&lt;property name=&#34;hibernate.hbm2ddl.auto&#34; value=&#34;create&#34; /&gt;--&gt;
+        &lt;/properties&gt;
+    &lt;/persistence-unit&gt;
+
+&lt;/persistence&gt;
+build.gradle.kts">
 <meta name="author" content="">
 <link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/jpa-%EC%A0%95%EB%A6%AC-ch9-2/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
@@ -22,6 +68,7 @@ QueryDSL QueryDSL 환경 설정을 위해 build.gradle.kts 파일에 설정을 �
 <link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/posts/jpa-%EC%A0%95%EB%A6%AC-ch9-2/">
 <noscript>
     <style>
         #theme-toggle,
@@ -39,7 +86,7 @@ QueryDSL QueryDSL 환경 설정을 위해 build.gradle.kts 파일에 설정을 �
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -58,22 +105,71 @@ QueryDSL QueryDSL 환경 설정을 위해 build.gradle.kts 파일에 설정을 �
         }
 
     </style>
-</noscript><meta property="og:title" content="Jpa 정리 Ch9 (2)" />
-<meta property="og:description" content="무슨 이유에서인지 QueryDSL 의 쿼리 결과를 list() 로도, unique() 로도 반환할 수 없다. 원인을 파악해야 한다.
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/jpa-%EC%A0%95%EB%A6%AC-ch9-2/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="Jpa 정리 Ch9 (2)">
+  <meta property="og:description" content="무슨 이유에서인지 QueryDSL 의 쿼리 결과를 list() 로도, unique() 로도 반환할 수 없다. 원인을 파악해야 한다.
 QueryDSL QueryDSL 환경 설정을 위해 build.gradle.kts 파일에 설정을 추가한다. 추가하는 설정은 이 글 맨 아래에서 확인할 수 있다.
 설정 파일 persistence.xml
-&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt; &lt;!-- xml 네임스페이스와 사용할 버전을 지정한다. --&gt; &lt;!-- jpa 2.1 을 사용하려면 여기에 xmlns 와 2.1 을 쓰면 된다. --&gt; &lt;persistence xmlns=&#34;http://xmlns.jcp.org/xml/ns/persistence&#34; version=&#34;2.2&#34;&gt; &lt;!-- 영속성 유닛. 일반적으로 연결할 데이터베이스당 하나의 영속성 유닛을 등록한다." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/jpa-%EC%A0%95%EB%A6%AC-ch9-2/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2021-10-12T01:27:12+09:00" />
-<meta property="article:modified_time" content="2021-10-12T01:27:12+09:00" />
-
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Jpa 정리 Ch9 (2)"/>
+&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt; &lt;!-- xml 네임스페이스와 사용할 버전을 지정한다. --&gt; &lt;!-- jpa 2.1 을 사용하려면 여기에 xmlns 와 2.1 을 쓰면 된다. --&gt; &lt;persistence xmlns=&#34;http://xmlns.jcp.org/xml/ns/persistence&#34; version=&#34;2.2&#34;&gt; &lt;!-- 영속성 유닛. 일반적으로 연결할 데이터베이스당 하나의 영속성 유닛을 등록한다. --&gt; &lt;!-- 그리고 영속성 이름에는 고유한 이름을 부여해야 한다. 여기서는 jpabook. --&gt; &lt;persistence-unit name=&#34;jpabook&#34;&gt; &lt;!-- @Entity 애너테이션이 들어가는 클래스 목록 --&gt; &lt;class&gt;com.wisdoom.Member&lt;/class&gt; &lt;class&gt;com.wisdoom.Team&lt;/class&gt; &lt;properties&gt; &lt;!-- 필수 속성 --&gt; &lt;!-- name 이 javax.persistence 로 시작하는 속성은 JPA 표준 속성으로 특정 구현체에 종속되지 않는다. --&gt; &lt;property name=&#34;javax.persistence.jdbc.driver&#34; value=&#34;org.h2.Driver&#34;/&gt; &lt;property name=&#34;javax.persistence.jdbc.user&#34; value=&#34;sa&#34;/&gt; &lt;property name=&#34;javax.persistence.jdbc.password&#34; value=&#34;&#34;/&gt; &lt;property name=&#34;javax.persistence.jdbc.url&#34; value=&#34;jdbc:h2:tcp://localhost/~/test&#34;/&gt; &lt;!-- 특정 데이터베이스를 활용하기 위해 사용. --&gt; &lt;property name=&#34;hibernate.dialect&#34; value=&#34;org.hibernate.dialect.H2Dialect&#34;/&gt; &lt;!-- 옵션 --&gt; &lt;!-- DDL 을 콘솔에 출력한다. --&gt; &lt;property name=&#34;hibernate.show_sql&#34; value=&#34;true&#34;/&gt; &lt;!-- 애플리케이션 실행 시점에 데이터베이스 테이블을 자동으로 생성한다. create: 기존 테이블 삭제 후 생성; create-drop: create 속성과 동일하나, create 한 내용을 애플리케이션 종료 시에 DROP update: 데이터베이스 테이블과 엔티티 매핑 정보를 비교해 변경 사항만 수정 validate: 데이터베이스 테이블과 엔티티 매핑 저보를 비교했을 때 차이가 있으면 경고를 남기고 애플리케이션을 실행하지 않는다. --&gt; &lt;!-- &lt;property name=&#34;hibernate.hbm2ddl.auto&#34; value=&#34;create&#34;/&gt;--&gt; &lt;!--???? 기본 키 생성 전략을 사용하기 위한 설정 ????--&gt; &lt;property name=&#34;hibernate.id.new_generator_mappings&#34; value=&#34;true&#34;/&gt; &lt;!-- 실제로 실행되는 sql query 를 다이얼로그에 출력한다 true. --&gt; &lt;property name=&#34;hibernate.use_sql_comments&#34; value=&#34;true&#34;/&gt; &lt;!-- 실제로 실행되는 sql query 를 사람이 보기 좋게 출력한다 true. 보기 좋게 출력하지 않는다 false. --&gt; &lt;property name=&#34;hibernate.format_sql&#34; value=&#34;false&#34;/&gt; &lt;!--&lt;property name=&#34;hibernate.hbm2ddl.auto&#34; value=&#34;create&#34; /&gt;--&gt; &lt;/properties&gt; &lt;/persistence-unit&gt; &lt;/persistence&gt; build.gradle.kts">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-10-12T01:27:12+09:00">
+    <meta property="article:modified_time" content="2021-10-12T01:27:12+09:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jpa 정리 Ch9 (2)">
 <meta name="twitter:description" content="무슨 이유에서인지 QueryDSL 의 쿼리 결과를 list() 로도, unique() 로도 반환할 수 없다. 원인을 파악해야 한다.
-QueryDSL QueryDSL 환경 설정을 위해 build.gradle.kts 파일에 설정을 추가한다. 추가하는 설정은 이 글 맨 아래에서 확인할 수 있다.
-설정 파일 persistence.xml
-&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt; &lt;!-- xml 네임스페이스와 사용할 버전을 지정한다. --&gt; &lt;!-- jpa 2.1 을 사용하려면 여기에 xmlns 와 2.1 을 쓰면 된다. --&gt; &lt;persistence xmlns=&#34;http://xmlns.jcp.org/xml/ns/persistence&#34; version=&#34;2.2&#34;&gt; &lt;!-- 영속성 유닛. 일반적으로 연결할 데이터베이스당 하나의 영속성 유닛을 등록한다."/>
+QueryDSL
+QueryDSL 환경 설정을 위해 build.gradle.kts 파일에 설정을 추가한다. 추가하는 설정은 이 글 맨 아래에서 확인할 수 있다.
+설정 파일
+persistence.xml
+&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;!-- xml 네임스페이스와 사용할 버전을 지정한다. --&gt;
+&lt;!-- jpa 2.1 을 사용하려면 여기에 xmlns 와 2.1 을 쓰면 된다. --&gt;
+&lt;persistence xmlns=&#34;http://xmlns.jcp.org/xml/ns/persistence&#34; version=&#34;2.2&#34;&gt;
+
+    &lt;!-- 영속성 유닛. 일반적으로 연결할 데이터베이스당 하나의 영속성 유닛을 등록한다. --&gt;
+    &lt;!-- 그리고 영속성 이름에는 고유한 이름을 부여해야 한다. 여기서는 jpabook. --&gt;
+    &lt;persistence-unit name=&#34;jpabook&#34;&gt;
+        &lt;!-- @Entity 애너테이션이 들어가는 클래스 목록 --&gt;
+        &lt;class&gt;com.wisdoom.Member&lt;/class&gt;
+        &lt;class&gt;com.wisdoom.Team&lt;/class&gt;
+        &lt;properties&gt;
+
+            &lt;!-- 필수 속성 --&gt;
+            &lt;!-- name 이 javax.persistence 로 시작하는 속성은 JPA 표준 속성으로 특정 구현체에 종속되지 않는다. --&gt;
+            &lt;property name=&#34;javax.persistence.jdbc.driver&#34; value=&#34;org.h2.Driver&#34;/&gt;
+            &lt;property name=&#34;javax.persistence.jdbc.user&#34; value=&#34;sa&#34;/&gt;
+            &lt;property name=&#34;javax.persistence.jdbc.password&#34; value=&#34;&#34;/&gt;
+            &lt;property name=&#34;javax.persistence.jdbc.url&#34; value=&#34;jdbc:h2:tcp://localhost/~/test&#34;/&gt;
+            &lt;!-- 특정 데이터베이스를 활용하기 위해 사용. --&gt;
+            &lt;property name=&#34;hibernate.dialect&#34; value=&#34;org.hibernate.dialect.H2Dialect&#34;/&gt;
+
+            &lt;!-- 옵션 --&gt;
+            &lt;!-- DDL 을 콘솔에 출력한다. --&gt;
+            &lt;property name=&#34;hibernate.show_sql&#34; value=&#34;true&#34;/&gt;
+            &lt;!-- 애플리케이션 실행 시점에 데이터베이스 테이블을 자동으로 생성한다.
+            create: 기존 테이블 삭제 후 생성; create-drop: create 속성과 동일하나, create 한 내용을 애플리케이션 종료 시에 DROP
+            update: 데이터베이스 테이블과 엔티티 매핑 정보를 비교해 변경 사항만 수정
+            validate: 데이터베이스 테이블과 엔티티 매핑 저보를 비교했을 때 차이가 있으면 경고를 남기고 애플리케이션을 실행하지 않는다.
+            --&gt;
+&lt;!--             &lt;property name=&#34;hibernate.hbm2ddl.auto&#34; value=&#34;create&#34;/&gt;--&gt;
+
+            &lt;!--???? 기본 키 생성 전략을 사용하기 위한 설정 ????--&gt;
+            &lt;property name=&#34;hibernate.id.new_generator_mappings&#34; value=&#34;true&#34;/&gt;
+
+            &lt;!-- 실제로 실행되는 sql query 를 다이얼로그에 출력한다 true. --&gt;
+            &lt;property name=&#34;hibernate.use_sql_comments&#34; value=&#34;true&#34;/&gt;
+            &lt;!-- 실제로 실행되는 sql query 를 사람이 보기 좋게 출력한다 true. 보기 좋게 출력하지 않는다 false. --&gt;
+            &lt;property name=&#34;hibernate.format_sql&#34; value=&#34;false&#34;/&gt;
+
+            &lt;!--&lt;property name=&#34;hibernate.hbm2ddl.auto&#34; value=&#34;create&#34; /&gt;--&gt;
+        &lt;/properties&gt;
+    &lt;/persistence-unit&gt;
+
+&lt;/persistence&gt;
+build.gradle.kts">
 
 
 <script type="application/ld+json">
@@ -102,7 +198,7 @@ QueryDSL QueryDSL 환경 설정을 위해 build.gradle.kts 파일에 설정을 �
   "@type": "BlogPosting",
   "headline": "Jpa 정리 Ch9 (2)",
   "name": "Jpa 정리 Ch9 (2)",
-  "description": "무슨 이유에서인지 QueryDSL 의 쿼리 결과를 list() 로도, unique() 로도 반환할 수 없다. 원인을 파악해야 한다.\nQueryDSL QueryDSL 환경 설정을 위해 build.gradle.kts 파일에 설정을 추가한다. 추가하는 설정은 이 글 맨 아래에서 확인할 수 있다.\n설정 파일 persistence.xml\n\u0026lt;?xml version=\u0026#34;1.0\u0026#34; encoding=\u0026#34;UTF-8\u0026#34;?\u0026gt; \u0026lt;!-- xml 네임스페이스와 사용할 버전을 지정한다. --\u0026gt; \u0026lt;!-- jpa 2.1 을 사용하려면 여기에 xmlns 와 2.1 을 쓰면 된다. --\u0026gt; \u0026lt;persistence xmlns=\u0026#34;http://xmlns.jcp.org/xml/ns/persistence\u0026#34; version=\u0026#34;2.2\u0026#34;\u0026gt; \u0026lt;!-- 영속성 유닛. 일반적으로 연결할 데이터베이스당 하나의 영속성 유닛을 등록한다.",
+  "description": "무슨 이유에서인지 QueryDSL 의 쿼리 결과를 list() 로도, unique() 로도 반환할 수 없다. 원인을 파악해야 한다.\nQueryDSL QueryDSL 환경 설정을 위해 build.gradle.kts 파일에 설정을 추가한다. 추가하는 설정은 이 글 맨 아래에서 확인할 수 있다.\n설정 파일 persistence.xml\n\u0026lt;?xml version=\u0026#34;1.0\u0026#34; encoding=\u0026#34;UTF-8\u0026#34;?\u0026gt; \u0026lt;!-- xml 네임스페이스와 사용할 버전을 지정한다. --\u0026gt; \u0026lt;!-- jpa 2.1 을 사용하려면 여기에 xmlns 와 2.1 을 쓰면 된다. --\u0026gt; \u0026lt;persistence xmlns=\u0026#34;http://xmlns.jcp.org/xml/ns/persistence\u0026#34; version=\u0026#34;2.2\u0026#34;\u0026gt; \u0026lt;!-- 영속성 유닛. 일반적으로 연결할 데이터베이스당 하나의 영속성 유닛을 등록한다. --\u0026gt; \u0026lt;!-- 그리고 영속성 이름에는 고유한 이름을 부여해야 한다. 여기서는 jpabook. --\u0026gt; \u0026lt;persistence-unit name=\u0026#34;jpabook\u0026#34;\u0026gt; \u0026lt;!-- @Entity 애너테이션이 들어가는 클래스 목록 --\u0026gt; \u0026lt;class\u0026gt;com.wisdoom.Member\u0026lt;/class\u0026gt; \u0026lt;class\u0026gt;com.wisdoom.Team\u0026lt;/class\u0026gt; \u0026lt;properties\u0026gt; \u0026lt;!-- 필수 속성 --\u0026gt; \u0026lt;!-- name 이 javax.persistence 로 시작하는 속성은 JPA 표준 속성으로 특정 구현체에 종속되지 않는다. --\u0026gt; \u0026lt;property name=\u0026#34;javax.persistence.jdbc.driver\u0026#34; value=\u0026#34;org.h2.Driver\u0026#34;/\u0026gt; \u0026lt;property name=\u0026#34;javax.persistence.jdbc.user\u0026#34; value=\u0026#34;sa\u0026#34;/\u0026gt; \u0026lt;property name=\u0026#34;javax.persistence.jdbc.password\u0026#34; value=\u0026#34;\u0026#34;/\u0026gt; \u0026lt;property name=\u0026#34;javax.persistence.jdbc.url\u0026#34; value=\u0026#34;jdbc:h2:tcp://localhost/~/test\u0026#34;/\u0026gt; \u0026lt;!-- 특정 데이터베이스를 활용하기 위해 사용. --\u0026gt; \u0026lt;property name=\u0026#34;hibernate.dialect\u0026#34; value=\u0026#34;org.hibernate.dialect.H2Dialect\u0026#34;/\u0026gt; \u0026lt;!-- 옵션 --\u0026gt; \u0026lt;!-- DDL 을 콘솔에 출력한다. --\u0026gt; \u0026lt;property name=\u0026#34;hibernate.show_sql\u0026#34; value=\u0026#34;true\u0026#34;/\u0026gt; \u0026lt;!-- 애플리케이션 실행 시점에 데이터베이스 테이블을 자동으로 생성한다. create: 기존 테이블 삭제 후 생성; create-drop: create 속성과 동일하나, create 한 내용을 애플리케이션 종료 시에 DROP update: 데이터베이스 테이블과 엔티티 매핑 정보를 비교해 변경 사항만 수정 validate: 데이터베이스 테이블과 엔티티 매핑 저보를 비교했을 때 차이가 있으면 경고를 남기고 애플리케이션을 실행하지 않는다. --\u0026gt; \u0026lt;!-- \u0026lt;property name=\u0026#34;hibernate.hbm2ddl.auto\u0026#34; value=\u0026#34;create\u0026#34;/\u0026gt;--\u0026gt; \u0026lt;!--???? 기본 키 생성 전략을 사용하기 위한 설정 ????--\u0026gt; \u0026lt;property name=\u0026#34;hibernate.id.new_generator_mappings\u0026#34; value=\u0026#34;true\u0026#34;/\u0026gt; \u0026lt;!-- 실제로 실행되는 sql query 를 다이얼로그에 출력한다 true. --\u0026gt; \u0026lt;property name=\u0026#34;hibernate.use_sql_comments\u0026#34; value=\u0026#34;true\u0026#34;/\u0026gt; \u0026lt;!-- 실제로 실행되는 sql query 를 사람이 보기 좋게 출력한다 true. 보기 좋게 출력하지 않는다 false. --\u0026gt; \u0026lt;property name=\u0026#34;hibernate.format_sql\u0026#34; value=\u0026#34;false\u0026#34;/\u0026gt; \u0026lt;!--\u0026lt;property name=\u0026#34;hibernate.hbm2ddl.auto\u0026#34; value=\u0026#34;create\u0026#34; /\u0026gt;--\u0026gt; \u0026lt;/properties\u0026gt; \u0026lt;/persistence-unit\u0026gt; \u0026lt;/persistence\u0026gt; build.gradle.kts\n",
   "keywords": [
     
   ],
@@ -175,7 +271,7 @@ QueryDSL QueryDSL 환경 설정을 위해 build.gradle.kts 파일에 설정을 �
 <article class="post-single">
   <header class="post-header">
     
-    <h1 class="post-title">
+    <h1 class="post-title entry-hint-parent">
       Jpa 정리 Ch9 (2)
     </h1>
     <div class="post-meta"><span title='2021-10-12 01:27:12 +0900 KST'>October 12, 2021</span>
@@ -344,7 +440,8 @@ QueryDSL QueryDSL 환경 설정을 위해 build.gradle.kts 파일에 설정을 �
     </main>
     
 <footer class="footer">
-    <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &

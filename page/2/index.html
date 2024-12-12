@@ -2,7 +2,7 @@
 <html lang="en" dir="auto">
 
 <head>
-	<meta name="generator" content="Hugo 0.119.0"><meta charset="utf-8">
+	<meta name="generator" content="Hugo 0.139.4"><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
@@ -20,6 +20,7 @@
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
 <link rel="alternate" type="application/rss+xml" href="https://Scoobi-wisdoom.github.io/index.xml">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/">
 <noscript>
     <style>
         #theme-toggle,
@@ -37,7 +38,7 @@
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -56,14 +57,14 @@
         }
 
     </style>
-</noscript><meta property="og:title" content="wisdoom" />
-<meta property="og:description" content="" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://Scoobi-wisdoom.github.io/" />
-
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="wisdoom"/>
-<meta name="twitter:description" content=""/>
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="wisdoom">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="wisdoom">
+<meta name="twitter:description" content="">
 
 <script type="application/ld+json">
 {
@@ -72,7 +73,7 @@
   "name": "wisdoom",
   "url": "https://Scoobi-wisdoom.github.io/",
   "description": "",
-  "thumbnailUrl": "https://Scoobi-wisdoom.github.io/favicon.ico",
+  "logo": "https://Scoobi-wisdoom.github.io/favicon.ico",
   "sameAs": [
       
   ]
@@ -127,7 +128,23 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Jackson Mapper 는 가끔 위험하다
+    <h2 class="entry-hint-parent">Abstract Class
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Spring 은 IoC container 에 bean 객체를 생성한 후 그 객체를 등록한 후, 필요할 때 사용한다. Interface 는 객체를 생성할 수 없기 때문에 bean 이 될 수 없다.
+그렇다면 Abstract Class 는 어떨까? 아래 코드를 보면 일단 bean 으로 등록할 수 없다.
+@RestController class Controller( val abstractService: AbstractService, ) { @GetMapping(&#34;/abstract&#34;) fun getAbstract() = abstractService.abstractFunction() } @Service abstract class AbstractService { fun abstractFunction() = &#34;&#34; } 아래와 같은 메시지가 뜨면서 애플리케이션이 멈춘다.
+*************************** APPLICATION FAILED TO START *************************** Description: Parameter 0 of constructor in com.demo.controller.Controller required a bean of type &#39;com.demo.service.AbstractService&#39; that could not be found. 왜 그럴까? 필자에게 하나의 가설이 있었다. Abstract Class 의 메서드 역시 abstract method 다. Child Class 가 어떻게 구현하느냐에 따라 달라지기 때문에 Abstract Class 는 bean 으로 등록할 수 없다. 그렇다면, Abstract Class 의 모든 메서드가 final method 라면 bean 으로 등록할 수 있을까? 그래서 아래와 같이 구현을 한 후 애플리케이션을 run 했다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2022-03-16 00:16:44 +0900 KST'>March 16, 2022</span></footer>
+  <a class="entry-link" aria-label="post link to Abstract Class" href="https://Scoobi-wisdoom.github.io/posts/abstract-class/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Jackson Mapper 는 가끔 위험하다
     </h2>
   </header>
   <div class="entry-content">
@@ -135,7 +152,9 @@
 아래의 RequestBody class 를 보면 알 수 있듯이 blocked 는 not nullable 이다.
 RequestBody data class
 data class ReqBody( val demoId: String, val demoName: String, val openDate: LocalDate?, val blocked: Boolean ) json 으로 request 를 보낼 때, 아래와 같이 보내면 어떻게 될까?
-json 형태의 request...</p>
+json 형태의 request
+{ &#34;demoId&#34;: &#34;demo1&#34;, &#34;demoName&#34;: &#34;demo name&#34;, &#34;openDate&#34;: &#34;2021-10-22&#34; } not nullable 인 blocked 를 null 로 보내기 때문에, BAD REQUEST 에러가 발생할 것으로 예상한다. 하지만 그렇지 않고 아래와 같이 blocked 는 false 값을 할당받았다.
+...</p>
   </div>
   <footer class="entry-footer"><span title='2021-10-27 22:51:13 +0900 KST'>October 27, 2021</span></footer>
   <a class="entry-link" aria-label="post link to Jackson Mapper 는 가끔 위험하다" href="https://Scoobi-wisdoom.github.io/posts/jackson-mapper-%EB%8A%94-%EA%B0%80%EB%81%94-%EC%9C%84%ED%97%98%ED%95%98%EB%8B%A4/"></a>
@@ -143,14 +162,15 @@ json 형태의 request...</p>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Jpa 정리 Ch9 (2)
+    <h2 class="entry-hint-parent">Jpa 정리 Ch9 (2)
     </h2>
   </header>
   <div class="entry-content">
     <p>무슨 이유에서인지 QueryDSL 의 쿼리 결과를 list() 로도, unique() 로도 반환할 수 없다. 원인을 파악해야 한다.
 QueryDSL QueryDSL 환경 설정을 위해 build.gradle.kts 파일에 설정을 추가한다. 추가하는 설정은 이 글 맨 아래에서 확인할 수 있다.
 설정 파일 persistence.xml
-&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt; &lt;!-- xml 네임스페이스와 사용할 버전을 지정한다. --&gt; &lt;!-- jpa 2.1 을 사용하려면 여기에 xmlns 와 2.1 을 쓰면 된다. --&gt; &lt;persistence xmlns=&#34;http://xmlns.jcp.org/xml/ns/persistence&#34; version=&#34;2.2&#34;&gt; &lt;!-- 영속성 유닛. 일반적으로 연결할 데이터베이스당 하나의 영속성 유닛을 등록한다....</p>
+&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt; &lt;!-- xml 네임스페이스와 사용할 버전을 지정한다. --&gt; &lt;!-- jpa 2.1 을 사용하려면 여기에 xmlns 와 2.1 을 쓰면 된다. --&gt; &lt;persistence xmlns=&#34;http://xmlns.jcp.org/xml/ns/persistence&#34; version=&#34;2.2&#34;&gt; &lt;!-- 영속성 유닛. 일반적으로 연결할 데이터베이스당 하나의 영속성 유닛을 등록한다. --&gt; &lt;!-- 그리고 영속성 이름에는 고유한 이름을 부여해야 한다. 여기서는 jpabook. --&gt; &lt;persistence-unit name=&#34;jpabook&#34;&gt; &lt;!-- @Entity 애너테이션이 들어가는 클래스 목록 --&gt; &lt;class&gt;com.wisdoom.Member&lt;/class&gt; &lt;class&gt;com.wisdoom.Team&lt;/class&gt; &lt;properties&gt; &lt;!-- 필수 속성 --&gt; &lt;!-- name 이 javax.persistence 로 시작하는 속성은 JPA 표준 속성으로 특정 구현체에 종속되지 않는다. --&gt; &lt;property name=&#34;javax.persistence.jdbc.driver&#34; value=&#34;org.h2.Driver&#34;/&gt; &lt;property name=&#34;javax.persistence.jdbc.user&#34; value=&#34;sa&#34;/&gt; &lt;property name=&#34;javax.persistence.jdbc.password&#34; value=&#34;&#34;/&gt; &lt;property name=&#34;javax.persistence.jdbc.url&#34; value=&#34;jdbc:h2:tcp://localhost/~/test&#34;/&gt; &lt;!-- 특정 데이터베이스를 활용하기 위해 사용. --&gt; &lt;property name=&#34;hibernate.dialect&#34; value=&#34;org.hibernate.dialect.H2Dialect&#34;/&gt; &lt;!-- 옵션 --&gt; &lt;!-- DDL 을 콘솔에 출력한다. --&gt; &lt;property name=&#34;hibernate.show_sql&#34; value=&#34;true&#34;/&gt; &lt;!-- 애플리케이션 실행 시점에 데이터베이스 테이블을 자동으로 생성한다. create: 기존 테이블 삭제 후 생성; create-drop: create 속성과 동일하나, create 한 내용을 애플리케이션 종료 시에 DROP update: 데이터베이스 테이블과 엔티티 매핑 정보를 비교해 변경 사항만 수정 validate: 데이터베이스 테이블과 엔티티 매핑 저보를 비교했을 때 차이가 있으면 경고를 남기고 애플리케이션을 실행하지 않는다. --&gt; &lt;!-- &lt;property name=&#34;hibernate.hbm2ddl.auto&#34; value=&#34;create&#34;/&gt;--&gt; &lt;!--???? 기본 키 생성 전략을 사용하기 위한 설정 ????--&gt; &lt;property name=&#34;hibernate.id.new_generator_mappings&#34; value=&#34;true&#34;/&gt; &lt;!-- 실제로 실행되는 sql query 를 다이얼로그에 출력한다 true. --&gt; &lt;property name=&#34;hibernate.use_sql_comments&#34; value=&#34;true&#34;/&gt; &lt;!-- 실제로 실행되는 sql query 를 사람이 보기 좋게 출력한다 true. 보기 좋게 출력하지 않는다 false. --&gt; &lt;property name=&#34;hibernate.format_sql&#34; value=&#34;false&#34;/&gt; &lt;!--&lt;property name=&#34;hibernate.hbm2ddl.auto&#34; value=&#34;create&#34; /&gt;--&gt; &lt;/properties&gt; &lt;/persistence-unit&gt; &lt;/persistence&gt; build.gradle.kts
+...</p>
   </div>
   <footer class="entry-footer"><span title='2021-10-12 01:27:12 +0900 KST'>October 12, 2021</span></footer>
   <a class="entry-link" aria-label="post link to Jpa 정리 Ch9 (2)" href="https://Scoobi-wisdoom.github.io/posts/jpa-%EC%A0%95%EB%A6%AC-ch9-2/"></a>
@@ -158,13 +178,14 @@ QueryDSL QueryDSL 환경 설정을 위해 build.gradle.kts 파일에 설정을 �
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Jpa 정리 Ch9 (1)
+    <h2 class="entry-hint-parent">Jpa 정리 Ch9 (1)
     </h2>
   </header>
   <div class="entry-content">
     <p>의문점:
 JPQL 의 여러 값 projection 을 할 때, [Ljava.lang.Object 로 resultList 가 보이는데, 이걸 사람이 알아볼 수 있게 만드는 방법이 없을까? DTO 를 만들어서 TypedQuery&lt;DTO&gt; 로 해결하는 것으로 보인다. 이 글은 책(김영한, 자바 orm 표준 jpa 프로그래밍, 에이콘, 2019) 의 내용을 정리한 것임을 밝힌다.
-값 타입 JPA 의 데이터 타입은 엔티티 타입과 값 타입으로 나뉜다. 엔티티 타입의 객체는 @Entity 로 정의되는 객체로 JPA 에서 식별자와 생명주기를 가져 영속성 컨텍스트에서 관리되지만, 값 타입은 state로서 실별자도 생명주기도 없는 것으로서 기본값 타입(basic value type), 임베디드 타입(embedded type), 컬렉션 값 타입(collection value type) 으로 나뉜다....</p>
+값 타입 JPA 의 데이터 타입은 엔티티 타입과 값 타입으로 나뉜다. 엔티티 타입의 객체는 @Entity 로 정의되는 객체로 JPA 에서 식별자와 생명주기를 가져 영속성 컨텍스트에서 관리되지만, 값 타입은 state로서 실별자도 생명주기도 없는 것으로서 기본값 타입(basic value type), 임베디드 타입(embedded type), 컬렉션 값 타입(collection value type) 으로 나뉜다.
+...</p>
   </div>
   <footer class="entry-footer"><span title='2021-09-27 22:15:56 +0900 KST'>September 27, 2021</span></footer>
   <a class="entry-link" aria-label="post link to Jpa 정리 Ch9 (1)" href="https://Scoobi-wisdoom.github.io/posts/jpa-%EC%A0%95%EB%A6%AC-ch9-1/"></a>
@@ -172,13 +193,14 @@ JPQL 의 여러 값 projection 을 할 때, [Ljava.lang.Object 로 resultList �
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>클래스의 프로퍼티를 Map으로 변환하기
+    <h2 class="entry-hint-parent">클래스의 프로퍼티를 Map으로 변환하기
     </h2>
   </header>
   <div class="entry-content">
     <p>코틀린 class 의 properties 개수가 많고, 이의 fields 가 반복되는 규칙의 이름을 가진 경우, objectMapper 를 통해 쉽게 값을 사용할 수 있다.
 어떤 경우에 이런 기능이 필요할까? 필자가 개발하다 보니, 인수인계 받은 코드의 item class 의 프로퍼티가 매우 많았다. item01 ~ item35 까지 있었다. 이렇게 되면 한 눈에 클래스를 파악하기도 힘들었다. 설상가상으로, item class 는 entity 였기 때문에 덩달아 service layer 의 코드도 길어졌다.
-이런 redundancy 를 줄이기 위해 ITEM01, ITEM02, … 대신에 listOfItems 라는 list 로 대체하는 작업을 했다....</p>
+이런 redundancy 를 줄이기 위해 ITEM01, ITEM02, … 대신에 listOfItems 라는 list 로 대체하는 작업을 했다. 그때 유용하게 사용한 것이 ObjectMapper 의 convertValue 함수다.
+...</p>
   </div>
   <footer class="entry-footer"><span title='2021-09-13 23:27:26 +0900 KST'>September 13, 2021</span></footer>
   <a class="entry-link" aria-label="post link to 클래스의 프로퍼티를 Map으로 변환하기" href="https://Scoobi-wisdoom.github.io/posts/%ED%81%B4%EB%9E%98%EC%8A%A4%EC%9D%98-%ED%94%84%EB%A1%9C%ED%8D%BC%ED%8B%B0%EB%A5%BC-map%EC%9C%BC%EB%A1%9C-%EB%B3%80%ED%99%98%ED%95%98%EA%B8%B0/"></a>
@@ -186,7 +208,7 @@ JPQL 의 여러 값 projection 을 할 때, [Ljava.lang.Object 로 resultList �
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>스프링부트와 환경변수
+    <h2 class="entry-hint-parent">스프링부트와 환경변수
     </h2>
   </header>
   <div class="entry-content">
@@ -194,7 +216,8 @@ JPQL 의 여러 값 projection 을 할 때, [Ljava.lang.Object 로 resultList �
 @ActiveProfiles(“test”) 로 해결? 하지만 DB 가 모두 삭제된다. 스프링 부트를 이용하다 보면 JUnit 을 이용해 테스트 코드를 작성하는 경우가 많다.
 테스트 중 integration test 를 하는 경우가 있는데 필자는 아래와 같이 DB 를 생성한 후 삭제한다.
 DbDestinationTest
-@BeforeAll fun initialDataInput() = run { Repository1.saveAll(listOfEntities) Unit } @AfterAll fun clearData() = run { Repository1....</p>
+@BeforeAll fun initialDataInput() = run { Repository1.saveAll(listOfEntities) Unit } @AfterAll fun clearData() = run { Repository1.deleteAll() } 테스트용 DB 와 실제 DB destination 이 모두 달라야 한다. 그렇지 않으면 clearData() 메서드가 모든 DB 데이터를 삭제한다.
+...</p>
   </div>
   <footer class="entry-footer"><span title='2021-08-25 00:38:47 +0900 KST'>August 25, 2021</span></footer>
   <a class="entry-link" aria-label="post link to 스프링부트와 환경변수" href="https://Scoobi-wisdoom.github.io/posts/%EC%8A%A4%ED%94%84%EB%A7%81%EB%B6%80%ED%8A%B8%EC%99%80-%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/"></a>
@@ -202,12 +225,13 @@ DbDestinationTest
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Kotlin Collection
+    <h2 class="entry-hint-parent">Kotlin Collection
     </h2>
   </header>
   <div class="entry-content">
     <p>Kotlin Collection - associateBy 와 groupBy 1. Kotlin Docs associateBy 와 groupBy 의 코드를 비교해보자.
-public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&gt; K): Map&lt;K, T&gt; { val capacity = mapCapacity(collectionSizeOrDefault(10)).coerceAtLeast(16) return associateByTo(LinkedHashMap&lt;K, T&gt;(capacity), keySelector) } public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.groupBy(keySelector: (T) -&gt; K): Map&lt;K, List&lt;T&gt;&gt; { return groupByTo(LinkedHashMap&lt;K, MutableList&lt;T&gt;&gt;(), keySelector) } 두 함수의 공통점은, Map 을 반환한다는 것이다. 차이점은, associateBy 는 T 를 value 로 반환하는 반면, groupBy 는 List 를 value 로 반환한다는 것이다....</p>
+public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&gt; K): Map&lt;K, T&gt; { val capacity = mapCapacity(collectionSizeOrDefault(10)).coerceAtLeast(16) return associateByTo(LinkedHashMap&lt;K, T&gt;(capacity), keySelector) } public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.groupBy(keySelector: (T) -&gt; K): Map&lt;K, List&lt;T&gt;&gt; { return groupByTo(LinkedHashMap&lt;K, MutableList&lt;T&gt;&gt;(), keySelector) } 두 함수의 공통점은, Map 을 반환한다는 것이다. 차이점은, associateBy 는 T 를 value 로 반환하는 반면, groupBy 는 List 를 value 로 반환한다는 것이다. 즉, associateBy 는 Iterable 에서 T 가 unique 하다고 가정하는 반면, groupBy 는 duplicates 가 있다고 가정하고 있다. 아래 예제를 살펴보자.
+...</p>
   </div>
   <footer class="entry-footer"><span title='2021-08-15 19:11:54 +0900 KST'>August 15, 2021</span></footer>
   <a class="entry-link" aria-label="post link to Kotlin Collection" href="https://Scoobi-wisdoom.github.io/posts/kotlin-collection-associateby-%EC%99%80-groupby/"></a>
@@ -215,13 +239,14 @@ public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>AWS Ec2 Docker 에 Domain 연결
+    <h2 class="entry-hint-parent">AWS Ec2 Docker 에 Domain 연결
     </h2>
   </header>
   <div class="entry-content">
     <p>사전 준비 사항 EC2 instance 생성 완료, domain 보유 완료.
 주의 사항 EC2 를 stop 했다가 run 하면 두 가지를 신경써야 한다. 첫째로 IPv4 address 와 IPv4 DNS 이 모두 변경된다. 그렇기 때문에 Putty 에 주소 입력을 새롭게 해줘야 한다. 둘째로, Docker 가 inactive 가 된다. 결국 Putty 에서 다시 Docker run 을 실행해야 한다. 링크의 6. AWS EC2 에서 Docker 사용 부터 살펴보자.
-AWS EC2 instance 에 domain 을 부여하자....</p>
+AWS EC2 instance 에 domain 을 부여하자. AWS 홈페이지에서 로그인 한 후에 Dashboard 에서 Compute &gt; EC2 에 접속한다. 사용할 instance 가 running 상태인지 확인하자. Instance 가 running 상태가 아니면 Public IPv4 address 가 없다. Public IPv4 address 를 복사한다.
+...</p>
   </div>
   <footer class="entry-footer"><span title='2021-04-08 22:35:45 +0900 KST'>April 8, 2021</span></footer>
   <a class="entry-link" aria-label="post link to AWS Ec2 Docker 에 Domain 연결" href="https://Scoobi-wisdoom.github.io/posts/aws-ec2-docker-%EC%97%90-domain-%EC%97%B0%EA%B2%B0/"></a>
@@ -229,14 +254,16 @@ AWS EC2 instance 에 domain 을 부여하자....</p>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Node 입문 및 배포 (Docker 와 Aws)
+    <h2 class="entry-hint-parent">Node 입문 및 배포 (Docker 와 Aws)
     </h2>
   </header>
   <div class="entry-content">
     <p>NodeJS, ExpressJS 와 Docker nodeJS 앱 만들기 프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.
 app.js
 const express = require(&#39;express&#39;); const app = express(); app.get(&#39;/&#39;, (req, res) =&gt; res.send(&#39;hello world&#39;)); app.listen(80, () =&gt; { console.log(&#39;My REST API running on port 80!&#39;); }); Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.
-npm install express 이제 package....</p>
+npm install express 이제 package.json 의 script 에 start command 를 추가한다. 이는 app.js 를 run 하기 위해서다.
+package.json
+...</p>
   </div>
   <footer class="entry-footer"><span title='2021-04-06 23:36:09 +0900 KST'>April 6, 2021</span></footer>
   <a class="entry-link" aria-label="post link to Node 입문 및 배포 (Docker 와 Aws)" href="https://Scoobi-wisdoom.github.io/posts/node-%EC%9E%85%EB%AC%B8-%EB%B0%8F-%EB%B0%B0%ED%8F%AC-docker-%EC%99%80-aws/"></a>
@@ -244,31 +271,17 @@ npm install express 이제 package....</p>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Docker와 AWS (EC2)
+    <h2 class="entry-hint-parent">Docker와 AWS (EC2)
     </h2>
   </header>
   <div class="entry-content">
-    <p>목차 Docker 설치하기 예제를 통한 Dockerfile, image 생성 Docker Hub 에 Docker Image 등록 AWS EC2 에서 instance 생성 AWS EC2 접속 AWS EC2 에서 Docker 사용 1. Docker 설치하기 Docker 공식홈페이지에서 Docker desktop 을 찾는다.
+    <p> 목차 Docker 설치하기 예제를 통한 Dockerfile, image 생성 Docker Hub 에 Docker Image 등록 AWS EC2 에서 instance 생성 AWS EC2 접속 AWS EC2 에서 Docker 사용 1. Docker 설치하기 Docker 공식홈페이지에서 Docker desktop 을 찾는다.
 여기서 OS 에 맞는 Docker를 다운받는다. Stable 버전으로 받자. 나는 windows 버전으로 받았다. Default 로 설치한다.
-나의 경우 Linux를 설치하지 않았기 때문에 docker 를 실행할 수 없었다. 이 경우 WSL 2 Linux 커널 업데이트를 하면 해결된다....</p>
+나의 경우 Linux를 설치하지 않았기 때문에 docker 를 실행할 수 없었다. 이 경우 WSL 2 Linux 커널 업데이트를 하면 해결된다.
+...</p>
   </div>
   <footer class="entry-footer"><span title='2020-11-29 21:54:44 +0900 KST'>November 29, 2020</span></footer>
   <a class="entry-link" aria-label="post link to Docker와 AWS (EC2)" href="https://Scoobi-wisdoom.github.io/posts/docker%EC%99%80-aws-ec2/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2>Hugo로 블로그 만들기 2
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>이제 로컬에서 작성한 글을 Hugo 를 이용해 git blog 에 업로드하는 방법을 알아보자.
-이 글에서 설명한 것을 실행하기 전에, 반드시 이 글 맨 아래에 있는 Reference 의 두 번째를 참조하여 두 개의 repository 를 만들고 submodule 처리를 해야 한다.
-먼저 프로젝트 폴더로 cmd 에서 이동한다. 그 다음에 hugo new 명령어를 이용해 작성할 글 파일을 생성한다.
-hugo new posts/Hugo로-블로그-만들기-2.md 이제 이 파일을 열어 글을 작성한다. 작성 완료 후 배포하기 전에 localhost 에서 미리보기를 한다....</p>
-  </div>
-  <footer class="entry-footer"><span title='2020-11-26 16:54:58 +0900 KST'>November 26, 2020</span></footer>
-  <a class="entry-link" aria-label="post link to Hugo로 블로그 만들기 2" href="https://Scoobi-wisdoom.github.io/posts/hugo%EB%A1%9C-%EB%B8%94%EB%A1%9C%EA%B7%B8-%EB%A7%8C%EB%93%A4%EA%B8%B0-2/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">
@@ -282,7 +295,8 @@ hugo new posts/Hugo로-블로그-만들기-2.md 이제 이 파일을 열어 글�
     </main>
     
 <footer class="footer">
-    <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &

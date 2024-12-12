@@ -7,14 +7,23 @@
 <meta name="robots" content="index, follow">
 <title>Node 입문 및 배포 (Docker 와 Aws) | wisdoom</title>
 <meta name="keywords" content="">
-<meta name="description" content="NodeJS, ExpressJS 와 Docker nodeJS 앱 만들기 프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.
+<meta name="description" content="NodeJS, ExpressJS 와 Docker
+nodeJS 앱 만들기
+프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.
 app.js
-const express = require(&#39;express&#39;); const app = express(); app.get(&#39;/&#39;, (req, res) =&gt; res.send(&#39;hello world&#39;)); app.listen(80, () =&gt; { console.log(&#39;My REST API running on port 80!&#39;); }); Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.
-npm install express 이제 package.">
+const express = require(&#39;express&#39;);
+const app = express();
+app.get(&#39;/&#39;, (req, res) =&gt; res.send(&#39;hello world&#39;));
+app.listen(80, () =&gt; {
+    console.log(&#39;My REST API running on port 80!&#39;);
+});
+Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.
+npm install express
+이제 package.json 의 script 에 start command 를 추가한다. 이는 app.js 를 run 하기 위해서다.
+package.json">
 <meta name="author" content="">
 <link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/node-%EC%9E%85%EB%AC%B8-%EB%B0%8F-%EB%B0%B0%ED%8F%AC-docker-%EC%99%80-aws/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
@@ -22,6 +31,7 @@ npm install express 이제 package.">
 <link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/posts/node-%EC%9E%85%EB%AC%B8-%EB%B0%8F-%EB%B0%B0%ED%8F%AC-docker-%EC%99%80-aws/">
 <noscript>
     <style>
         #theme-toggle,
@@ -39,7 +49,7 @@ npm install express 이제 package.">
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -58,22 +68,35 @@ npm install express 이제 package.">
         }
 
     </style>
-</noscript><meta property="og:title" content="Node 입문 및 배포 (Docker 와 Aws)" />
-<meta property="og:description" content="NodeJS, ExpressJS 와 Docker nodeJS 앱 만들기 프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/node-%EC%9E%85%EB%AC%B8-%EB%B0%8F-%EB%B0%B0%ED%8F%AC-docker-%EC%99%80-aws/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="Node 입문 및 배포 (Docker 와 Aws)">
+  <meta property="og:description" content="NodeJS, ExpressJS 와 Docker nodeJS 앱 만들기 프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.
 app.js
 const express = require(&#39;express&#39;); const app = express(); app.get(&#39;/&#39;, (req, res) =&gt; res.send(&#39;hello world&#39;)); app.listen(80, () =&gt; { console.log(&#39;My REST API running on port 80!&#39;); }); Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.
-npm install express 이제 package." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/node-%EC%9E%85%EB%AC%B8-%EB%B0%8F-%EB%B0%B0%ED%8F%AC-docker-%EC%99%80-aws/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2021-04-06T23:36:09+09:00" />
-<meta property="article:modified_time" content="2021-04-06T23:36:09+09:00" />
-
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Node 입문 및 배포 (Docker 와 Aws)"/>
-<meta name="twitter:description" content="NodeJS, ExpressJS 와 Docker nodeJS 앱 만들기 프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.
+npm install express 이제 package.json 의 script 에 start command 를 추가한다. 이는 app.js 를 run 하기 위해서다.
+package.json">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-04-06T23:36:09+09:00">
+    <meta property="article:modified_time" content="2021-04-06T23:36:09+09:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Node 입문 및 배포 (Docker 와 Aws)">
+<meta name="twitter:description" content="NodeJS, ExpressJS 와 Docker
+nodeJS 앱 만들기
+프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.
 app.js
-const express = require(&#39;express&#39;); const app = express(); app.get(&#39;/&#39;, (req, res) =&gt; res.send(&#39;hello world&#39;)); app.listen(80, () =&gt; { console.log(&#39;My REST API running on port 80!&#39;); }); Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.
-npm install express 이제 package."/>
+const express = require(&#39;express&#39;);
+const app = express();
+app.get(&#39;/&#39;, (req, res) =&gt; res.send(&#39;hello world&#39;));
+app.listen(80, () =&gt; {
+    console.log(&#39;My REST API running on port 80!&#39;);
+});
+Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.
+npm install express
+이제 package.json 의 script 에 start command 를 추가한다. 이는 app.js 를 run 하기 위해서다.
+package.json">
 
 
 <script type="application/ld+json">
@@ -102,7 +125,7 @@ npm install express 이제 package."/>
   "@type": "BlogPosting",
   "headline": "Node 입문 및 배포 (Docker 와 Aws)",
   "name": "Node 입문 및 배포 (Docker 와 Aws)",
-  "description": "NodeJS, ExpressJS 와 Docker nodeJS 앱 만들기 프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.\napp.js\nconst express = require(\u0026#39;express\u0026#39;); const app = express(); app.get(\u0026#39;/\u0026#39;, (req, res) =\u0026gt; res.send(\u0026#39;hello world\u0026#39;)); app.listen(80, () =\u0026gt; { console.log(\u0026#39;My REST API running on port 80!\u0026#39;); }); Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.\nnpm install express 이제 package.",
+  "description": "NodeJS, ExpressJS 와 Docker nodeJS 앱 만들기 프로젝트 폴더를 생성한 후에 폴더 안에 app.js 를 만든다. 아래와 같은 코드로 작성하며, hello world 를 출력하는 간단한 웹 앱이다.\napp.js\nconst express = require(\u0026#39;express\u0026#39;); const app = express(); app.get(\u0026#39;/\u0026#39;, (req, res) =\u0026gt; res.send(\u0026#39;hello world\u0026#39;)); app.listen(80, () =\u0026gt; { console.log(\u0026#39;My REST API running on port 80!\u0026#39;); }); Express 를 app.js 에서 사용하기 때문에 terminal 에 다음과 같은 명령어를 입력하여 express 를 설치한다.\nnpm install express 이제 package.json 의 script 에 start command 를 추가한다. 이는 app.js 를 run 하기 위해서다.\npackage.json\n",
   "keywords": [
     
   ],
@@ -175,7 +198,7 @@ npm install express 이제 package."/>
 <article class="post-single">
   <header class="post-header">
     
-    <h1 class="post-title">
+    <h1 class="post-title entry-hint-parent">
       Node 입문 및 배포 (Docker 와 Aws)
     </h1>
     <div class="post-meta"><span title='2021-04-06 23:36:09 +0900 KST'>April 6, 2021</span>
@@ -278,7 +301,8 @@ npm install express 이제 package."/>
     </main>
     
 <footer class="footer">
-    <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &

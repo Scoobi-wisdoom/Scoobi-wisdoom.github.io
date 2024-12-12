@@ -7,12 +7,21 @@
 <meta name="robots" content="index, follow">
 <title>Kotlin Collection | wisdoom</title>
 <meta name="keywords" content="">
-<meta name="description" content="Kotlin Collection - associateBy 와 groupBy 1. Kotlin Docs associateBy 와 groupBy 의 코드를 비교해보자.
-public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&gt; K): Map&lt;K, T&gt; { val capacity = mapCapacity(collectionSizeOrDefault(10)).coerceAtLeast(16) return associateByTo(LinkedHashMap&lt;K, T&gt;(capacity), keySelector) } public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.groupBy(keySelector: (T) -&gt; K): Map&lt;K, List&lt;T&gt;&gt; { return groupByTo(LinkedHashMap&lt;K, MutableList&lt;T&gt;&gt;(), keySelector) } 두 함수의 공통점은, Map 을 반환한다는 것이다. 차이점은, associateBy 는 T 를 value 로 반환하는 반면, groupBy 는 List 를 value 로 반환한다는 것이다.">
+<meta name="description" content="Kotlin Collection - associateBy 와 groupBy
+1. Kotlin Docs
+associateBy 와 groupBy 의 코드를 비교해보자.
+public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&gt; K): Map&lt;K, T&gt; {
+    val capacity = mapCapacity(collectionSizeOrDefault(10)).coerceAtLeast(16)
+    return associateByTo(LinkedHashMap&lt;K, T&gt;(capacity), keySelector)
+}
+
+public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.groupBy(keySelector: (T) -&gt; K): Map&lt;K, List&lt;T&gt;&gt; {
+    return groupByTo(LinkedHashMap&lt;K, MutableList&lt;T&gt;&gt;(), keySelector)
+}
+두 함수의 공통점은, Map 을 반환한다는 것이다. 차이점은, associateBy 는 T 를 value 로 반환하는 반면, groupBy 는 List 를 value 로 반환한다는 것이다. 즉, associateBy 는 Iterable 에서 T 가 unique 하다고 가정하는 반면, groupBy 는 duplicates 가 있다고 가정하고 있다. 아래 예제를 살펴보자.">
 <meta name="author" content="">
 <link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/kotlin-collection-associateby-%EC%99%80-groupby/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
@@ -20,6 +29,7 @@ public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&
 <link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/posts/kotlin-collection-associateby-%EC%99%80-groupby/">
 <noscript>
     <style>
         #theme-toggle,
@@ -37,7 +47,7 @@ public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -56,18 +66,30 @@ public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&
         }
 
     </style>
-</noscript><meta property="og:title" content="Kotlin Collection" />
-<meta property="og:description" content="Kotlin Collection - associateBy 와 groupBy 1. Kotlin Docs associateBy 와 groupBy 의 코드를 비교해보자.
-public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&gt; K): Map&lt;K, T&gt; { val capacity = mapCapacity(collectionSizeOrDefault(10)).coerceAtLeast(16) return associateByTo(LinkedHashMap&lt;K, T&gt;(capacity), keySelector) } public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.groupBy(keySelector: (T) -&gt; K): Map&lt;K, List&lt;T&gt;&gt; { return groupByTo(LinkedHashMap&lt;K, MutableList&lt;T&gt;&gt;(), keySelector) } 두 함수의 공통점은, Map 을 반환한다는 것이다. 차이점은, associateBy 는 T 를 value 로 반환하는 반면, groupBy 는 List 를 value 로 반환한다는 것이다." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/kotlin-collection-associateby-%EC%99%80-groupby/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2021-08-15T19:11:54+09:00" />
-<meta property="article:modified_time" content="2021-08-15T19:11:54+09:00" />
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/kotlin-collection-associateby-%EC%99%80-groupby/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="Kotlin Collection">
+  <meta property="og:description" content="Kotlin Collection - associateBy 와 groupBy 1. Kotlin Docs associateBy 와 groupBy 의 코드를 비교해보자.
+public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&gt; K): Map&lt;K, T&gt; { val capacity = mapCapacity(collectionSizeOrDefault(10)).coerceAtLeast(16) return associateByTo(LinkedHashMap&lt;K, T&gt;(capacity), keySelector) } public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.groupBy(keySelector: (T) -&gt; K): Map&lt;K, List&lt;T&gt;&gt; { return groupByTo(LinkedHashMap&lt;K, MutableList&lt;T&gt;&gt;(), keySelector) } 두 함수의 공통점은, Map 을 반환한다는 것이다. 차이점은, associateBy 는 T 를 value 로 반환하는 반면, groupBy 는 List 를 value 로 반환한다는 것이다. 즉, associateBy 는 Iterable 에서 T 가 unique 하다고 가정하는 반면, groupBy 는 duplicates 가 있다고 가정하고 있다. 아래 예제를 살펴보자.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-08-15T19:11:54+09:00">
+    <meta property="article:modified_time" content="2021-08-15T19:11:54+09:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kotlin Collection">
+<meta name="twitter:description" content="Kotlin Collection - associateBy 와 groupBy
+1. Kotlin Docs
+associateBy 와 groupBy 의 코드를 비교해보자.
+public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&gt; K): Map&lt;K, T&gt; {
+    val capacity = mapCapacity(collectionSizeOrDefault(10)).coerceAtLeast(16)
+    return associateByTo(LinkedHashMap&lt;K, T&gt;(capacity), keySelector)
+}
 
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Kotlin Collection"/>
-<meta name="twitter:description" content="Kotlin Collection - associateBy 와 groupBy 1. Kotlin Docs associateBy 와 groupBy 의 코드를 비교해보자.
-public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&gt; K): Map&lt;K, T&gt; { val capacity = mapCapacity(collectionSizeOrDefault(10)).coerceAtLeast(16) return associateByTo(LinkedHashMap&lt;K, T&gt;(capacity), keySelector) } public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.groupBy(keySelector: (T) -&gt; K): Map&lt;K, List&lt;T&gt;&gt; { return groupByTo(LinkedHashMap&lt;K, MutableList&lt;T&gt;&gt;(), keySelector) } 두 함수의 공통점은, Map 을 반환한다는 것이다. 차이점은, associateBy 는 T 를 value 로 반환하는 반면, groupBy 는 List 를 value 로 반환한다는 것이다."/>
+public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.groupBy(keySelector: (T) -&gt; K): Map&lt;K, List&lt;T&gt;&gt; {
+    return groupByTo(LinkedHashMap&lt;K, MutableList&lt;T&gt;&gt;(), keySelector)
+}
+두 함수의 공통점은, Map 을 반환한다는 것이다. 차이점은, associateBy 는 T 를 value 로 반환하는 반면, groupBy 는 List 를 value 로 반환한다는 것이다. 즉, associateBy 는 Iterable 에서 T 가 unique 하다고 가정하는 반면, groupBy 는 duplicates 가 있다고 가정하고 있다. 아래 예제를 살펴보자.">
 
 
 <script type="application/ld+json">
@@ -96,7 +118,7 @@ public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&
   "@type": "BlogPosting",
   "headline": "Kotlin Collection",
   "name": "Kotlin Collection",
-  "description": "Kotlin Collection - associateBy 와 groupBy 1. Kotlin Docs associateBy 와 groupBy 의 코드를 비교해보자.\npublic inline fun \u0026lt;T, K\u0026gt; Iterable\u0026lt;T\u0026gt;.associateBy(keySelector: (T) -\u0026gt; K): Map\u0026lt;K, T\u0026gt; { val capacity = mapCapacity(collectionSizeOrDefault(10)).coerceAtLeast(16) return associateByTo(LinkedHashMap\u0026lt;K, T\u0026gt;(capacity), keySelector) } public inline fun \u0026lt;T, K\u0026gt; Iterable\u0026lt;T\u0026gt;.groupBy(keySelector: (T) -\u0026gt; K): Map\u0026lt;K, List\u0026lt;T\u0026gt;\u0026gt; { return groupByTo(LinkedHashMap\u0026lt;K, MutableList\u0026lt;T\u0026gt;\u0026gt;(), keySelector) } 두 함수의 공통점은, Map 을 반환한다는 것이다. 차이점은, associateBy 는 T 를 value 로 반환하는 반면, groupBy 는 List 를 value 로 반환한다는 것이다.",
+  "description": "Kotlin Collection - associateBy 와 groupBy 1. Kotlin Docs associateBy 와 groupBy 의 코드를 비교해보자.\npublic inline fun \u0026lt;T, K\u0026gt; Iterable\u0026lt;T\u0026gt;.associateBy(keySelector: (T) -\u0026gt; K): Map\u0026lt;K, T\u0026gt; { val capacity = mapCapacity(collectionSizeOrDefault(10)).coerceAtLeast(16) return associateByTo(LinkedHashMap\u0026lt;K, T\u0026gt;(capacity), keySelector) } public inline fun \u0026lt;T, K\u0026gt; Iterable\u0026lt;T\u0026gt;.groupBy(keySelector: (T) -\u0026gt; K): Map\u0026lt;K, List\u0026lt;T\u0026gt;\u0026gt; { return groupByTo(LinkedHashMap\u0026lt;K, MutableList\u0026lt;T\u0026gt;\u0026gt;(), keySelector) } 두 함수의 공통점은, Map 을 반환한다는 것이다. 차이점은, associateBy 는 T 를 value 로 반환하는 반면, groupBy 는 List 를 value 로 반환한다는 것이다. 즉, associateBy 는 Iterable 에서 T 가 unique 하다고 가정하는 반면, groupBy 는 duplicates 가 있다고 가정하고 있다. 아래 예제를 살펴보자.\n",
   "keywords": [
     
   ],
@@ -169,7 +191,7 @@ public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&
 <article class="post-single">
   <header class="post-header">
     
-    <h1 class="post-title">
+    <h1 class="post-title entry-hint-parent">
       Kotlin Collection
     </h1>
     <div class="post-meta"><span title='2021-08-15 19:11:54 +0900 KST'>August 15, 2021</span>
@@ -311,7 +333,8 @@ public inline fun &lt;T, K&gt; Iterable&lt;T&gt;.associateBy(keySelector: (T) -&
     </main>
     
 <footer class="footer">
-    <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &

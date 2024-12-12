@@ -7,15 +7,41 @@
 <meta name="robots" content="index, follow">
 <title>네트워크 상식 | wisdoom</title>
 <meta name="keywords" content="">
-<meta name="description" content="개발자에게 필요한 네트워크 상식 백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다.
+<meta name="description" content="개발자에게 필요한 네트워크 상식
+백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다.
 개발자라면 다음과 같은 문제에 대답할 수 있어야 한다.
-private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법 웹 브라우저의 MAC 주소를 알 수 있는 방법 IP 주소를 사용자 식별자로 사용할 수 있는 방법 80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법
+
+private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법 
+웹 브라우저의 MAC 주소를 알 수 있는 방법 
+IP 주소를 사용자 식별자로 사용할 수 있는 방법 
+80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법
+
 나는 첫 두 개는 모르고 있었다. 갈 길이 멀다.
-private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: public IP 주소를 할당받아야 함.">
+
+private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: public IP 주소를 할당받아야 함.
+
+public IP 주소를 할당받아 DMZ 영역에 서버를 구성
+public IP 주소를 할당받아 STUN, TURN 등 기술을 사용
+
+웹 브라우저의 MAC 주소를 알 수 있는 방법
+
+사용자의 MAC 주소를 알 방법은 없음
+별도의 프로그램으로 수집할 수 있지만 개인정보 침해 소지가 있음
+
+아이피 주소를 사용자 식별자로 사용하는 방법
+
+논리적 아이피 주소는 환경에 따라 변경가능하기 때문에 식별자로 사용할 수 없음.
+
+80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법
+
+포트는 운영체제에서 실행되는 프로세스를 식별할 수 있는 key 로서, 동시에 여러 개 실행하는 것은 불가능
+하나의 컴퓨터에 여러 개 가상화 환경을 준비하고 실행하는 방법은 있음.
+
+
+이제 왜 위와 같은 결론이 나오는지 알아보자.">
 <meta name="author" content="">
 <link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EC%83%81%EC%8B%9D/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
@@ -23,6 +49,7 @@ private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: 
 <link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/posts/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EC%83%81%EC%8B%9D/">
 <noscript>
     <style>
         #theme-toggle,
@@ -40,7 +67,7 @@ private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: 
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -59,24 +86,53 @@ private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: 
         }
 
     </style>
-</noscript><meta property="og:title" content="네트워크 상식" />
-<meta property="og:description" content="개발자에게 필요한 네트워크 상식 백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다.
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EC%83%81%EC%8B%9D/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="네트워크 상식">
+  <meta property="og:description" content="개발자에게 필요한 네트워크 상식 백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다.
 개발자라면 다음과 같은 문제에 대답할 수 있어야 한다.
 private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법 웹 브라우저의 MAC 주소를 알 수 있는 방법 IP 주소를 사용자 식별자로 사용할 수 있는 방법 80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법
 나는 첫 두 개는 모르고 있었다. 갈 길이 멀다.
-private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: public IP 주소를 할당받아야 함." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EC%83%81%EC%8B%9D/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2022-05-23T22:48:14+09:00" />
-<meta property="article:modified_time" content="2022-05-23T22:48:14+09:00" />
+private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: public IP 주소를 할당받아야 함. public IP 주소를 할당받아 DMZ 영역에 서버를 구성 public IP 주소를 할당받아 STUN, TURN 등 기술을 사용 웹 브라우저의 MAC 주소를 알 수 있는 방법 사용자의 MAC 주소를 알 방법은 없음 별도의 프로그램으로 수집할 수 있지만 개인정보 침해 소지가 있음 아이피 주소를 사용자 식별자로 사용하는 방법 논리적 아이피 주소는 환경에 따라 변경가능하기 때문에 식별자로 사용할 수 없음. 80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법 포트는 운영체제에서 실행되는 프로세스를 식별할 수 있는 key 로서, 동시에 여러 개 실행하는 것은 불가능 하나의 컴퓨터에 여러 개 가상화 환경을 준비하고 실행하는 방법은 있음. 이제 왜 위와 같은 결론이 나오는지 알아보자.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2022-05-23T22:48:14+09:00">
+    <meta property="article:modified_time" content="2022-05-23T22:48:14+09:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="네트워크 상식">
+<meta name="twitter:description" content="개발자에게 필요한 네트워크 상식
+백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다.
+개발자라면 다음과 같은 문제에 대답할 수 있어야 한다.
 
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="네트워크 상식"/>
-<meta name="twitter:description" content="개발자에게 필요한 네트워크 상식 백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다.
-개발자라면 다음과 같은 문제에 대답할 수 있어야 한다.
-private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법 웹 브라우저의 MAC 주소를 알 수 있는 방법 IP 주소를 사용자 식별자로 사용할 수 있는 방법 80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법
+private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법 
+웹 브라우저의 MAC 주소를 알 수 있는 방법 
+IP 주소를 사용자 식별자로 사용할 수 있는 방법 
+80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법
+
 나는 첫 두 개는 모르고 있었다. 갈 길이 멀다.
-private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: public IP 주소를 할당받아야 함."/>
+
+private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: public IP 주소를 할당받아야 함.
+
+public IP 주소를 할당받아 DMZ 영역에 서버를 구성
+public IP 주소를 할당받아 STUN, TURN 등 기술을 사용
+
+웹 브라우저의 MAC 주소를 알 수 있는 방법
+
+사용자의 MAC 주소를 알 방법은 없음
+별도의 프로그램으로 수집할 수 있지만 개인정보 침해 소지가 있음
+
+아이피 주소를 사용자 식별자로 사용하는 방법
+
+논리적 아이피 주소는 환경에 따라 변경가능하기 때문에 식별자로 사용할 수 없음.
+
+80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법
+
+포트는 운영체제에서 실행되는 프로세스를 식별할 수 있는 key 로서, 동시에 여러 개 실행하는 것은 불가능
+하나의 컴퓨터에 여러 개 가상화 환경을 준비하고 실행하는 방법은 있음.
+
+
+이제 왜 위와 같은 결론이 나오는지 알아보자.">
 
 
 <script type="application/ld+json">
@@ -105,11 +161,11 @@ private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: 
   "@type": "BlogPosting",
   "headline": "네트워크 상식",
   "name": "네트워크 상식",
-  "description": "개발자에게 필요한 네트워크 상식 백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다.\n개발자라면 다음과 같은 문제에 대답할 수 있어야 한다.\nprivate IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법 웹 브라우저의 MAC 주소를 알 수 있는 방법 IP 주소를 사용자 식별자로 사용할 수 있는 방법 80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법\n나는 첫 두 개는 모르고 있었다. 갈 길이 멀다.\nprivate IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: public IP 주소를 할당받아야 함.",
+  "description": "개발자에게 필요한 네트워크 상식 백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다.\n개발자라면 다음과 같은 문제에 대답할 수 있어야 한다.\nprivate IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법 웹 브라우저의 MAC 주소를 알 수 있는 방법 IP 주소를 사용자 식별자로 사용할 수 있는 방법 80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법\n나는 첫 두 개는 모르고 있었다. 갈 길이 멀다.\nprivate IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: public IP 주소를 할당받아야 함. public IP 주소를 할당받아 DMZ 영역에 서버를 구성 public IP 주소를 할당받아 STUN, TURN 등 기술을 사용 웹 브라우저의 MAC 주소를 알 수 있는 방법 사용자의 MAC 주소를 알 방법은 없음 별도의 프로그램으로 수집할 수 있지만 개인정보 침해 소지가 있음 아이피 주소를 사용자 식별자로 사용하는 방법 논리적 아이피 주소는 환경에 따라 변경가능하기 때문에 식별자로 사용할 수 없음. 80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법 포트는 운영체제에서 실행되는 프로세스를 식별할 수 있는 key 로서, 동시에 여러 개 실행하는 것은 불가능 하나의 컴퓨터에 여러 개 가상화 환경을 준비하고 실행하는 방법은 있음. 이제 왜 위와 같은 결론이 나오는지 알아보자.\n",
   "keywords": [
     
   ],
-  "articleBody": "개발자에게 필요한 네트워크 상식 백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다.\n개발자라면 다음과 같은 문제에 대답할 수 있어야 한다.\nprivate IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법 웹 브라우저의 MAC 주소를 알 수 있는 방법 IP 주소를 사용자 식별자로 사용할 수 있는 방법 80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법\n나는 첫 두 개는 모르고 있었다. 갈 길이 멀다.\nprivate IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: public IP 주소를 할당받아야 함. public IP 주소를 할당받아 DMZ 영역에 서버를 구성 public IP 주소를 할당받아 STUN, TURN 등 기술을 사용 웹 브라우저의 MAC 주소를 알 수 있는 방법 사용자의 MAC 주소를 알 방법은 없음 별도의 프로그램으로 수집할 수 있지만 개인정보 침해 소지가 있음 아이피 주소를 사용자 식별자로 사용하는 방법 논리적 아이피 주소는 환경에 따라 변경가능하기 때문에 식별자로 사용할 수 없음. 80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법 포트는 운영체제에서 실행되는 프로세스를 식별할 수 있는 key 로서, 동시에 여러 개 실행하는 것은 불가능 하나의 컴퓨터에 여러 개 가상화 환경을 준비하고 실행하는 방법은 있음. 이제 왜 위와 같은 결론이 나오는지 알아보자.\n통신 3요소 송신자 데이터를 전송하고 결과를 기다림. 데이터를 전송하기 위해 수신자 정보인 MAC, IP, PORT 가 필요함. MAC (Media Access Control Address): 호스트를 식별할 수 있는 물리적 식별 값 (네트워크 카드에 할당됨) IP (Internet Protocol) 주소: 인터넷을 통해 특정 호스트를 찾을 수 있는 논리적 식별값 PORT: 프로그램(프로세스)를 구분할 수 있는 유일한 정보로, 특정 프로그램에 접속할 때 사용함. 수신자 데이터를 받고 결과를 전송함. 필요한 것만 받음 (protocol) 통신매체 유선 (LAN), 무선 (WIFI). 계속 신호를 주고 받음. 데이터 송신: 스위치 이용 (내부망) 송신자는 데이터를 스위치로 보낸다. 데이터는 송신자 MAC, 수신자 MAC 을 포함한다. 스위치는 스위치\u0008에 연결된 모든 장비에 데이터를 전송한다 (broadcasting). 데이터를 수신한 호스트는 자기 MAC 정보와 같지 않을 경우 무시한다. 참고로 broadcasting 은 감청에 취약할 수 있다. 스위치는 모든 호스트에 데이터를 보내기 때문에, 스위치에만 연결되면 감청이 가능하기 때문이다.\n데이터 송신: 라우터 이용 (인터넷) 스위치에 연결되지 않은 외부 호스트와 통신하기 위해서는 IP 주소가 필요하다.\n송신자의 IP 주소를 송신자의 라우터에 할당한다. 수신자의 IP 주소를 수신자의 라우터에 할당한다. IP 주소를 이용해 라우터끼리 통신한다. 이 방식은 broadcasting 과 달리 특\u001d정 호스트와 직접 통신한다. 이 때 전달되는 MAC 정보는 라우터의 MAC 정보뿐이다. 참고로 인터넷은 세상의 모든 라우터가 서로 연결된 네트워크 망이다.\nPublic IP 주소를 라우터에 할당하면 다른 라우터가 public IP 주소를 찾을 수 있지만, private IP 주소는 찾을 수 없다. 전송되는 데이터를 패킷 이라고 부르며, 여기에는 전송자와 수신자의 IP 주소가 포함돼 있다.\nPORT: 호스트 내부의 실제 수신자 위에서 설명한 것처럼 스위치는 MAC 을 통해, 라우터는 IP 주소를 이용해 데이터를 전송한다. 최종적으로 데이터는 호스트가 가진 여러 개의 수신자 (process) 중 하나가 받는다. 어떤 수신자가 패킷을 받는지는 port 로 구분한다.\n통신 방식에 port 번호가 없는 경우가 있으나, 이건 실제로 port 가 없는 게 아니라 기본값이 지정된 경우다. 다음은 통신 방법에 따른 port 기본값이다.\nhttp: 80\ntelnet: 23\ntftp: 69\n데이터 수신: protocol 사용 수신자는 데이터를 받은 후 protocol 을 이용해 데이터를 확인한다. Protocol 이란 송신자와 수신자가 데이터를 주고 받을 때 필요한 약속이다. Protocal 에는 여러 가지가 있는데, 각 protocol 의 특징을 비교하는 기준으로 흐름 제어, 오류 제어, 혼잡 제어 등이 있다.\n흐름제어는 연결과 종료, 오류제어는 타임아웃 및 패킷 손상에 대한 보완, 혼잡제어는 인터넷의 혼잡도에 따라 데이터 송신량을 조정하는 것과 관련이 있다. protocol 종류 TCP 는 연결 지향의 프로토콜로, 흐름/오류/혼잡제어가 기본으로 제공된다. 그래서 TCP/IP 로 대부분의 네트워크 송수신이 이루어진다 (예: SQL 실행). UDP 는 전송 지향 프로토콜이다. 수신자가 데이터를 받았는지 확인하거나, 수신에 실패했을 때 다시 시도하는 등의 처리는 애플리케이션에서 따로 구현해야 한다. 단방향으로 데이터를 보내기 때문에 TCP 보다 속도가 빠르다. 그래서 동영상 재생에서 사용된다. HTTP 는 application layer 의 프로토콜이다. 즉, network layer 가 TCP 를 사용하든 UDP 를 사용하든 통신을 할 수 있다. 또한, HTTP 의 가장 큰 특징은 송신자의 IP 주소가 변경될 수 있다는 것이다. HTTP 1.0 은 HTTP 의 특징인 비연결성 때문에 매번 접속/끊기가 반복된다. HTTP 1.1 은 TCP/IP 연결을 끊지 않고 하나의 스트림으로 받는 방식으로 비연결성을 보완한다. keep-alive 기능으로 하나의 웹페이지에서 html img css 등 여러 개의 컨텐츠를 다운받을 수 있다. HTTP 2 에서는 압축 기능을 사용해 인터넷 부하를 줄인다. HTTP 통신은 ASCII 로 데이터를 주고 받기 때문에 데이터량이 많기 때문이다. 보통 HTTP 2 는 인프라를 제공하는 WAS 에서 유용하다. 가장 적합한 예시가 Google 이다 (크롬). Reference 백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 미즈구치 카츠야, 모두의 네트워크, 이승룡 옮김, 길벗, 2020 ",
+  "articleBody": "개발자에게 필요한 네트워크 상식 백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다.\n개발자라면 다음과 같은 문제에 대답할 수 있어야 한다.\nprivate IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법 웹 브라우저의 MAC 주소를 알 수 있는 방법 IP 주소를 사용자 식별자로 사용할 수 있는 방법 80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법\n나는 첫 두 개는 모르고 있었다. 갈 길이 멀다.\nprivate IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: public IP 주소를 할당받아야 함. public IP 주소를 할당받아 DMZ 영역에 서버를 구성 public IP 주소를 할당받아 STUN, TURN 등 기술을 사용 웹 브라우저의 MAC 주소를 알 수 있는 방법 사용자의 MAC 주소를 알 방법은 없음 별도의 프로그램으로 수집할 수 있지만 개인정보 침해 소지가 있음 아이피 주소를 사용자 식별자로 사용하는 방법 논리적 아이피 주소는 환경에 따라 변경가능하기 때문에 식별자로 사용할 수 없음. 80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법 포트는 운영체제에서 실행되는 프로세스를 식별할 수 있는 key 로서, 동시에 여러 개 실행하는 것은 불가능 하나의 컴퓨터에 여러 개 가상화 환경을 준비하고 실행하는 방법은 있음. 이제 왜 위와 같은 결론이 나오는지 알아보자.\n통신 3요소 송신자 데이터를 전송하고 결과를 기다림. 데이터를 전송하기 위해 수신자 정보인 MAC, IP, PORT 가 필요함. MAC (Media Access Control Address): 호스트를 식별할 수 있는 물리적 식별 값 (네트워크 카드에 할당됨) IP (Internet Protocol) 주소: 인터넷을 통해 특정 호스트를 찾을 수 있는 논리적 식별값 PORT: 프로그램(프로세스)를 구분할 수 있는 유일한 정보로, 특정 프로그램에 접속할 때 사용함. 수신자 데이터를 받고 결과를 전송함. 필요한 것만 받음 (protocol) 통신매체 유선 (LAN), 무선 (WIFI). 계속 신호를 주고 받음. 데이터 송신: 스위치 이용 (내부망) 송신자는 데이터를 스위치로 보낸다. 데이터는 송신자 MAC, 수신자 MAC 을 포함한다. 스위치는 스위치\b에 연결된 모든 장비에 데이터를 전송한다 (broadcasting). 데이터를 수신한 호스트는 자기 MAC 정보와 같지 않을 경우 무시한다. 참고로 broadcasting 은 감청에 취약할 수 있다. 스위치는 모든 호스트에 데이터를 보내기 때문에, 스위치에만 연결되면 감청이 가능하기 때문이다.\n데이터 송신: 라우터 이용 (인터넷) 스위치에 연결되지 않은 외부 호스트와 통신하기 위해서는 IP 주소가 필요하다.\n송신자의 IP 주소를 송신자의 라우터에 할당한다. 수신자의 IP 주소를 수신자의 라우터에 할당한다. IP 주소를 이용해 라우터끼리 통신한다. 이 방식은 broadcasting 과 달리 특\u001d정 호스트와 직접 통신한다. 이 때 전달되는 MAC 정보는 라우터의 MAC 정보뿐이다. 참고로 인터넷은 세상의 모든 라우터가 서로 연결된 네트워크 망이다.\nPublic IP 주소를 라우터에 할당하면 다른 라우터가 public IP 주소를 찾을 수 있지만, private IP 주소는 찾을 수 없다. 전송되는 데이터를 패킷 이라고 부르며, 여기에는 전송자와 수신자의 IP 주소가 포함돼 있다.\nPORT: 호스트 내부의 실제 수신자 위에서 설명한 것처럼 스위치는 MAC 을 통해, 라우터는 IP 주소를 이용해 데이터를 전송한다. 최종적으로 데이터는 호스트가 가진 여러 개의 수신자 (process) 중 하나가 받는다. 어떤 수신자가 패킷을 받는지는 port 로 구분한다.\n통신 방식에 port 번호가 없는 경우가 있으나, 이건 실제로 port 가 없는 게 아니라 기본값이 지정된 경우다. 다음은 통신 방법에 따른 port 기본값이다.\nhttp: 80\ntelnet: 23\ntftp: 69\n데이터 수신: protocol 사용 수신자는 데이터를 받은 후 protocol 을 이용해 데이터를 확인한다. Protocol 이란 송신자와 수신자가 데이터를 주고 받을 때 필요한 약속이다. Protocal 에는 여러 가지가 있는데, 각 protocol 의 특징을 비교하는 기준으로 흐름 제어, 오류 제어, 혼잡 제어 등이 있다.\n흐름제어는 연결과 종료, 오류제어는 타임아웃 및 패킷 손상에 대한 보완, 혼잡제어는 인터넷의 혼잡도에 따라 데이터 송신량을 조정하는 것과 관련이 있다. protocol 종류 TCP 는 연결 지향의 프로토콜로, 흐름/오류/혼잡제어가 기본으로 제공된다. 그래서 TCP/IP 로 대부분의 네트워크 송수신이 이루어진다 (예: SQL 실행). UDP 는 전송 지향 프로토콜이다. 수신자가 데이터를 받았는지 확인하거나, 수신에 실패했을 때 다시 시도하는 등의 처리는 애플리케이션에서 따로 구현해야 한다. 단방향으로 데이터를 보내기 때문에 TCP 보다 속도가 빠르다. 그래서 동영상 재생에서 사용된다. HTTP 는 application layer 의 프로토콜이다. 즉, network layer 가 TCP 를 사용하든 UDP 를 사용하든 통신을 할 수 있다. 또한, HTTP 의 가장 큰 특징은 송신자의 IP 주소가 변경될 수 있다는 것이다. HTTP 1.0 은 HTTP 의 특징인 비연결성 때문에 매번 접속/끊기가 반복된다. HTTP 1.1 은 TCP/IP 연결을 끊지 않고 하나의 스트림으로 받는 방식으로 비연결성을 보완한다. keep-alive 기능으로 하나의 웹페이지에서 html img css 등 여러 개의 컨텐츠를 다운받을 수 있다. HTTP 2 에서는 압축 기능을 사용해 인터넷 부하를 줄인다. HTTP 통신은 ASCII 로 데이터를 주고 받기 때문에 데이터량이 많기 때문이다. 보통 HTTP 2 는 인프라를 제공하는 WAS 에서 유용하다. 가장 적합한 예시가 Google 이다 (크롬). Reference 백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 미즈구치 카츠야, 모두의 네트워크, 이승룡 옮김, 길벗, 2020 ",
   "wordCount" : "699",
   "inLanguage": "en",
   "datePublished": "2022-05-23T22:48:14+09:00",
@@ -178,7 +234,7 @@ private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: 
 <article class="post-single">
   <header class="post-header">
     
-    <h1 class="post-title">
+    <h1 class="post-title entry-hint-parent">
       네트워크 상식
     </h1>
     <div class="post-meta"><span title='2022-05-23 22:48:14 +0900 KST'>May 23, 2022</span>
@@ -329,7 +385,8 @@ tftp: 69</p>
     </main>
     
 <footer class="footer">
-    <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &

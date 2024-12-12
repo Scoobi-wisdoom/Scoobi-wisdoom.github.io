@@ -8,14 +8,24 @@
 <title>스프링부트와 환경변수 | wisdoom</title>
 <meta name="keywords" content="">
 <meta name="description" content="JUnit 을 이용한 테스트에서는 데이터 레이어를 테스트하는 경우가 있다. 이 경우 실제 DB 와 테스트용 DB 를 구분해야 하며, 테스트에서는 테스트용 DB 만 사용해야 한다.
-@ActiveProfiles(&ldquo;test&rdquo;) 로 해결? 하지만 DB 가 모두 삭제된다. 스프링 부트를 이용하다 보면 JUnit 을 이용해 테스트 코드를 작성하는 경우가 많다.
+@ActiveProfiles(&ldquo;test&rdquo;) 로 해결? 하지만 DB 가 모두 삭제된다.
+스프링 부트를 이용하다 보면 JUnit 을 이용해 테스트 코드를 작성하는 경우가 많다.
 테스트 중 integration test 를 하는 경우가 있는데 필자는 아래와 같이 DB 를 생성한 후 삭제한다.
 DbDestinationTest
-@BeforeAll fun initialDataInput() = run { Repository1.saveAll(listOfEntities) Unit } @AfterAll fun clearData() = run { Repository1.">
+    @BeforeAll
+    fun initialDataInput() = run {
+        Repository1.saveAll(listOfEntities)
+        Unit
+    }
+
+    @AfterAll
+    fun clearData() = run {
+        Repository1.deleteAll()
+    }
+테스트용 DB 와 실제 DB destination 이 모두 달라야 한다. 그렇지 않으면 clearData() 메서드가 모든 DB 데이터를 삭제한다.">
 <meta name="author" content="">
 <link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/%EC%8A%A4%ED%94%84%EB%A7%81%EB%B6%80%ED%8A%B8%EC%99%80-%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
@@ -23,6 +33,7 @@ DbDestinationTest
 <link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/posts/%EC%8A%A4%ED%94%84%EB%A7%81%EB%B6%80%ED%8A%B8%EC%99%80-%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/">
 <noscript>
     <style>
         #theme-toggle,
@@ -40,7 +51,7 @@ DbDestinationTest
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -59,24 +70,37 @@ DbDestinationTest
         }
 
     </style>
-</noscript><meta property="og:title" content="스프링부트와 환경변수" />
-<meta property="og:description" content="JUnit 을 이용한 테스트에서는 데이터 레이어를 테스트하는 경우가 있다. 이 경우 실제 DB 와 테스트용 DB 를 구분해야 하며, 테스트에서는 테스트용 DB 만 사용해야 한다.
-@ActiveProfiles(&ldquo;test&rdquo;) 로 해결? 하지만 DB 가 모두 삭제된다. 스프링 부트를 이용하다 보면 JUnit 을 이용해 테스트 코드를 작성하는 경우가 많다.
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/%EC%8A%A4%ED%94%84%EB%A7%81%EB%B6%80%ED%8A%B8%EC%99%80-%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="스프링부트와 환경변수">
+  <meta property="og:description" content="JUnit 을 이용한 테스트에서는 데이터 레이어를 테스트하는 경우가 있다. 이 경우 실제 DB 와 테스트용 DB 를 구분해야 하며, 테스트에서는 테스트용 DB 만 사용해야 한다.
+@ActiveProfiles(“test”) 로 해결? 하지만 DB 가 모두 삭제된다. 스프링 부트를 이용하다 보면 JUnit 을 이용해 테스트 코드를 작성하는 경우가 많다.
 테스트 중 integration test 를 하는 경우가 있는데 필자는 아래와 같이 DB 를 생성한 후 삭제한다.
 DbDestinationTest
-@BeforeAll fun initialDataInput() = run { Repository1.saveAll(listOfEntities) Unit } @AfterAll fun clearData() = run { Repository1." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/%EC%8A%A4%ED%94%84%EB%A7%81%EB%B6%80%ED%8A%B8%EC%99%80-%ED%99%98%EA%B2%BD%EB%B3%80%EC%88%98/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2021-08-25T00:38:47+09:00" />
-<meta property="article:modified_time" content="2021-08-25T00:38:47+09:00" />
-
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="스프링부트와 환경변수"/>
+@BeforeAll fun initialDataInput() = run { Repository1.saveAll(listOfEntities) Unit } @AfterAll fun clearData() = run { Repository1.deleteAll() } 테스트용 DB 와 실제 DB destination 이 모두 달라야 한다. 그렇지 않으면 clearData() 메서드가 모든 DB 데이터를 삭제한다.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2021-08-25T00:38:47+09:00">
+    <meta property="article:modified_time" content="2021-08-25T00:38:47+09:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="스프링부트와 환경변수">
 <meta name="twitter:description" content="JUnit 을 이용한 테스트에서는 데이터 레이어를 테스트하는 경우가 있다. 이 경우 실제 DB 와 테스트용 DB 를 구분해야 하며, 테스트에서는 테스트용 DB 만 사용해야 한다.
-@ActiveProfiles(&ldquo;test&rdquo;) 로 해결? 하지만 DB 가 모두 삭제된다. 스프링 부트를 이용하다 보면 JUnit 을 이용해 테스트 코드를 작성하는 경우가 많다.
+@ActiveProfiles(&ldquo;test&rdquo;) 로 해결? 하지만 DB 가 모두 삭제된다.
+스프링 부트를 이용하다 보면 JUnit 을 이용해 테스트 코드를 작성하는 경우가 많다.
 테스트 중 integration test 를 하는 경우가 있는데 필자는 아래와 같이 DB 를 생성한 후 삭제한다.
 DbDestinationTest
-@BeforeAll fun initialDataInput() = run { Repository1.saveAll(listOfEntities) Unit } @AfterAll fun clearData() = run { Repository1."/>
+    @BeforeAll
+    fun initialDataInput() = run {
+        Repository1.saveAll(listOfEntities)
+        Unit
+    }
+
+    @AfterAll
+    fun clearData() = run {
+        Repository1.deleteAll()
+    }
+테스트용 DB 와 실제 DB destination 이 모두 달라야 한다. 그렇지 않으면 clearData() 메서드가 모든 DB 데이터를 삭제한다.">
 
 
 <script type="application/ld+json">
@@ -105,7 +129,7 @@ DbDestinationTest
   "@type": "BlogPosting",
   "headline": "스프링부트와 환경변수",
   "name": "스프링부트와 환경변수",
-  "description": "JUnit 을 이용한 테스트에서는 데이터 레이어를 테스트하는 경우가 있다. 이 경우 실제 DB 와 테스트용 DB 를 구분해야 하며, 테스트에서는 테스트용 DB 만 사용해야 한다.\n@ActiveProfiles(\u0026ldquo;test\u0026rdquo;) 로 해결? 하지만 DB 가 모두 삭제된다. 스프링 부트를 이용하다 보면 JUnit 을 이용해 테스트 코드를 작성하는 경우가 많다.\n테스트 중 integration test 를 하는 경우가 있는데 필자는 아래와 같이 DB 를 생성한 후 삭제한다.\nDbDestinationTest\n@BeforeAll fun initialDataInput() = run { Repository1.saveAll(listOfEntities) Unit } @AfterAll fun clearData() = run { Repository1.",
+  "description": "JUnit 을 이용한 테스트에서는 데이터 레이어를 테스트하는 경우가 있다. 이 경우 실제 DB 와 테스트용 DB 를 구분해야 하며, 테스트에서는 테스트용 DB 만 사용해야 한다.\n@ActiveProfiles(\u0026ldquo;test\u0026rdquo;) 로 해결? 하지만 DB 가 모두 삭제된다. 스프링 부트를 이용하다 보면 JUnit 을 이용해 테스트 코드를 작성하는 경우가 많다.\n테스트 중 integration test 를 하는 경우가 있는데 필자는 아래와 같이 DB 를 생성한 후 삭제한다.\nDbDestinationTest\n@BeforeAll fun initialDataInput() = run { Repository1.saveAll(listOfEntities) Unit } @AfterAll fun clearData() = run { Repository1.deleteAll() } 테스트용 DB 와 실제 DB destination 이 모두 달라야 한다. 그렇지 않으면 clearData() 메서드가 모든 DB 데이터를 삭제한다.\n",
   "keywords": [
     
   ],
@@ -178,7 +202,7 @@ DbDestinationTest
 <article class="post-single">
   <header class="post-header">
     
-    <h1 class="post-title">
+    <h1 class="post-title entry-hint-parent">
       스프링부트와 환경변수
     </h1>
     <div class="post-meta"><span title='2021-08-25 00:38:47 +0900 KST'>August 25, 2021</span>
@@ -272,7 +296,8 @@ datasource.mongo-connection-string=mongodb://localhost:27017/test?authSource\\\=
     </main>
     
 <footer class="footer">
-    <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &

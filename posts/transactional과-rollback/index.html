@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>@Transcational 과 Rollback | wisdoom</title>
+<meta name="keywords" content="">
+<meta name="description" content="우아한 기술블로그에서 설명하지 않은 부분이 헷갈려서 이 글을 쓰게 됐다. 위의 블로그를 읽고 생각하게 된 것은, &ldquo;RuntimeException 이 발생하면 무조건 rollback 이 발생한다.&rdquo; 였다. 하지만 이는 사실이 아니었다.
+결론을 먼저 말하자면 아래와 같다.
+
+@Transactional 이 붙은 함수가 완료되기 전에 catch Exception 이 있으면 롤백은 일어나지 않는다.
+@Transactional 이 붙은 함수가 완료된 후에 catch Exception 이 있으면 롤백이 일어난다.
+
+결론 도출을 위한 코드
+테스트를 위해 아래와 같이 kotlin 코드를 작성했다.
+@Service
+@Transactional
+class OuterService(
+    private val memberRepository: MemberRepository,
+    private val innerService: InnerService,
+) {
+    fun tryCatchAndThrow() {
+        try {
+            memberRepository.save(Member())
+            throw RuntimeException(&#34;Outer: intentionally thrown&#34;)
+        } catch (e: RuntimeException) {
+            println(e)
+        }
+    }
+
+    fun outerTryCatchAndInnerThrow() {
+        try {
+            innerService.`throw`()
+        } catch (e: RuntimeException) {
+            println(e)
+        }
+    }
+
+    fun innerTryCatchAndInnerThrow() {
+        innerService.tryCatchAndThrow()
+    }
+}
+@Service
+@Transactional
+class InnerService(
+    private val memberRepository: MemberRepository,
+) {
+    fun `throw`() {
+        memberRepository.save(Member())
+        throw RuntimeException(&#34;Inner: intentionally thrown&#34;)
+    }
+
+    fun tryCatchAndThrow() {
+        try {
+            memberRepository.save(Member())
+            throw RuntimeException(&#34;Inner: intentionally thrown&#34;)
+        } catch (e: Exception) {
+            println(e)
+        }
+    }
+}
+InnerService 를 참조하는 클래스는 OuterSerivce 뿐이라고 가정하고 OuterService 에 대해 아래와 같이 테스트 코드를 작성했다.">
+<meta name="author" content="">
+<link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/transactional%EA%B3%BC-rollback/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://Scoobi-wisdoom.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/posts/transactional%EA%B3%BC-rollback/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/transactional%EA%B3%BC-rollback/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="@Transcational 과 Rollback">
+  <meta property="og:description" content="우아한 기술블로그에서 설명하지 않은 부분이 헷갈려서 이 글을 쓰게 됐다. 위의 블로그를 읽고 생각하게 된 것은, “RuntimeException 이 발생하면 무조건 rollback 이 발생한다.” 였다. 하지만 이는 사실이 아니었다.
+결론을 먼저 말하자면 아래와 같다.
+@Transactional 이 붙은 함수가 완료되기 전에 catch Exception 이 있으면 롤백은 일어나지 않는다. @Transactional 이 붙은 함수가 완료된 후에 catch Exception 이 있으면 롤백이 일어난다. 결론 도출을 위한 코드 테스트를 위해 아래와 같이 kotlin 코드를 작성했다.
+@Service @Transactional class OuterService( private val memberRepository: MemberRepository, private val innerService: InnerService, ) { fun tryCatchAndThrow() { try { memberRepository.save(Member()) throw RuntimeException(&#34;Outer: intentionally thrown&#34;) } catch (e: RuntimeException) { println(e) } } fun outerTryCatchAndInnerThrow() { try { innerService.`throw`() } catch (e: RuntimeException) { println(e) } } fun innerTryCatchAndInnerThrow() { innerService.tryCatchAndThrow() } } @Service @Transactional class InnerService( private val memberRepository: MemberRepository, ) { fun `throw`() { memberRepository.save(Member()) throw RuntimeException(&#34;Inner: intentionally thrown&#34;) } fun tryCatchAndThrow() { try { memberRepository.save(Member()) throw RuntimeException(&#34;Inner: intentionally thrown&#34;) } catch (e: Exception) { println(e) } } } InnerService 를 참조하는 클래스는 OuterSerivce 뿐이라고 가정하고 OuterService 에 대해 아래와 같이 테스트 코드를 작성했다.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-12-10T20:43:47+09:00">
+    <meta property="article:modified_time" content="2024-12-10T20:43:47+09:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="@Transcational 과 Rollback">
+<meta name="twitter:description" content="우아한 기술블로그에서 설명하지 않은 부분이 헷갈려서 이 글을 쓰게 됐다. 위의 블로그를 읽고 생각하게 된 것은, &ldquo;RuntimeException 이 발생하면 무조건 rollback 이 발생한다.&rdquo; 였다. 하지만 이는 사실이 아니었다.
+결론을 먼저 말하자면 아래와 같다.
+
+@Transactional 이 붙은 함수가 완료되기 전에 catch Exception 이 있으면 롤백은 일어나지 않는다.
+@Transactional 이 붙은 함수가 완료된 후에 catch Exception 이 있으면 롤백이 일어난다.
+
+결론 도출을 위한 코드
+테스트를 위해 아래와 같이 kotlin 코드를 작성했다.
+@Service
+@Transactional
+class OuterService(
+    private val memberRepository: MemberRepository,
+    private val innerService: InnerService,
+) {
+    fun tryCatchAndThrow() {
+        try {
+            memberRepository.save(Member())
+            throw RuntimeException(&#34;Outer: intentionally thrown&#34;)
+        } catch (e: RuntimeException) {
+            println(e)
+        }
+    }
+
+    fun outerTryCatchAndInnerThrow() {
+        try {
+            innerService.`throw`()
+        } catch (e: RuntimeException) {
+            println(e)
+        }
+    }
+
+    fun innerTryCatchAndInnerThrow() {
+        innerService.tryCatchAndThrow()
+    }
+}
+@Service
+@Transactional
+class InnerService(
+    private val memberRepository: MemberRepository,
+) {
+    fun `throw`() {
+        memberRepository.save(Member())
+        throw RuntimeException(&#34;Inner: intentionally thrown&#34;)
+    }
+
+    fun tryCatchAndThrow() {
+        try {
+            memberRepository.save(Member())
+            throw RuntimeException(&#34;Inner: intentionally thrown&#34;)
+        } catch (e: Exception) {
+            println(e)
+        }
+    }
+}
+InnerService 를 참조하는 클래스는 OuterSerivce 뿐이라고 가정하고 OuterService 에 대해 아래와 같이 테스트 코드를 작성했다.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://Scoobi-wisdoom.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "@Transcational 과 Rollback",
+      "item": "https://Scoobi-wisdoom.github.io/posts/transactional%EA%B3%BC-rollback/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "@Transcational 과 Rollback",
+  "name": "@Transcational 과 Rollback",
+  "description": "우아한 기술블로그에서 설명하지 않은 부분이 헷갈려서 이 글을 쓰게 됐다. 위의 블로그를 읽고 생각하게 된 것은, \u0026ldquo;RuntimeException 이 발생하면 무조건 rollback 이 발생한다.\u0026rdquo; 였다. 하지만 이는 사실이 아니었다.\n결론을 먼저 말하자면 아래와 같다.\n@Transactional 이 붙은 함수가 완료되기 전에 catch Exception 이 있으면 롤백은 일어나지 않는다. @Transactional 이 붙은 함수가 완료된 후에 catch Exception 이 있으면 롤백이 일어난다. 결론 도출을 위한 코드 테스트를 위해 아래와 같이 kotlin 코드를 작성했다.\n@Service @Transactional class OuterService( private val memberRepository: MemberRepository, private val innerService: InnerService, ) { fun tryCatchAndThrow() { try { memberRepository.save(Member()) throw RuntimeException(\u0026#34;Outer: intentionally thrown\u0026#34;) } catch (e: RuntimeException) { println(e) } } fun outerTryCatchAndInnerThrow() { try { innerService.`throw`() } catch (e: RuntimeException) { println(e) } } fun innerTryCatchAndInnerThrow() { innerService.tryCatchAndThrow() } } @Service @Transactional class InnerService( private val memberRepository: MemberRepository, ) { fun `throw`() { memberRepository.save(Member()) throw RuntimeException(\u0026#34;Inner: intentionally thrown\u0026#34;) } fun tryCatchAndThrow() { try { memberRepository.save(Member()) throw RuntimeException(\u0026#34;Inner: intentionally thrown\u0026#34;) } catch (e: Exception) { println(e) } } } InnerService 를 참조하는 클래스는 OuterSerivce 뿐이라고 가정하고 OuterService 에 대해 아래와 같이 테스트 코드를 작성했다.\n",
+  "keywords": [
+    
+  ],
+  "articleBody": "우아한 기술블로그에서 설명하지 않은 부분이 헷갈려서 이 글을 쓰게 됐다. 위의 블로그를 읽고 생각하게 된 것은, “RuntimeException 이 발생하면 무조건 rollback 이 발생한다.” 였다. 하지만 이는 사실이 아니었다.\n결론을 먼저 말하자면 아래와 같다.\n@Transactional 이 붙은 함수가 완료되기 전에 catch Exception 이 있으면 롤백은 일어나지 않는다. @Transactional 이 붙은 함수가 완료된 후에 catch Exception 이 있으면 롤백이 일어난다. 결론 도출을 위한 코드 테스트를 위해 아래와 같이 kotlin 코드를 작성했다.\n@Service @Transactional class OuterService( private val memberRepository: MemberRepository, private val innerService: InnerService, ) { fun tryCatchAndThrow() { try { memberRepository.save(Member()) throw RuntimeException(\"Outer: intentionally thrown\") } catch (e: RuntimeException) { println(e) } } fun outerTryCatchAndInnerThrow() { try { innerService.`throw`() } catch (e: RuntimeException) { println(e) } } fun innerTryCatchAndInnerThrow() { innerService.tryCatchAndThrow() } } @Service @Transactional class InnerService( private val memberRepository: MemberRepository, ) { fun `throw`() { memberRepository.save(Member()) throw RuntimeException(\"Inner: intentionally thrown\") } fun tryCatchAndThrow() { try { memberRepository.save(Member()) throw RuntimeException(\"Inner: intentionally thrown\") } catch (e: Exception) { println(e) } } } InnerService 를 참조하는 클래스는 OuterSerivce 뿐이라고 가정하고 OuterService 에 대해 아래와 같이 테스트 코드를 작성했다.\n@SpringBootTest @ActiveProfiles(\"test\") @TestConstructor(autowireMode = ALL) @Import(TestcontainersConfiguration::class) class OuterServiceTest( private val outerService: OuterService, private val memberRepository: MemberRepository, ) { @BeforeEach fun tearDown() { memberRepository.deleteAll() } @Test fun `innerService 존재 X, outerService 예외 발생 - catch 하면 rollback X`() { assertDoesNotThrow { outerService.tryCatchAndThrow() } assertTrue(memberRepository.findAll().isNotEmpty()) } @Test fun `innerService 존재 O, innerService 예외 발생 - innerService 가 catch 하면 rollback X`() { assertDoesNotThrow { outerService.innerTryCatchAndInnerThrow() } assertTrue(memberRepository.findAll().isNotEmpty()) } @Test fun `innerService 존재 O, innerService 예외 발생 - outerServide 가 catch 하더라도 rollback O`() { assertThrows { outerService.outerTryCatchAndInnerThrow() } assertTrue(memberRepository.findAll().isEmpty()) } } 위 테스트 코드를 보면 트랜잭션이 끝나기 전에 catch Exception 한다면 예외가 발생하지 않고, 결과적으로 롤백이 발생하지 않음을 확인할 수 있다.\n로그 확인 아래는 rollback 이 발생하는 유일한 테스트 함수 innerService 존재 O, innerService 예외 발생 - outerServide 가 catch 하더라도 rollback O 의 로그다.\no.h.e.t.internal.TransactionImpl : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false o.h.e.t.internal.TransactionImpl : begin o.h.e.t.internal.TransactionImpl : committing o.h.e.t.internal.TransactionImpl : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false o.h.e.t.internal.TransactionImpl : begin cResourceLocalTransactionCoordinatorImpl : JDBC transaction marked for rollback-only (exception provided for stack trace) java.lang.Exception: exception just for purpose of providing stack trace java.lang.RuntimeException: Inner: intentionally thrown o.h.e.t.internal.TransactionImpl : committing cResourceLocalTransactionCoordinatorImpl : On commit, transaction was marked for roll-back only, rolling back o.h.e.t.internal.TransactionImpl : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false o.h.e.t.internal.TransactionImpl : begin o.h.e.t.internal.TransactionImpl : committing 아래는 rollback 이 발생하지 않는 테스트 함수의 로그로, 테스트 메서드 innerService 존재 X, outerService 예외 발생 - catch 하면 rollback X 의 로그다.\n2024-12-10T22:37:34.342+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false 2024-12-10T22:37:34.342+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : begin 2024-12-10T22:37:34.345+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : committing 2024-12-10T22:37:34.348+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false 2024-12-10T22:37:34.348+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : begin java.lang.RuntimeException: Outer: intentionally thrown 2024-12-10T22:37:34.350+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : committing 2024-12-10T22:37:34.357+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false 2024-12-10T22:37:34.357+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : begin 2024-12-10T22:37:34.360+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : committing 아래는 rollback 이 발생하지 않는 테스트 함수의 로그로, 테스트 메서드 innerService 존재 O, innerService 예외 발생 - innerService 가 catch 하면 rollback X 의 로그다.\n2024-12-10T22:37:34.364+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false 2024-12-10T22:37:34.365+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : begin 2024-12-10T22:37:34.369+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : committing 2024-12-10T22:37:34.376+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false 2024-12-10T22:37:34.376+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : begin java.lang.RuntimeException: Inner: intentionally thrown 2024-12-10T22:37:34.378+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : committing 2024-12-10T22:37:34.382+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false 2024-12-10T22:37:34.382+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : begin 2024-12-10T22:37:34.384+09:00 DEBUG 10375 --- [ Test worker] o.h.e.t.internal.TransactionImpl : committing 테스트 환경 설정 build.gradle.kts\nplugins { val kotlinVersion = \"1.9.25\" kotlin(\"jvm\") version kotlinVersion kotlin(\"plugin.spring\") version kotlinVersion id(\"org.springframework.boot\") version \"3.3.5\" id(\"io.spring.dependency-management\") version \"1.1.6\" kotlin(\"plugin.jpa\") version kotlinVersion } group = \"org.example\" version = \"1.0-SNAPSHOT\" repositories { mavenCentral() } dependencies { implementation(\"org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0\") implementation(\"org.springframework.boot:spring-boot-starter-data-jpa\") implementation(\"org.springframework.boot:spring-boot-starter-web\") implementation(\"com.fasterxml.jackson.module:jackson-module-kotlin\") implementation(\"org.jetbrains.kotlin:kotlin-reflect\") runtimeOnly(\"com.mysql:mysql-connector-j\") testImplementation(\"org.springframework.boot:spring-boot-starter-test\") testImplementation(\"org.jetbrains.kotlin:kotlin-test-junit5\") testRuntimeOnly(\"org.junit.platform:junit-platform-launcher\") testImplementation(\"org.springframework.boot:spring-boot-testcontainers\") testImplementation(\"org.testcontainers:junit-jupiter\") testImplementation(\"org.testcontainers:mysql\") } tasks.test { useJUnitPlatform() } kotlin { jvmToolchain(17) } 테스트 컨테이너 설정\n@TestConfiguration(proxyBeanMethods = false) class TestcontainersConfiguration { @Bean @ServiceConnection fun mysqlContainer(): MySQLContainer\u003c*\u003e { return MySQLContainer(DockerImageName.parse(MYSQL_8_0)) } private object Constant { const val MYSQL_8_0 = \"mysql:8.0\" } } application-test.yml\nspring: jpa: hibernate: ddl-auto: create logging: level: ROOT: warn org.hibernate.engine.transaction.internal: DEBUG org.hibernate.resource.transaction.backend.jdbc: DEBUG 부록: Propagation 에 따른 테스트 IneerService Transactional Propagation 유형에 따라 테스트 코드의 성공 실패 여부를 체크해보았다. 실패해는 경우에는 취소선 (strikethrough) 을 그어서 표시했다.\n테스트 메서드: innerService 존재 X, outerService 예외 발생 - catch 하면 rollback X REQUIRED\nSUPPORTS\nMANDATORY\nREQUIRES_NEW\nNOT_SUPPORTED\nNEVER\nNESTED\n테스트 메서드: innerService 존재 O, innerService 예외 발생 - innerService 가 catch 하면 rollback X REQUIRED\nSUPPORTS\nMANDATORY\nREQUIRES_NEW\nNOT_SUPPORTED\nNEVER\nNESTED\n테스트 메서드: innerService 존재 O, innerService 예외 발생 - outerServide 가 catch 하더라도 rollback O REQUIRED\nSUPPORTS\nMANDATORY\nREQUIRES_NEW\nNOT_SUPPORTED\nNEVER\nNESTED\nReferences 응? 이게 왜 롤백되는거지?, 구인본 - 우아한 기술블로그 ",
+  "wordCount" : "850",
+  "inLanguage": "en",
+  "datePublished": "2024-12-10T20:43:47+09:00",
+  "dateModified": "2024-12-10T20:43:47+09:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://Scoobi-wisdoom.github.io/posts/transactional%EA%B3%BC-rollback/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "wisdoom",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://Scoobi-wisdoom.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://Scoobi-wisdoom.github.io/" accesskey="h" title="wisdoom (Alt + H)">wisdoom</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      @Transcational 과 Rollback
+    </h1>
+    <div class="post-meta"><span title='2024-12-10 20:43:47 +0900 KST'>December 10, 2024</span>
+
+</div>
+  </header> 
+  <div class="post-content"><p><a href="https://techblog.woowahan.com/2606/">우아한 기술블로그</a>에서 설명하지 않은 부분이 헷갈려서 이 글을 쓰게 됐다. 위의 블로그를 읽고 생각하게 된 것은, &ldquo;RuntimeException 이 발생하면 무조건 rollback 이 발생한다.&rdquo; 였다. 하지만 이는 사실이 아니었다.</p>
+<p>결론을 먼저 말하자면 아래와 같다.</p>
+<ul>
+<li><code>@Transactional</code> 이 붙은 함수가 완료되기 전에 catch Exception 이 있으면 롤백은 일어나지 않는다.</li>
+<li><code>@Transactional</code> 이 붙은 함수가 완료된 후에 catch Exception 이 있으면 롤백이 일어난다.</li>
+</ul>
+<h2 id="결론-도출을-위한-코드">결론 도출을 위한 코드<a hidden class="anchor" aria-hidden="true" href="#결론-도출을-위한-코드">#</a></h2>
+<p>테스트를 위해 아래와 같이 kotlin 코드를 작성했다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#a6e22e">@Service</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Transactional</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">OuterService</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">val</span> memberRepository: MemberRepository,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">val</span> innerService: InnerService,
+</span></span><span style="display:flex;"><span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">tryCatchAndThrow</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>            memberRepository.save(Member())
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> RuntimeException(<span style="color:#e6db74">&#34;Outer: intentionally thrown&#34;</span>)
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span> (e: RuntimeException) {
+</span></span><span style="display:flex;"><span>            println(e)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">outerTryCatchAndInnerThrow</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>            innerService.`throw`()
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span> (e: RuntimeException) {
+</span></span><span style="display:flex;"><span>            println(e)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">innerTryCatchAndInnerThrow</span>() {
+</span></span><span style="display:flex;"><span>        innerService.tryCatchAndThrow()
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#a6e22e">@Service</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Transactional</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">InnerService</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">val</span> memberRepository: MemberRepository,
+</span></span><span style="display:flex;"><span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">`throw`</span>() {
+</span></span><span style="display:flex;"><span>        memberRepository.save(Member())
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">throw</span> RuntimeException(<span style="color:#e6db74">&#34;Inner: intentionally thrown&#34;</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">tryCatchAndThrow</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>            memberRepository.save(Member())
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> RuntimeException(<span style="color:#e6db74">&#34;Inner: intentionally thrown&#34;</span>)
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span> (e: Exception) {
+</span></span><span style="display:flex;"><span>            println(e)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>InnerService 를 참조하는 클래스는 OuterSerivce 뿐이라고 가정하고 OuterService 에 대해 아래와 같이 테스트 코드를 작성했다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#a6e22e">@SpringBootTest</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@ActiveProfiles</span>(<span style="color:#e6db74">&#34;test&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@TestConstructor</span>(autowireMode = ALL)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Import</span>(TestcontainersConfiguration<span style="color:#f92672">::</span><span style="color:#66d9ef">class</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">OuterServiceTest</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">val</span> outerService: OuterService,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">val</span> memberRepository: MemberRepository,
+</span></span><span style="display:flex;"><span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@BeforeEach</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">tearDown</span>() {
+</span></span><span style="display:flex;"><span>        memberRepository.deleteAll()
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Test</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">`innerService 존재 X, outerService 예외 발생 - catch 하면 rollback X`</span>() {
+</span></span><span style="display:flex;"><span>        assertDoesNotThrow { outerService.tryCatchAndThrow() }
+</span></span><span style="display:flex;"><span>        assertTrue(memberRepository.findAll().isNotEmpty())
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Test</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">`innerService 존재 O, innerService 예외 발생 - innerService 가 catch 하면 rollback X`</span>() {
+</span></span><span style="display:flex;"><span>        assertDoesNotThrow { outerService.innerTryCatchAndInnerThrow() }
+</span></span><span style="display:flex;"><span>        assertTrue(memberRepository.findAll().isNotEmpty())
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Test</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">`innerService 존재 O, innerService 예외 발생 - outerServide 가 catch 하더라도 rollback O`</span>() {
+</span></span><span style="display:flex;"><span>        assertThrows&lt;UnexpectedRollbackException&gt; { outerService.outerTryCatchAndInnerThrow() }
+</span></span><span style="display:flex;"><span>        assertTrue(memberRepository.findAll().isEmpty())
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>위 테스트 코드를 보면 트랜잭션이 끝나기 전에 catch Exception 한다면 예외가 발생하지 않고, 결과적으로 롤백이 발생하지 않음을 확인할 수 있다.</p>
+<h2 id="로그-확인">로그 확인<a hidden class="anchor" aria-hidden="true" href="#로그-확인">#</a></h2>
+<p>아래는 rollback 이 발생하는 유일한 테스트 함수 <code>innerService 존재 O, innerService 예외 발생 - outerServide 가 catch 하더라도 rollback O</code> 의 로그다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>o.h.e.t.internal.TransactionImpl         : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false
+</span></span><span style="display:flex;"><span>o.h.e.t.internal.TransactionImpl         : begin
+</span></span><span style="display:flex;"><span>o.h.e.t.internal.TransactionImpl         : committing
+</span></span><span style="display:flex;"><span>o.h.e.t.internal.TransactionImpl         : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false
+</span></span><span style="display:flex;"><span>o.h.e.t.internal.TransactionImpl         : begin
+</span></span><span style="display:flex;"><span>cResourceLocalTransactionCoordinatorImpl : JDBC transaction marked for rollback-only (exception provided for stack trace)
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>java.lang.Exception: exception just for purpose of providing stack trace
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span>java.lang.RuntimeException: Inner: intentionally thrown
+</span></span><span style="display:flex;"><span>o.h.e.t.internal.TransactionImpl         : committing
+</span></span><span style="display:flex;"><span>cResourceLocalTransactionCoordinatorImpl : On commit, transaction was marked for roll-back only, rolling back
+</span></span><span style="display:flex;"><span>o.h.e.t.internal.TransactionImpl         : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false
+</span></span><span style="display:flex;"><span>o.h.e.t.internal.TransactionImpl         : begin
+</span></span><span style="display:flex;"><span>o.h.e.t.internal.TransactionImpl         : committing
+</span></span></code></pre></div><p>아래는 rollback 이 발생하지 않는 테스트 함수의 로그로, 테스트 메서드 <code>innerService 존재 X, outerService 예외 발생 - catch 하면 rollback X</code> 의 로그다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>2024-12-10T22:37:34.342+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false
+</span></span><span style="display:flex;"><span>2024-12-10T22:37:34.342+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : begin
+</span></span><span style="display:flex;"><span>2024-12-10T22:37:34.345+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : committing
+</span></span><span style="display:flex;"><span>2024-12-10T22:37:34.348+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false
+</span></span><span style="display:flex;"><span>2024-12-10T22:37:34.348+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : begin
+</span></span><span style="display:flex;"><span>java.lang.RuntimeException: Outer: intentionally thrown
+</span></span><span style="display:flex;"><span>2024-12-10T22:37:34.350+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : committing
+</span></span><span style="display:flex;"><span>2024-12-10T22:37:34.357+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false
+</span></span><span style="display:flex;"><span>2024-12-10T22:37:34.357+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : begin
+</span></span><span style="display:flex;"><span>2024-12-10T22:37:34.360+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : committing
+</span></span></code></pre></div><p>아래는 rollback 이 발생하지 않는 테스트 함수의 로그로, 테스트 메서드 <code>innerService 존재 O, innerService 예외 발생 - innerService 가 catch 하면 rollback X</code> 의 로그다.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-console" data-lang="console"><span style="display:flex;"><span>2024-12-10T22:37:34.364+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false
+</span></span><span style="display:flex;"><span>2024-12-10T22:37:34.365+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : begin
+</span></span><span style="display:flex;"><span>2024-12-10T22:37:34.369+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : committing
+</span></span><span style="display:flex;"><span>2024-12-10T22:37:34.376+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false
+</span></span><span style="display:flex;"><span>2024-12-10T22:37:34.376+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : begin
+</span></span><span style="display:flex;"><span>java.lang.RuntimeException: Inner: intentionally thrown
+</span></span><span style="display:flex;"><span>2024-12-10T22:37:34.378+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : committing
+</span></span><span style="display:flex;"><span>2024-12-10T22:37:34.382+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : On TransactionImpl creation, JpaCompliance#isJpaTransactionComplianceEnabled == false
+</span></span><span style="display:flex;"><span>2024-12-10T22:37:34.382+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : begin
+</span></span><span style="display:flex;"><span>2024-12-10T22:37:34.384+09:00 DEBUG 10375 --- [    Test worker] o.h.e.t.internal.TransactionImpl         : committing
+</span></span></code></pre></div><h2 id="테스트-환경-설정">테스트 환경 설정<a hidden class="anchor" aria-hidden="true" href="#테스트-환경-설정">#</a></h2>
+<p>build.gradle.kts</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gradle" data-lang="gradle"><span style="display:flex;"><span>plugins <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    val kotlinVersion <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1.9.25&#34;</span>
+</span></span><span style="display:flex;"><span>    kotlin<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;jvm&#34;</span><span style="color:#f92672">)</span> version kotlinVersion
+</span></span><span style="display:flex;"><span>    kotlin<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;plugin.spring&#34;</span><span style="color:#f92672">)</span> version kotlinVersion
+</span></span><span style="display:flex;"><span>    id<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;org.springframework.boot&#34;</span><span style="color:#f92672">)</span> version <span style="color:#e6db74">&#34;3.3.5&#34;</span>
+</span></span><span style="display:flex;"><span>    id<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;io.spring.dependency-management&#34;</span><span style="color:#f92672">)</span> version <span style="color:#e6db74">&#34;1.1.6&#34;</span>
+</span></span><span style="display:flex;"><span>    kotlin<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;plugin.jpa&#34;</span><span style="color:#f92672">)</span> version kotlinVersion
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>group <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;org.example&#34;</span>
+</span></span><span style="display:flex;"><span>version <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1.0-SNAPSHOT&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>repositories <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    mavenCentral<span style="color:#f92672">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>dependencies <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    implementation<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    implementation<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;org.springframework.boot:spring-boot-starter-data-jpa&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    implementation<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;org.springframework.boot:spring-boot-starter-web&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    implementation<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;com.fasterxml.jackson.module:jackson-module-kotlin&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    implementation<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;org.jetbrains.kotlin:kotlin-reflect&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    runtimeOnly<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;com.mysql:mysql-connector-j&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    testImplementation<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;org.springframework.boot:spring-boot-starter-test&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    testImplementation<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;org.jetbrains.kotlin:kotlin-test-junit5&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    testRuntimeOnly<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;org.junit.platform:junit-platform-launcher&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    testImplementation<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;org.springframework.boot:spring-boot-testcontainers&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    testImplementation<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;org.testcontainers:junit-jupiter&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>    testImplementation<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;org.testcontainers:mysql&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>tasks<span style="color:#f92672">.</span><span style="color:#a6e22e">test</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    useJUnitPlatform<span style="color:#f92672">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>kotlin <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    jvmToolchain<span style="color:#f92672">(</span><span style="color:#ae81ff">17</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p>테스트 컨테이너 설정</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#a6e22e">@TestConfiguration</span>(proxyBeanMethods = <span style="color:#66d9ef">false</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TestcontainersConfiguration</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Bean</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@ServiceConnection</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">mysqlContainer</span>(): MySQLContainer&lt;*&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> MySQLContainer(<span style="color:#a6e22e">DockerImageName</span>.parse(MYSQL_8_0))
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">object</span> <span style="color:#a6e22e">Constant</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">val</span> MYSQL_8_0 = <span style="color:#e6db74">&#34;mysql:8.0&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>application-test.yml</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#f92672">spring</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">jpa</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">hibernate</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">ddl-auto</span>: <span style="color:#ae81ff">create</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">logging</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">level</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ROOT</span>: <span style="color:#ae81ff">warn</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">org.hibernate.engine.transaction.internal</span>: <span style="color:#ae81ff">DEBUG</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">org.hibernate.resource.transaction.backend.jdbc</span>: <span style="color:#ae81ff">DEBUG</span>
+</span></span></code></pre></div><h2 id="부록-propagation-에-따른-테스트">부록: Propagation 에 따른 테스트<a hidden class="anchor" aria-hidden="true" href="#부록-propagation-에-따른-테스트">#</a></h2>
+<p>IneerService Transactional Propagation 유형에 따라 테스트 코드의 성공 실패 여부를 체크해보았다. 실패해는 경우에는 <strong><del>취소선 (strikethrough</del>)</strong> 을 그어서 표시했다.</p>
+<h3 id="테스트-메서드-innerservice-존재-x-outerservice-예외-발생---catch-하면-rollback-x">테스트 메서드: innerService 존재 X, outerService 예외 발생 - catch 하면 rollback X<a hidden class="anchor" aria-hidden="true" href="#테스트-메서드-innerservice-존재-x-outerservice-예외-발생---catch-하면-rollback-x">#</a></h3>
+<p>REQUIRED<br>
+SUPPORTS<br>
+MANDATORY<br>
+REQUIRES_NEW<br>
+NOT_SUPPORTED<br>
+NEVER<br>
+NESTED</p>
+<h3 id="테스트-메서드-innerservice-존재-o-innerservice-예외-발생---innerservice-가-catch-하면-rollback-x">테스트 메서드: innerService 존재 O, innerService 예외 발생 - innerService 가 catch 하면 rollback X<a hidden class="anchor" aria-hidden="true" href="#테스트-메서드-innerservice-존재-o-innerservice-예외-발생---innerservice-가-catch-하면-rollback-x">#</a></h3>
+<p>REQUIRED<br>
+SUPPORTS<br>
+MANDATORY<br>
+REQUIRES_NEW<br>
+NOT_SUPPORTED<br>
+<strong><del>NEVER</del></strong><br>
+<strong><del>NESTED</del></strong></p>
+<h3 id="테스트-메서드-innerservice-존재-o-innerservice-예외-발생---outerservide-가-catch-하더라도-rollback-o">테스트 메서드: innerService 존재 O, innerService 예외 발생 - outerServide 가 catch 하더라도 rollback O<a hidden class="anchor" aria-hidden="true" href="#테스트-메서드-innerservice-존재-o-innerservice-예외-발생---outerservide-가-catch-하더라도-rollback-o">#</a></h3>
+<p>REQUIRED<br>
+SUPPORTS<br>
+MANDATORY<br>
+<strong><del>REQUIRES_NEW</del></strong><br>
+<strong><del>NOT_SUPPORTED</del></strong><br>
+<strong><del>NEVER</del></strong><br>
+<strong><del>NESTED</del></strong></p>
+<h1 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">#</a></h1>
+<ul>
+<li><a href="https://techblog.woowahan.com/2606/">응? 이게 왜 롤백되는거지?, 구인본 - 우아한 기술블로그</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

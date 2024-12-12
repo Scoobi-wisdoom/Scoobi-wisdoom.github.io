@@ -7,17 +7,20 @@
 <meta name="robots" content="index, follow">
 <title>백엔드 프레임워크와 UTF Encoding | wisdoom</title>
 <meta name="keywords" content="">
-<meta name="description" content="백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다. 컴퓨터를 사용하다 보면 아래와 같이 알 수 없는 문자를 본 적이 한 번쯤은 있다. 한글이 깨졌다.
-궢귛귍귪궻귺긏긘깈깛 이런 난감한 상황을 막으려면 character set 기준을 정해야 한다.
+<meta name="description" content="백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다.
+컴퓨터를 사용하다 보면 아래와 같이 알 수 없는 문자를 본 적이 한 번쯤은 있다. 한글이 깨졌다.
+궢귛귍귪궻귺긏긘깈깛
+이런 난감한 상황을 막으려면 character set 기준을 정해야 한다.
+
 Character set: 사람의 문자 문자열을 컴퓨터의 문자 비트열로 저장하기 위한 규칙.
 Encoding: 문자열과 비트열간 변환 작업.
 Decoding: Encoding된 대상을 원본으로 되돌리는 작업을 의미한다.
+
 Character set에 맞춰 어떻게 encoding/decoding 할지 결정한다.
 character set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다.">
 <meta name="author" content="">
 <link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/%EB%B0%B1%EC%97%94%EB%93%9C-%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC%EC%99%80-utf-encoding/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
@@ -25,6 +28,7 @@ character set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다
 <link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/posts/%EB%B0%B1%EC%97%94%EB%93%9C-%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC%EC%99%80-utf-encoding/">
 <noscript>
     <style>
         #theme-toggle,
@@ -42,7 +46,7 @@ character set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -61,28 +65,34 @@ character set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다
         }
 
     </style>
-</noscript><meta property="og:title" content="백엔드 프레임워크와 UTF Encoding" />
-<meta property="og:description" content="백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다. 컴퓨터를 사용하다 보면 아래와 같이 알 수 없는 문자를 본 적이 한 번쯤은 있다. 한글이 깨졌다.
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/%EB%B0%B1%EC%97%94%EB%93%9C-%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC%EC%99%80-utf-encoding/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="백엔드 프레임워크와 UTF Encoding">
+  <meta property="og:description" content="백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다. 컴퓨터를 사용하다 보면 아래와 같이 알 수 없는 문자를 본 적이 한 번쯤은 있다. 한글이 깨졌다.
 궢귛귍귪궻귺긏긘깈깛 이런 난감한 상황을 막으려면 character set 기준을 정해야 한다.
 Character set: 사람의 문자 문자열을 컴퓨터의 문자 비트열로 저장하기 위한 규칙.
 Encoding: 문자열과 비트열간 변환 작업.
 Decoding: Encoding된 대상을 원본으로 되돌리는 작업을 의미한다.
 Character set에 맞춰 어떻게 encoding/decoding 할지 결정한다.
-character set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/%EB%B0%B1%EC%97%94%EB%93%9C-%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC%EC%99%80-utf-encoding/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2022-06-07T00:19:22+09:00" />
-<meta property="article:modified_time" content="2022-06-07T00:19:22+09:00" />
+character set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2022-06-07T00:19:22+09:00">
+    <meta property="article:modified_time" content="2022-06-07T00:19:22+09:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="백엔드 프레임워크와 UTF Encoding">
+<meta name="twitter:description" content="백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다.
+컴퓨터를 사용하다 보면 아래와 같이 알 수 없는 문자를 본 적이 한 번쯤은 있다. 한글이 깨졌다.
+궢귛귍귪궻귺긏긘깈깛
+이런 난감한 상황을 막으려면 character set 기준을 정해야 한다.
 
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="백엔드 프레임워크와 UTF Encoding"/>
-<meta name="twitter:description" content="백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다. 컴퓨터를 사용하다 보면 아래와 같이 알 수 없는 문자를 본 적이 한 번쯤은 있다. 한글이 깨졌다.
-궢귛귍귪궻귺긏긘깈깛 이런 난감한 상황을 막으려면 character set 기준을 정해야 한다.
 Character set: 사람의 문자 문자열을 컴퓨터의 문자 비트열로 저장하기 위한 규칙.
 Encoding: 문자열과 비트열간 변환 작업.
 Decoding: Encoding된 대상을 원본으로 되돌리는 작업을 의미한다.
+
 Character set에 맞춰 어떻게 encoding/decoding 할지 결정한다.
-character set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다."/>
+character set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다.">
 
 
 <script type="application/ld+json">
@@ -111,11 +121,11 @@ character set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다
   "@type": "BlogPosting",
   "headline": "백엔드 프레임워크와 UTF Encoding",
   "name": "백엔드 프레임워크와 UTF Encoding",
-  "description": "백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다. 컴퓨터를 사용하다 보면 아래와 같이 알 수 없는 문자를 본 적이 한 번쯤은 있다. 한글이 깨졌다.\n궢귛귍귪궻귺긏긘깈깛 이런 난감한 상황을 막으려면 character set 기준을 정해야 한다.\nCharacter set: 사람의 문자 문자열을 컴퓨터의 문자 비트열로 저장하기 위한 규칙.\nEncoding: 문자열과 비트열간 변환 작업.\nDecoding: Encoding된 대상을 원본으로 되돌리는 작업을 의미한다.\nCharacter set에 맞춰 어떻게 encoding/decoding 할지 결정한다.\ncharacter set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다.",
+  "description": "백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다. 컴퓨터를 사용하다 보면 아래와 같이 알 수 없는 문자를 본 적이 한 번쯤은 있다. 한글이 깨졌다.\n궢귛귍귪궻귺긏긘깈깛 이런 난감한 상황을 막으려면 character set 기준을 정해야 한다.\nCharacter set: 사람의 문자 문자열을 컴퓨터의 문자 비트열로 저장하기 위한 규칙.\nEncoding: 문자열과 비트열간 변환 작업.\nDecoding: Encoding된 대상을 원본으로 되돌리는 작업을 의미한다.\nCharacter set에 맞춰 어떻게 encoding/decoding 할지 결정한다.\ncharacter set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다.\n",
   "keywords": [
     
   ],
-  "articleBody": "백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다. 컴퓨터를 사용하다 보면 아래와 같이 알 수 없는 문자를 본 적이 한 번쯤은 있다. 한글이 깨졌다.\n궢귛귍귪궻귺긏긘깈깛 이런 난감한 상황을 막으려면 character set 기준을 정해야 한다.\nCharacter set: 사람의 문자 문자열을 컴퓨터의 문자 비트열로 저장하기 위한 규칙.\nEncoding: 문자열과 비트열간 변환 작업.\nDecoding: Encoding된 대상을 원본으로 되돌리는 작업을 의미한다.\nCharacter set에 맞춰 어떻게 encoding/decoding 할지 결정한다.\ncharacter set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다.\nUTF8은 여러 종류의 character set 인코딩에 호환된다. UTF8은 기본적으로 3 Bytes를 사용하기 때문이다. 그렇기 때문에 EUC-KR을 UTF8로 변환할 수는 있어도 UTF8을 EUC-KR로 변환할 수는 없다.\n\u0008백엔드 프레임워크는 UTF8의 호환성을 이용해야 한다. UTF8의 호환성을 사용해야 하는 곳은 크게 세 가지로 나뉜다. 첫째, 베이스라인, 둘째, DMBS/네트워크/레거시, 셋째, 컨테이너다. 각자에 맞는 방식으로 UTF8의 호환성을 이용한다.\n베이스라인 (산출물) 아래와 같이 xml, jsp, html 등에서 파일 헤더에 character set을 표현하자.\n\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e DBMS, 네트워크, 레거시 하나의 character set만 사용해야 한다. 이렇게 할 수 없으면 아래와 같이 어떤 요청이 WAS로 올 때 해당 요청을 UTF8로 변환한 후 작업을 하자.\nprotected override fun service(request: HttpServletRequest, response: HttpServletResponse) { // POST 방식 요청에 대해 UTF-8 인코딩을 적용한다. request.characterEncoding = this.characterSet } val characterSet: String = init.getCharacterSet() println(\"uri characterSet [$characterSet]\") val conn = tomcat.getConnector() // GET 방식 요청에 대해 UTF8 인코딩 적용 // GET 방식 요청에 대해 UTF8 인코딩 적용 conn.setURIEncoding(characterSet) 컨테이너 (JVM) 톰캣을 띄울 때, 톰캣은 JVM 위에서 돌아간다. 그리고 JVM은 character set을 OS로부터 부여받는다. OS에서 넘겨주는 character set은 프레임워크 단에서 변경 못 할 수도 있다. 그렇기 때문에 프레임워크를 사용하는 서버의 character set을 UTF8로 아래와 같이 설정한다. UTF8은 호환성이 있기 때문이다.\nCHARACTER_SET : DEFAULT : \"UTF-8\" Reference 백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 ",
+  "articleBody": "백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 에서 배운 내용을 정리한다. 컴퓨터를 사용하다 보면 아래와 같이 알 수 없는 문자를 본 적이 한 번쯤은 있다. 한글이 깨졌다.\n궢귛귍귪궻귺긏긘깈깛 이런 난감한 상황을 막으려면 character set 기준을 정해야 한다.\nCharacter set: 사람의 문자 문자열을 컴퓨터의 문자 비트열로 저장하기 위한 규칙.\nEncoding: 문자열과 비트열간 변환 작업.\nDecoding: Encoding된 대상을 원본으로 되돌리는 작업을 의미한다.\nCharacter set에 맞춰 어떻게 encoding/decoding 할지 결정한다.\ncharacter set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다.\nUTF8은 여러 종류의 character set 인코딩에 호환된다. UTF8은 기본적으로 3 Bytes를 사용하기 때문이다. 그렇기 때문에 EUC-KR을 UTF8로 변환할 수는 있어도 UTF8을 EUC-KR로 변환할 수는 없다.\n\b백엔드 프레임워크는 UTF8의 호환성을 이용해야 한다. UTF8의 호환성을 사용해야 하는 곳은 크게 세 가지로 나뉜다. 첫째, 베이스라인, 둘째, DMBS/네트워크/레거시, 셋째, 컨테이너다. 각자에 맞는 방식으로 UTF8의 호환성을 이용한다.\n베이스라인 (산출물) 아래와 같이 xml, jsp, html 등에서 파일 헤더에 character set을 표현하자.\n\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e DBMS, 네트워크, 레거시 하나의 character set만 사용해야 한다. 이렇게 할 수 없으면 아래와 같이 어떤 요청이 WAS로 올 때 해당 요청을 UTF8로 변환한 후 작업을 하자.\nprotected override fun service(request: HttpServletRequest, response: HttpServletResponse) { // POST 방식 요청에 대해 UTF-8 인코딩을 적용한다. request.characterEncoding = this.characterSet } val characterSet: String = init.getCharacterSet() println(\"uri characterSet [$characterSet]\") val conn = tomcat.getConnector() // GET 방식 요청에 대해 UTF8 인코딩 적용 // GET 방식 요청에 대해 UTF8 인코딩 적용 conn.setURIEncoding(characterSet) 컨테이너 (JVM) 톰캣을 띄울 때, 톰캣은 JVM 위에서 돌아간다. 그리고 JVM은 character set을 OS로부터 부여받는다. OS에서 넘겨주는 character set은 프레임워크 단에서 변경 못 할 수도 있다. 그렇기 때문에 프레임워크를 사용하는 서버의 character set을 UTF8로 아래와 같이 설정한다. UTF8은 호환성이 있기 때문이다.\nCHARACTER_SET : DEFAULT : \"UTF-8\" Reference 백엔드 프레임워크 만들기 (개정판), 제로 - 인프런 ",
   "wordCount" : "273",
   "inLanguage": "en",
   "datePublished": "2022-06-07T00:19:22+09:00",
@@ -184,7 +194,7 @@ character set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다
 <article class="post-single">
   <header class="post-header">
     
-    <h1 class="post-title">
+    <h1 class="post-title entry-hint-parent">
       백엔드 프레임워크와 UTF Encoding
     </h1>
     <div class="post-meta"><span title='2022-06-07 00:19:22 +0900 KST'>June 7, 2022</span>
@@ -239,7 +249,8 @@ Decoding: Encoding된 대상을 원본으로 되돌리는 작업을 의미한다
     </main>
     
 <footer class="footer">
-    <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &

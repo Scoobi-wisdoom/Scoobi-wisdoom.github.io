@@ -9,12 +9,12 @@
 <meta name="keywords" content="">
 <meta name="description" content="자바 메모리 관리에 대해 알아보자.
 메모리 관리란 새로운 object를 메모리에 할당하고, 오래된 object를 메모리에서 제거하는 과정을 말한다.
-Garbage Collection Garbage Collection이란 objects를 할당하기 위해 heap 또는 nursery 공간을 확보하는 과정을 말한다. Java에서는 사용자가 직접 메모리를 통제하는 게 아니라 JVM의 Garbage Collector가 한다. 물론 예외적으로 Reference variable에 null을 할당하거나, System.gc() 메서드를 호출하는 방법이 있다. 후자는 시스템 성능에 예기치 못한 영향을 미칠 수 있으니 사용하면 안 된다.
-Java objects는 heap에 위치한다. Heap이 생성되는 시점은 JVM이 시작될 때이며, heap의 사이즈는 애플리케이션이 구동하면서 증감한다.">
+Garbage Collection
+Garbage Collection이란 objects를 할당하기 위해 heap 또는 nursery 공간을 확보하는 과정을 말한다. Java에서는 사용자가 직접 메모리를 통제하는 게 아니라 JVM의 Garbage Collector가 한다. 물론 예외적으로 Reference variable에 null을 할당하거나, System.gc() 메서드를 호출하는 방법이 있다. 후자는 시스템 성능에 예기치 못한 영향을 미칠 수 있으니 사용하면 안 된다.
+Java objects는 heap에 위치한다. Heap이 생성되는 시점은 JVM이 시작될 때이며, heap의 사이즈는 애플리케이션이 구동하면서 증감한다. Heap이 가득차면 garbage collection(gc)이 일어난다. 사용하지 않는 objects는 gc를 통해서 삭제되고, 이를 통해 새로운 objects를 할당할 수 있는 공간을 메모리에 확보한다.">
 <meta name="author" content="">
 <link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/garbage-collection/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
@@ -22,6 +22,7 @@ Java objects는 heap에 위치한다. Heap이 생성되는 시점은 JVM이 시�
 <link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/posts/garbage-collection/">
 <noscript>
     <style>
         #theme-toggle,
@@ -39,7 +40,7 @@ Java objects는 heap에 위치한다. Heap이 생성되는 시점은 JVM이 시�
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -58,22 +59,25 @@ Java objects는 heap에 위치한다. Heap이 생성되는 시점은 JVM이 시�
         }
 
     </style>
-</noscript><meta property="og:title" content="Garbage Collection" />
-<meta property="og:description" content="자바 메모리 관리에 대해 알아보자.
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/garbage-collection/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="Garbage Collection">
+  <meta property="og:description" content="자바 메모리 관리에 대해 알아보자.
 메모리 관리란 새로운 object를 메모리에 할당하고, 오래된 object를 메모리에서 제거하는 과정을 말한다.
 Garbage Collection Garbage Collection이란 objects를 할당하기 위해 heap 또는 nursery 공간을 확보하는 과정을 말한다. Java에서는 사용자가 직접 메모리를 통제하는 게 아니라 JVM의 Garbage Collector가 한다. 물론 예외적으로 Reference variable에 null을 할당하거나, System.gc() 메서드를 호출하는 방법이 있다. 후자는 시스템 성능에 예기치 못한 영향을 미칠 수 있으니 사용하면 안 된다.
-Java objects는 heap에 위치한다. Heap이 생성되는 시점은 JVM이 시작될 때이며, heap의 사이즈는 애플리케이션이 구동하면서 증감한다." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/garbage-collection/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2022-07-10T21:57:35+09:00" />
-<meta property="article:modified_time" content="2022-07-10T21:57:35+09:00" />
-
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Garbage Collection"/>
+Java objects는 heap에 위치한다. Heap이 생성되는 시점은 JVM이 시작될 때이며, heap의 사이즈는 애플리케이션이 구동하면서 증감한다. Heap이 가득차면 garbage collection(gc)이 일어난다. 사용하지 않는 objects는 gc를 통해서 삭제되고, 이를 통해 새로운 objects를 할당할 수 있는 공간을 메모리에 확보한다.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2022-07-10T21:57:35+09:00">
+    <meta property="article:modified_time" content="2022-07-10T21:57:35+09:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Garbage Collection">
 <meta name="twitter:description" content="자바 메모리 관리에 대해 알아보자.
 메모리 관리란 새로운 object를 메모리에 할당하고, 오래된 object를 메모리에서 제거하는 과정을 말한다.
-Garbage Collection Garbage Collection이란 objects를 할당하기 위해 heap 또는 nursery 공간을 확보하는 과정을 말한다. Java에서는 사용자가 직접 메모리를 통제하는 게 아니라 JVM의 Garbage Collector가 한다. 물론 예외적으로 Reference variable에 null을 할당하거나, System.gc() 메서드를 호출하는 방법이 있다. 후자는 시스템 성능에 예기치 못한 영향을 미칠 수 있으니 사용하면 안 된다.
-Java objects는 heap에 위치한다. Heap이 생성되는 시점은 JVM이 시작될 때이며, heap의 사이즈는 애플리케이션이 구동하면서 증감한다."/>
+Garbage Collection
+Garbage Collection이란 objects를 할당하기 위해 heap 또는 nursery 공간을 확보하는 과정을 말한다. Java에서는 사용자가 직접 메모리를 통제하는 게 아니라 JVM의 Garbage Collector가 한다. 물론 예외적으로 Reference variable에 null을 할당하거나, System.gc() 메서드를 호출하는 방법이 있다. 후자는 시스템 성능에 예기치 못한 영향을 미칠 수 있으니 사용하면 안 된다.
+Java objects는 heap에 위치한다. Heap이 생성되는 시점은 JVM이 시작될 때이며, heap의 사이즈는 애플리케이션이 구동하면서 증감한다. Heap이 가득차면 garbage collection(gc)이 일어난다. 사용하지 않는 objects는 gc를 통해서 삭제되고, 이를 통해 새로운 objects를 할당할 수 있는 공간을 메모리에 확보한다.">
 
 
 <script type="application/ld+json">
@@ -102,7 +106,7 @@ Java objects는 heap에 위치한다. Heap이 생성되는 시점은 JVM이 시�
   "@type": "BlogPosting",
   "headline": "Garbage Collection",
   "name": "Garbage Collection",
-  "description": "자바 메모리 관리에 대해 알아보자.\n메모리 관리란 새로운 object를 메모리에 할당하고, 오래된 object를 메모리에서 제거하는 과정을 말한다.\nGarbage Collection Garbage Collection이란 objects를 할당하기 위해 heap 또는 nursery 공간을 확보하는 과정을 말한다. Java에서는 사용자가 직접 메모리를 통제하는 게 아니라 JVM의 Garbage Collector가 한다. 물론 예외적으로 Reference variable에 null을 할당하거나, System.gc() 메서드를 호출하는 방법이 있다. 후자는 시스템 성능에 예기치 못한 영향을 미칠 수 있으니 사용하면 안 된다.\nJava objects는 heap에 위치한다. Heap이 생성되는 시점은 JVM이 시작될 때이며, heap의 사이즈는 애플리케이션이 구동하면서 증감한다.",
+  "description": "자바 메모리 관리에 대해 알아보자.\n메모리 관리란 새로운 object를 메모리에 할당하고, 오래된 object를 메모리에서 제거하는 과정을 말한다.\nGarbage Collection Garbage Collection이란 objects를 할당하기 위해 heap 또는 nursery 공간을 확보하는 과정을 말한다. Java에서는 사용자가 직접 메모리를 통제하는 게 아니라 JVM의 Garbage Collector가 한다. 물론 예외적으로 Reference variable에 null을 할당하거나, System.gc() 메서드를 호출하는 방법이 있다. 후자는 시스템 성능에 예기치 못한 영향을 미칠 수 있으니 사용하면 안 된다.\nJava objects는 heap에 위치한다. Heap이 생성되는 시점은 JVM이 시작될 때이며, heap의 사이즈는 애플리케이션이 구동하면서 증감한다. Heap이 가득차면 garbage collection(gc)이 일어난다. 사용하지 않는 objects는 gc를 통해서 삭제되고, 이를 통해 새로운 objects를 할당할 수 있는 공간을 메모리에 확보한다.\n",
   "keywords": [
     
   ],
@@ -175,7 +179,7 @@ Java objects는 heap에 위치한다. Heap이 생성되는 시점은 JVM이 시�
 <article class="post-single">
   <header class="post-header">
     
-    <h1 class="post-title">
+    <h1 class="post-title entry-hint-parent">
       Garbage Collection
     </h1>
     <div class="post-meta"><span title='2022-07-10 21:57:35 +0900 KST'>July 10, 2022</span>
@@ -313,7 +317,8 @@ Initial marking, concurrent marking, remarking, concurrent sweeping 등 네 단�
     </main>
     
 <footer class="footer">
-    <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &

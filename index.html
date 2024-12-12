@@ -2,7 +2,7 @@
 <html lang="en" dir="auto">
 
 <head>
-	<meta name="generator" content="Hugo 0.119.0"><meta charset="utf-8">
+	<meta name="generator" content="Hugo 0.139.4"><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
@@ -20,6 +20,7 @@
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
 <link rel="alternate" type="application/rss+xml" href="https://Scoobi-wisdoom.github.io/index.xml">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/">
 <noscript>
     <style>
         #theme-toggle,
@@ -37,7 +38,7 @@
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -56,14 +57,14 @@
         }
 
     </style>
-</noscript><meta property="og:title" content="wisdoom" />
-<meta property="og:description" content="" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://Scoobi-wisdoom.github.io/" />
-
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="wisdoom"/>
-<meta name="twitter:description" content=""/>
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="wisdoom">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="wisdoom">
+<meta name="twitter:description" content="">
 
 <script type="application/ld+json">
 {
@@ -72,7 +73,7 @@
   "name": "wisdoom",
   "url": "https://Scoobi-wisdoom.github.io/",
   "description": "",
-  "thumbnailUrl": "https://Scoobi-wisdoom.github.io/favicon.ico",
+  "logo": "https://Scoobi-wisdoom.github.io/favicon.ico",
   "sameAs": [
       
   ]
@@ -127,12 +128,29 @@
 
 <article class="first-entry"> 
   <header class="entry-header">
-    <h2>AWS 이것만 외우자
+    <h2 class="entry-hint-parent">@Transcational 과 Rollback
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>우아한 기술블로그에서 설명하지 않은 부분이 헷갈려서 이 글을 쓰게 됐다. 위의 블로그를 읽고 생각하게 된 것은, “RuntimeException 이 발생하면 무조건 rollback 이 발생한다.” 였다. 하지만 이는 사실이 아니었다.
+결론을 먼저 말하자면 아래와 같다.
+@Transactional 이 붙은 함수가 완료되기 전에 catch Exception 이 있으면 롤백은 일어나지 않는다. @Transactional 이 붙은 함수가 완료된 후에 catch Exception 이 있으면 롤백이 일어난다. 결론 도출을 위한 코드 테스트를 위해 아래와 같이 kotlin 코드를 작성했다.
+@Service @Transactional class OuterService( private val memberRepository: MemberRepository, private val innerService: InnerService, ) { fun tryCatchAndThrow() { try { memberRepository.save(Member()) throw RuntimeException(&#34;Outer: intentionally thrown&#34;) } catch (e: RuntimeException) { println(e) } } fun outerTryCatchAndInnerThrow() { try { innerService.`throw`() } catch (e: RuntimeException) { println(e) } } fun innerTryCatchAndInnerThrow() { innerService.tryCatchAndThrow() } } @Service @Transactional class InnerService( private val memberRepository: MemberRepository, ) { fun `throw`() { memberRepository.save(Member()) throw RuntimeException(&#34;Inner: intentionally thrown&#34;) } fun tryCatchAndThrow() { try { memberRepository.save(Member()) throw RuntimeException(&#34;Inner: intentionally thrown&#34;) } catch (e: Exception) { println(e) } } } InnerService 를 참조하는 클래스는 OuterSerivce 뿐이라고 가정하고 OuterService 에 대해 아래와 같이 테스트 코드를 작성했다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2024-12-10 20:43:47 +0900 KST'>December 10, 2024</span></footer>
+  <a class="entry-link" aria-label="post link to @Transcational 과 Rollback" href="https://Scoobi-wisdoom.github.io/posts/transactional%EA%B3%BC-rollback/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">AWS 이것만 외우자
     </h2>
   </header>
   <div class="entry-content">
     <p>로컬 vs 클라우드 차이: Networking 백엔드 개발을 처음 배울 때, Hello World 를 출력하는 앱을 만들어본다. 예를 들어, 아래와 같이 요청에 대해 “Hello World” 를 응답하는 것이다 (Spring Boot 사용).
-@RestController class DemoController { @GetMapping fun getDemo() = &#34;Hello World&#34; } 이 애플리케이션을 로컬 컴퓨터에서 구동한 후, 로컬 브라우저에서 localhost:8080 을 입력해 Hello World 를 브라우저 화면에서 확인할 수 있다. 애플리케이션을 AWS 에서 구동하는 것 역시 이와 거의 동일하다. 로컬 환경이 클라우드 환경으로 변한 것뿐이다....</p>
+@RestController class DemoController { @GetMapping fun getDemo() = &#34;Hello World&#34; } 이 애플리케이션을 로컬 컴퓨터에서 구동한 후, 로컬 브라우저에서 localhost:8080 을 입력해 Hello World 를 브라우저 화면에서 확인할 수 있다. 애플리케이션을 AWS 에서 구동하는 것 역시 이와 거의 동일하다. 로컬 환경이 클라우드 환경으로 변한 것뿐이다. 아래 그림처럼 말이다. 그림에서 로컬 환경과 클라우드 환경을 비교해보면 크게 두 가지가 다르다.
+...</p>
   </div>
   <footer class="entry-footer"><span title='2024-03-09 19:13:35 +0900 KST'>March 9, 2024</span></footer>
   <a class="entry-link" aria-label="post link to AWS 이것만 외우자" href="https://Scoobi-wisdoom.github.io/posts/aws-%EC%9D%B4%EA%B2%83%EB%A7%8C-%EC%99%B8%EC%9A%B0%EC%9E%90/"></a>
@@ -140,14 +158,15 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Kotlin Coroutines
+    <h2 class="entry-hint-parent">Kotlin Coroutines
     </h2>
   </header>
   <div class="entry-content">
     <p>왜 coroutine 을 사용해야 할까? Kotlin coroutine 은 효율적으로 thread 를 사용하고, 프로그래머가 편하고, 퍼포먼스가 좋다.
 효율적으로 thread 를 사용한다 Thread 를 생성하는 데에는 큰 비용이 든다. 그런데 Coroutine 를 사용하기 위해 추가적인 thread 생성이 필요 없다.
 또한 coroutine 은 non-blocking 이다. 즉, coroutine 이 완료될 때까지 thread 가 멈춰있지 않고 다른 작업을 처리할 수 있다. 아래 예시를 보자.
-fun showOrderInfo(details: Details) = async { val orderId = orderProduct(details).await() val orderData = loadOrderData(orderId)....</p>
+fun showOrderInfo(details: Details) = async { val orderId = orderProduct(details).await() val orderData = loadOrderData(orderId).await() showData(orderData) } 위 예시에서 orderProduct() 와 loadOrderData() 는 suspend fun 로서, non-blocking 이다. 덕분에 thread 는 showOrderInfo() 함수 말고도 다른 작업을 할 수 있다. 만약 orderProduct() 와 loadOrderData() 가 blocking 이라면, thread 는 두 함수가 완료될 때까지 다른 작업을 할 수 없다.
+...</p>
   </div>
   <footer class="entry-footer"><span title='2023-09-26 00:41:11 +0900 KST'>September 26, 2023</span></footer>
   <a class="entry-link" aria-label="post link to Kotlin Coroutines" href="https://Scoobi-wisdoom.github.io/posts/kotlin-coroutines/"></a>
@@ -155,14 +174,15 @@ fun showOrderInfo(details: Details) = async { val orderId = orderProduct(details
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>JPA: 단뱡향 @ManyToOne만 써라
+    <h2 class="entry-hint-parent">JPA: 단뱡향 @ManyToOne만 써라
     </h2>
   </header>
   <div class="entry-content">
     <p>자극적인 제목 미안하다. 물론 장단점이 있을 수 있다. 하지만 글의 결론부터 말하자면, 단방향 (unidirectional) @OneToMany보다는 양방향 (bidirectional) @OneToMany가 좋고, 양방향 @OneToMany보다는 단방향 @ManyToOne이 좋다.
 @OneToMany를 사용한다면 무조건 양방향이 좋다. Spring Boot Persistence Best Practices 책의 저자는 @OneToMany가 단방향으로 설정됐을 때 얼마나 안 좋은지를 서술한다.
 JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이 생긴다. 그렇기 때문에 단방향으로 설정하는 경우가 있다.
-하지만 @OneToMany는 단방향을 선택하면 안 된다. 비효율적인 쿼리가 발생하기 때문이다. 여기서는 실험을 통해 이를 확인한다....</p>
+하지만 @OneToMany는 단방향을 선택하면 안 된다. 비효율적인 쿼리가 발생하기 때문이다. 여기서는 실험을 통해 이를 확인한다. Spring Boot Persistence Best Practices 책의 예제를 재구성해 실험했다.
+...</p>
   </div>
   <footer class="entry-footer"><span title='2023-03-19 21:29:21 +0900 KST'>March 19, 2023</span></footer>
   <a class="entry-link" aria-label="post link to JPA: 단뱡향 @ManyToOne만 써라" href="https://Scoobi-wisdoom.github.io/posts/jpa-direction-of-onetomany/"></a>
@@ -170,13 +190,14 @@ JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>특정 커밋만 제외하고 모두 git merge
+    <h2 class="entry-hint-parent">특정 커밋만 제외하고 모두 git merge
     </h2>
   </header>
   <div class="entry-content">
     <p>Develop 브랜치의 여러 개의 커밋 중 특정 커밋만 제외하고 나머지를 모두 master 브랜치에 merge하는 방법이 없을까?
 상황 먼저 이런 상황은 어떤 때 발생할까? 실제로 겪은 상황으로, 세부 사항은 아래와 같다.
-Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 테스트가 완료되지 않았다. 나머지 커밋은 당장 master에 merge 후 deploy해야 한다. 언제든 테스트가 완료되면, 두 번째 및 세 번째 커밋도 master에 merge해야 한다. 해결 방법: cherry pick Develop 브랜치의 commit log는 아래와 같다....</p>
+Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 테스트가 완료되지 않았다. 나머지 커밋은 당장 master에 merge 후 deploy해야 한다. 언제든 테스트가 완료되면, 두 번째 및 세 번째 커밋도 master에 merge해야 한다. 해결 방법: cherry pick Develop 브랜치의 commit log는 아래와 같다.
+...</p>
   </div>
   <footer class="entry-footer"><span title='2022-12-04 22:59:12 +0900 KST'>December 4, 2022</span></footer>
   <a class="entry-link" aria-label="post link to 특정 커밋만 제외하고 모두 git merge" href="https://Scoobi-wisdoom.github.io/posts/%ED%8A%B9%EC%A0%95-%EC%BB%A4%EB%B0%8B%EB%A7%8C-%EC%A0%9C%EC%99%B8%ED%95%98%EA%B3%A0-%EB%AA%A8%EB%91%90-git-merge/"></a>
@@ -184,13 +205,14 @@ Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Hibernate가 무슨 쿼리를 만드는지 눈으로 확인하지 말자
+    <h2 class="entry-hint-parent">Hibernate가 무슨 쿼리를 만드는지 눈으로 확인하지 말자
     </h2>
   </header>
   <div class="entry-content">
     <p>JPA hibernate는 편리하지만 때로 치명적이다. 의도하지 않은 여러 쿼리가 실행돼 db에 부하가 걸리거나, 영속성 컨텍스트와 실제 db 데이터가 다를 수 있는 등의 문제가 발생할 수 있기 때문이다. 여기서는 첫 번째 문제를 보완할 수 있는 방법을 소개한다.
 Hibernate가 어떤 쿼리를 생성하는지 보통은 눈으로 확인한다. 아래와 같은 로그를 보고 말이다.
-[ Test worker] org.hibernate.SQL : select book0_.id as id1_0_0_ from book book0_ where book0_.id=? [ Test worker] o.h.type.descriptor.sql.BasicBinder : binding parameter [1] as [BIGINT] - [0] 로그를 눈으로 보면 select 쿼리가 한 번 발생하는 것을 확인할 수 있다....</p>
+[ Test worker] org.hibernate.SQL : select book0_.id as id1_0_0_ from book book0_ where book0_.id=? [ Test worker] o.h.type.descriptor.sql.BasicBinder : binding parameter [1] as [BIGINT] - [0] 로그를 눈으로 보면 select 쿼리가 한 번 발생하는 것을 확인할 수 있다.
+...</p>
   </div>
   <footer class="entry-footer"><span title='2022-08-31 00:11:17 +0900 KST'>August 31, 2022</span></footer>
   <a class="entry-link" aria-label="post link to Hibernate가 무슨 쿼리를 만드는지 눈으로 확인하지 말자" href="https://Scoobi-wisdoom.github.io/posts/hibernate%EA%B0%80-%EB%AC%B4%EC%8A%A8-%EC%BF%BC%EB%A6%AC%EB%A5%BC-%EB%A7%8C%EB%93%9C%EB%8A%94%EC%A7%80-%EB%88%88%EC%9C%BC%EB%A1%9C-%ED%99%95%EC%9D%B8%ED%95%98%EC%A7%80-%EB%A7%90%EC%9E%90/"></a>
@@ -198,7 +220,7 @@ Hibernate가 어떤 쿼리를 생성하는지 보통은 눈으로 확인한다. 
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Interface vs Abstract Class
+    <h2 class="entry-hint-parent">Interface vs Abstract Class
     </h2>
   </header>
   <div class="entry-content">
@@ -206,7 +228,8 @@ Hibernate가 어떤 쿼리를 생성하는지 보통은 눈으로 확인한다. 
 Java 8부터 interface에는 default method가 생겼다. 이로 인해 interface와 abstract class의 차이가 하나 줄었다.
 Interface와 abstract class의 차이는 크게 두 가지다.
 Abstract class는 interface와 달리 다중 상속의 대상이 될 수 없다. Abstract class는 state를 가질 수 있지만 interface는 state를 가질 수 없다. 이외에도 lambda expression과 관련한 차이도 있다. 하지만 여기서는 다루지 않는다. 위에 명시한 두 가지 차이에 대해서 알아보자.
-다중 상속 Effective Java를 보면 abstract class보다는 interface를 사용하라고 한다....</p>
+다중 상속 Effective Java를 보면 abstract class보다는 interface를 사용하라고 한다. 여러 이유가 있는데 그 중 위에서 언급한 첫 번째 이유가 있다. Abstract class 다중 상속의 대상이 될 수 없다. 결국, abstract class는 hierarchy와 관련된다. 하지만 hierarchy가 부적절한 경우가 많다. 예를 들어 interface Husband와 interface Son을 조합해 class MarriedMan을 정의할 수 있다. MarriedMan은 Husband이면서 Son이다. Hierarchy로 이 셋의 관계를 정의하는 건 부적절하다.
+...</p>
   </div>
   <footer class="entry-footer"><span title='2022-08-07 16:44:53 +0900 KST'>August 7, 2022</span></footer>
   <a class="entry-link" aria-label="post link to Interface vs Abstract Class" href="https://Scoobi-wisdoom.github.io/posts/interface-vs-abstract-class/"></a>
@@ -214,14 +237,15 @@ Abstract class는 interface와 달리 다중 상속의 대상이 될 수 없다.
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Garbage Collection
+    <h2 class="entry-hint-parent">Garbage Collection
     </h2>
   </header>
   <div class="entry-content">
     <p>자바 메모리 관리에 대해 알아보자.
 메모리 관리란 새로운 object를 메모리에 할당하고, 오래된 object를 메모리에서 제거하는 과정을 말한다.
 Garbage Collection Garbage Collection이란 objects를 할당하기 위해 heap 또는 nursery 공간을 확보하는 과정을 말한다. Java에서는 사용자가 직접 메모리를 통제하는 게 아니라 JVM의 Garbage Collector가 한다. 물론 예외적으로 Reference variable에 null을 할당하거나, System.gc() 메서드를 호출하는 방법이 있다. 후자는 시스템 성능에 예기치 못한 영향을 미칠 수 있으니 사용하면 안 된다.
-Java objects는 heap에 위치한다. Heap이 생성되는 시점은 JVM이 시작될 때이며, heap의 사이즈는 애플리케이션이 구동하면서 증감한다....</p>
+Java objects는 heap에 위치한다. Heap이 생성되는 시점은 JVM이 시작될 때이며, heap의 사이즈는 애플리케이션이 구동하면서 증감한다. Heap이 가득차면 garbage collection(gc)이 일어난다. 사용하지 않는 objects는 gc를 통해서 삭제되고, 이를 통해 새로운 objects를 할당할 수 있는 공간을 메모리에 확보한다.
+...</p>
   </div>
   <footer class="entry-footer"><span title='2022-07-10 21:57:35 +0900 KST'>July 10, 2022</span></footer>
   <a class="entry-link" aria-label="post link to Garbage Collection" href="https://Scoobi-wisdoom.github.io/posts/garbage-collection/"></a>
@@ -229,7 +253,7 @@ Java objects는 heap에 위치한다. Heap이 생성되는 시점은 JVM이 시�
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>백엔드 프레임워크와 UTF Encoding
+    <h2 class="entry-hint-parent">백엔드 프레임워크와 UTF Encoding
     </h2>
   </header>
   <div class="entry-content">
@@ -239,7 +263,8 @@ Character set: 사람의 문자 문자열을 컴퓨터의 문자 비트열로 �
 Encoding: 문자열과 비트열간 변환 작업.
 Decoding: Encoding된 대상을 원본으로 되돌리는 작업을 의미한다.
 Character set에 맞춰 어떻게 encoding/decoding 할지 결정한다.
-character set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다....</p>
+character set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다.
+...</p>
   </div>
   <footer class="entry-footer"><span title='2022-06-07 00:19:22 +0900 KST'>June 7, 2022</span></footer>
   <a class="entry-link" aria-label="post link to 백엔드 프레임워크와 UTF Encoding" href="https://Scoobi-wisdoom.github.io/posts/%EB%B0%B1%EC%97%94%EB%93%9C-%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC%EC%99%80-utf-encoding/"></a>
@@ -247,7 +272,7 @@ character set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>네트워크 상식
+    <h2 class="entry-hint-parent">네트워크 상식
     </h2>
   </header>
   <div class="entry-content">
@@ -255,24 +280,11 @@ character set에 맞지 않게 인코딩되면 데이터를 해석할 수 없다
 개발자라면 다음과 같은 문제에 대답할 수 있어야 한다.
 private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법 웹 브라우저의 MAC 주소를 알 수 있는 방법 IP 주소를 사용자 식별자로 사용할 수 있는 방법 80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법
 나는 첫 두 개는 모르고 있었다. 갈 길이 멀다.
-private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: public IP 주소를 할당받아야 함....</p>
+private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: public IP 주소를 할당받아야 함. public IP 주소를 할당받아 DMZ 영역에 서버를 구성 public IP 주소를 할당받아 STUN, TURN 등 기술을 사용 웹 브라우저의 MAC 주소를 알 수 있는 방법 사용자의 MAC 주소를 알 방법은 없음 별도의 프로그램으로 수집할 수 있지만 개인정보 침해 소지가 있음 아이피 주소를 사용자 식별자로 사용하는 방법 논리적 아이피 주소는 환경에 따라 변경가능하기 때문에 식별자로 사용할 수 없음. 80 포트를 사용하는 톰캣을 여러 개 실행할 수 있는 방법 포트는 운영체제에서 실행되는 프로세스를 식별할 수 있는 key 로서, 동시에 여러 개 실행하는 것은 불가능 하나의 컴퓨터에 여러 개 가상화 환경을 준비하고 실행하는 방법은 있음. 이제 왜 위와 같은 결론이 나오는지 알아보자.
+...</p>
   </div>
   <footer class="entry-footer"><span title='2022-05-23 22:48:14 +0900 KST'>May 23, 2022</span></footer>
   <a class="entry-link" aria-label="post link to 네트워크 상식" href="https://Scoobi-wisdoom.github.io/posts/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EC%83%81%EC%8B%9D/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2>Abstract Class
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>Spring 은 IoC container 에 bean 객체를 생성한 후 그 객체를 등록한 후, 필요할 때 사용한다. Interface 는 객체를 생성할 수 없기 때문에 bean 이 될 수 없다.
-그렇다면 Abstract Class 는 어떨까? 아래 코드를 보면 일단 bean 으로 등록할 수 없다.
-@RestController class Controller( val abstractService: AbstractService, ) { @GetMapping(&#34;/abstract&#34;) fun getAbstract() = abstractService.abstractFunction() } @Service abstract class AbstractService { fun abstractFunction() = &#34;&#34; } 아래와 같은 메시지가 뜨면서 애플리케이션이 멈춘다....</p>
-  </div>
-  <footer class="entry-footer"><span title='2022-03-16 00:16:44 +0900 KST'>March 16, 2022</span></footer>
-  <a class="entry-link" aria-label="post link to Abstract Class" href="https://Scoobi-wisdoom.github.io/posts/abstract-class/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">
@@ -283,7 +295,8 @@ private IP 주소를 사용하는 외부 서버에 접속할 수 있는 방법: 
     </main>
     
 <footer class="footer">
-    <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &

@@ -8,12 +8,20 @@
 <title>특정 커밋만 제외하고 모두 git merge | wisdoom</title>
 <meta name="keywords" content="">
 <meta name="description" content="Develop 브랜치의 여러 개의 커밋 중 특정 커밋만 제외하고 나머지를 모두 master 브랜치에 merge하는 방법이 없을까?
-상황 먼저 이런 상황은 어떤 때 발생할까? 실제로 겪은 상황으로, 세부 사항은 아래와 같다.
-Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 테스트가 완료되지 않았다. 나머지 커밋은 당장 master에 merge 후 deploy해야 한다. 언제든 테스트가 완료되면, 두 번째 및 세 번째 커밋도 master에 merge해야 한다. 해결 방법: cherry pick Develop 브랜치의 commit log는 아래와 같다.">
+상황
+먼저 이런 상황은 어떤 때 발생할까? 실제로 겪은 상황으로, 세부 사항은 아래와 같다.
+
+
+Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 테스트가 완료되지 않았다.
+나머지 커밋은 당장 master에 merge 후 deploy해야 한다.
+언제든 테스트가 완료되면, 두 번째 및 세 번째 커밋도 master에 merge해야 한다.
+
+
+해결 방법: cherry pick
+Develop 브랜치의 commit log는 아래와 같다.">
 <meta name="author" content="">
 <link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/%ED%8A%B9%EC%A0%95-%EC%BB%A4%EB%B0%8B%EB%A7%8C-%EC%A0%9C%EC%99%B8%ED%95%98%EA%B3%A0-%EB%AA%A8%EB%91%90-git-merge/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
@@ -21,6 +29,7 @@ Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 
 <link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/posts/%ED%8A%B9%EC%A0%95-%EC%BB%A4%EB%B0%8B%EB%A7%8C-%EC%A0%9C%EC%99%B8%ED%95%98%EA%B3%A0-%EB%AA%A8%EB%91%90-git-merge/">
 <noscript>
     <style>
         #theme-toggle,
@@ -38,7 +47,7 @@ Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -57,20 +66,31 @@ Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 
         }
 
     </style>
-</noscript><meta property="og:title" content="특정 커밋만 제외하고 모두 git merge" />
-<meta property="og:description" content="Develop 브랜치의 여러 개의 커밋 중 특정 커밋만 제외하고 나머지를 모두 master 브랜치에 merge하는 방법이 없을까?
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/%ED%8A%B9%EC%A0%95-%EC%BB%A4%EB%B0%8B%EB%A7%8C-%EC%A0%9C%EC%99%B8%ED%95%98%EA%B3%A0-%EB%AA%A8%EB%91%90-git-merge/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="특정 커밋만 제외하고 모두 git merge">
+  <meta property="og:description" content="Develop 브랜치의 여러 개의 커밋 중 특정 커밋만 제외하고 나머지를 모두 master 브랜치에 merge하는 방법이 없을까?
 상황 먼저 이런 상황은 어떤 때 발생할까? 실제로 겪은 상황으로, 세부 사항은 아래와 같다.
-Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 테스트가 완료되지 않았다. 나머지 커밋은 당장 master에 merge 후 deploy해야 한다. 언제든 테스트가 완료되면, 두 번째 및 세 번째 커밋도 master에 merge해야 한다. 해결 방법: cherry pick Develop 브랜치의 commit log는 아래와 같다." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/%ED%8A%B9%EC%A0%95-%EC%BB%A4%EB%B0%8B%EB%A7%8C-%EC%A0%9C%EC%99%B8%ED%95%98%EA%B3%A0-%EB%AA%A8%EB%91%90-git-merge/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2022-12-04T22:59:12+09:00" />
-<meta property="article:modified_time" content="2022-12-04T22:59:12+09:00" />
-
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="특정 커밋만 제외하고 모두 git merge"/>
+Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 테스트가 완료되지 않았다. 나머지 커밋은 당장 master에 merge 후 deploy해야 한다. 언제든 테스트가 완료되면, 두 번째 및 세 번째 커밋도 master에 merge해야 한다. 해결 방법: cherry pick Develop 브랜치의 commit log는 아래와 같다.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2022-12-04T22:59:12+09:00">
+    <meta property="article:modified_time" content="2022-12-04T22:59:12+09:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="특정 커밋만 제외하고 모두 git merge">
 <meta name="twitter:description" content="Develop 브랜치의 여러 개의 커밋 중 특정 커밋만 제외하고 나머지를 모두 master 브랜치에 merge하는 방법이 없을까?
-상황 먼저 이런 상황은 어떤 때 발생할까? 실제로 겪은 상황으로, 세부 사항은 아래와 같다.
-Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 테스트가 완료되지 않았다. 나머지 커밋은 당장 master에 merge 후 deploy해야 한다. 언제든 테스트가 완료되면, 두 번째 및 세 번째 커밋도 master에 merge해야 한다. 해결 방법: cherry pick Develop 브랜치의 commit log는 아래와 같다."/>
+상황
+먼저 이런 상황은 어떤 때 발생할까? 실제로 겪은 상황으로, 세부 사항은 아래와 같다.
+
+
+Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 테스트가 완료되지 않았다.
+나머지 커밋은 당장 master에 merge 후 deploy해야 한다.
+언제든 테스트가 완료되면, 두 번째 및 세 번째 커밋도 master에 merge해야 한다.
+
+
+해결 방법: cherry pick
+Develop 브랜치의 commit log는 아래와 같다.">
 
 
 <script type="application/ld+json">
@@ -99,7 +119,7 @@ Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 
   "@type": "BlogPosting",
   "headline": "특정 커밋만 제외하고 모두 git merge",
   "name": "특정 커밋만 제외하고 모두 git merge",
-  "description": "Develop 브랜치의 여러 개의 커밋 중 특정 커밋만 제외하고 나머지를 모두 master 브랜치에 merge하는 방법이 없을까?\n상황 먼저 이런 상황은 어떤 때 발생할까? 실제로 겪은 상황으로, 세부 사항은 아래와 같다.\nDevelop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 테스트가 완료되지 않았다. 나머지 커밋은 당장 master에 merge 후 deploy해야 한다. 언제든 테스트가 완료되면, 두 번째 및 세 번째 커밋도 master에 merge해야 한다. 해결 방법: cherry pick Develop 브랜치의 commit log는 아래와 같다.",
+  "description": "Develop 브랜치의 여러 개의 커밋 중 특정 커밋만 제외하고 나머지를 모두 master 브랜치에 merge하는 방법이 없을까?\n상황 먼저 이런 상황은 어떤 때 발생할까? 실제로 겪은 상황으로, 세부 사항은 아래와 같다.\nDevelop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 테스트가 완료되지 않았다. 나머지 커밋은 당장 master에 merge 후 deploy해야 한다. 언제든 테스트가 완료되면, 두 번째 및 세 번째 커밋도 master에 merge해야 한다. 해결 방법: cherry pick Develop 브랜치의 commit log는 아래와 같다.\n",
   "keywords": [
     
   ],
@@ -172,7 +192,7 @@ Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 
 <article class="post-single">
   <header class="post-header">
     
-    <h1 class="post-title">
+    <h1 class="post-title entry-hint-parent">
       특정 커밋만 제외하고 모두 git merge
     </h1>
     <div class="post-meta"><span title='2022-12-04 22:59:12 +0900 KST'>December 4, 2022</span>
@@ -324,7 +344,8 @@ Develop 브랜치의 총 다섯 개 커밋 중 두 번째, 세 번째 커밋만 
     </main>
     
 <footer class="footer">
-    <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &

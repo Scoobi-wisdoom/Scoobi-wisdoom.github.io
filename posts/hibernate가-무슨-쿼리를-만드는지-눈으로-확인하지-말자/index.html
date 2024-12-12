@@ -9,11 +9,12 @@
 <meta name="keywords" content="">
 <meta name="description" content="JPA hibernate는 편리하지만 때로 치명적이다. 의도하지 않은 여러 쿼리가 실행돼 db에 부하가 걸리거나, 영속성 컨텍스트와 실제 db 데이터가 다를 수 있는 등의 문제가 발생할 수 있기 때문이다. 여기서는 첫 번째 문제를 보완할 수 있는 방법을 소개한다.
 Hibernate가 어떤 쿼리를 생성하는지 보통은 눈으로 확인한다. 아래와 같은 로그를 보고 말이다.
-[ Test worker] org.hibernate.SQL : select book0_.id as id1_0_0_ from book book0_ where book0_.id=? [ Test worker] o.h.type.descriptor.sql.BasicBinder : binding parameter [1] as [BIGINT] - [0] 로그를 눈으로 보면 select 쿼리가 한 번 발생하는 것을 확인할 수 있다.">
+[    Test worker] org.hibernate.SQL                        : select book0_.id as id1_0_0_ from book book0_ where book0_.id=?
+[    Test worker] o.h.type.descriptor.sql.BasicBinder      : binding parameter [1] as [BIGINT] - [0]
+로그를 눈으로 보면 select 쿼리가 한 번 발생하는 것을 확인할 수 있다.">
 <meta name="author" content="">
 <link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/hibernate%EA%B0%80-%EB%AC%B4%EC%8A%A8-%EC%BF%BC%EB%A6%AC%EB%A5%BC-%EB%A7%8C%EB%93%9C%EB%8A%94%EC%A7%80-%EB%88%88%EC%9C%BC%EB%A1%9C-%ED%99%95%EC%9D%B8%ED%95%98%EC%A7%80-%EB%A7%90%EC%9E%90/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
@@ -21,6 +22,7 @@ Hibernate가 어떤 쿼리를 생성하는지 보통은 눈으로 확인한다. 
 <link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/posts/hibernate%EA%B0%80-%EB%AC%B4%EC%8A%A8-%EC%BF%BC%EB%A6%AC%EB%A5%BC-%EB%A7%8C%EB%93%9C%EB%8A%94%EC%A7%80-%EB%88%88%EC%9C%BC%EB%A1%9C-%ED%99%95%EC%9D%B8%ED%95%98%EC%A7%80-%EB%A7%90%EC%9E%90/">
 <noscript>
     <style>
         #theme-toggle,
@@ -38,7 +40,7 @@ Hibernate가 어떤 쿼리를 생성하는지 보통은 눈으로 확인한다. 
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -57,20 +59,24 @@ Hibernate가 어떤 쿼리를 생성하는지 보통은 눈으로 확인한다. 
         }
 
     </style>
-</noscript><meta property="og:title" content="Hibernate가 무슨 쿼리를 만드는지 눈으로 확인하지 말자" />
-<meta property="og:description" content="JPA hibernate는 편리하지만 때로 치명적이다. 의도하지 않은 여러 쿼리가 실행돼 db에 부하가 걸리거나, 영속성 컨텍스트와 실제 db 데이터가 다를 수 있는 등의 문제가 발생할 수 있기 때문이다. 여기서는 첫 번째 문제를 보완할 수 있는 방법을 소개한다.
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/hibernate%EA%B0%80-%EB%AC%B4%EC%8A%A8-%EC%BF%BC%EB%A6%AC%EB%A5%BC-%EB%A7%8C%EB%93%9C%EB%8A%94%EC%A7%80-%EB%88%88%EC%9C%BC%EB%A1%9C-%ED%99%95%EC%9D%B8%ED%95%98%EC%A7%80-%EB%A7%90%EC%9E%90/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="Hibernate가 무슨 쿼리를 만드는지 눈으로 확인하지 말자">
+  <meta property="og:description" content="JPA hibernate는 편리하지만 때로 치명적이다. 의도하지 않은 여러 쿼리가 실행돼 db에 부하가 걸리거나, 영속성 컨텍스트와 실제 db 데이터가 다를 수 있는 등의 문제가 발생할 수 있기 때문이다. 여기서는 첫 번째 문제를 보완할 수 있는 방법을 소개한다.
 Hibernate가 어떤 쿼리를 생성하는지 보통은 눈으로 확인한다. 아래와 같은 로그를 보고 말이다.
-[ Test worker] org.hibernate.SQL : select book0_.id as id1_0_0_ from book book0_ where book0_.id=? [ Test worker] o.h.type.descriptor.sql.BasicBinder : binding parameter [1] as [BIGINT] - [0] 로그를 눈으로 보면 select 쿼리가 한 번 발생하는 것을 확인할 수 있다." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/hibernate%EA%B0%80-%EB%AC%B4%EC%8A%A8-%EC%BF%BC%EB%A6%AC%EB%A5%BC-%EB%A7%8C%EB%93%9C%EB%8A%94%EC%A7%80-%EB%88%88%EC%9C%BC%EB%A1%9C-%ED%99%95%EC%9D%B8%ED%95%98%EC%A7%80-%EB%A7%90%EC%9E%90/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2022-08-31T00:11:17+09:00" />
-<meta property="article:modified_time" content="2022-08-31T00:11:17+09:00" />
-
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Hibernate가 무슨 쿼리를 만드는지 눈으로 확인하지 말자"/>
+[ Test worker] org.hibernate.SQL : select book0_.id as id1_0_0_ from book book0_ where book0_.id=? [ Test worker] o.h.type.descriptor.sql.BasicBinder : binding parameter [1] as [BIGINT] - [0] 로그를 눈으로 보면 select 쿼리가 한 번 발생하는 것을 확인할 수 있다.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2022-08-31T00:11:17+09:00">
+    <meta property="article:modified_time" content="2022-08-31T00:11:17+09:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hibernate가 무슨 쿼리를 만드는지 눈으로 확인하지 말자">
 <meta name="twitter:description" content="JPA hibernate는 편리하지만 때로 치명적이다. 의도하지 않은 여러 쿼리가 실행돼 db에 부하가 걸리거나, 영속성 컨텍스트와 실제 db 데이터가 다를 수 있는 등의 문제가 발생할 수 있기 때문이다. 여기서는 첫 번째 문제를 보완할 수 있는 방법을 소개한다.
 Hibernate가 어떤 쿼리를 생성하는지 보통은 눈으로 확인한다. 아래와 같은 로그를 보고 말이다.
-[ Test worker] org.hibernate.SQL : select book0_.id as id1_0_0_ from book book0_ where book0_.id=? [ Test worker] o.h.type.descriptor.sql.BasicBinder : binding parameter [1] as [BIGINT] - [0] 로그를 눈으로 보면 select 쿼리가 한 번 발생하는 것을 확인할 수 있다."/>
+[    Test worker] org.hibernate.SQL                        : select book0_.id as id1_0_0_ from book book0_ where book0_.id=?
+[    Test worker] o.h.type.descriptor.sql.BasicBinder      : binding parameter [1] as [BIGINT] - [0]
+로그를 눈으로 보면 select 쿼리가 한 번 발생하는 것을 확인할 수 있다.">
 
 
 <script type="application/ld+json">
@@ -99,7 +105,7 @@ Hibernate가 어떤 쿼리를 생성하는지 보통은 눈으로 확인한다. 
   "@type": "BlogPosting",
   "headline": "Hibernate가 무슨 쿼리를 만드는지 눈으로 확인하지 말자",
   "name": "Hibernate가 무슨 쿼리를 만드는지 눈으로 확인하지 말자",
-  "description": "JPA hibernate는 편리하지만 때로 치명적이다. 의도하지 않은 여러 쿼리가 실행돼 db에 부하가 걸리거나, 영속성 컨텍스트와 실제 db 데이터가 다를 수 있는 등의 문제가 발생할 수 있기 때문이다. 여기서는 첫 번째 문제를 보완할 수 있는 방법을 소개한다.\nHibernate가 어떤 쿼리를 생성하는지 보통은 눈으로 확인한다. 아래와 같은 로그를 보고 말이다.\n[ Test worker] org.hibernate.SQL : select book0_.id as id1_0_0_ from book book0_ where book0_.id=? [ Test worker] o.h.type.descriptor.sql.BasicBinder : binding parameter [1] as [BIGINT] - [0] 로그를 눈으로 보면 select 쿼리가 한 번 발생하는 것을 확인할 수 있다.",
+  "description": "JPA hibernate는 편리하지만 때로 치명적이다. 의도하지 않은 여러 쿼리가 실행돼 db에 부하가 걸리거나, 영속성 컨텍스트와 실제 db 데이터가 다를 수 있는 등의 문제가 발생할 수 있기 때문이다. 여기서는 첫 번째 문제를 보완할 수 있는 방법을 소개한다.\nHibernate가 어떤 쿼리를 생성하는지 보통은 눈으로 확인한다. 아래와 같은 로그를 보고 말이다.\n[ Test worker] org.hibernate.SQL : select book0_.id as id1_0_0_ from book book0_ where book0_.id=? [ Test worker] o.h.type.descriptor.sql.BasicBinder : binding parameter [1] as [BIGINT] - [0] 로그를 눈으로 보면 select 쿼리가 한 번 발생하는 것을 확인할 수 있다.\n",
   "keywords": [
     
   ],
@@ -172,7 +178,7 @@ Hibernate가 어떤 쿼리를 생성하는지 보통은 눈으로 확인한다. 
 <article class="post-single">
   <header class="post-header">
     
-    <h1 class="post-title">
+    <h1 class="post-title entry-hint-parent">
       Hibernate가 무슨 쿼리를 만드는지 눈으로 확인하지 말자
     </h1>
     <div class="post-meta"><span title='2022-08-31 00:11:17 +0900 KST'>August 31, 2022</span>
@@ -397,7 +403,8 @@ ProxyDataSourceConfig</p>
     </main>
     
 <footer class="footer">
-    <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &

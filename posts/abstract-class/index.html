@@ -7,13 +7,33 @@
 <meta name="robots" content="index, follow">
 <title>Abstract Class | wisdoom</title>
 <meta name="keywords" content="">
-<meta name="description" content="Spring 은 IoC container 에 bean 객체를 생성한 후 그 객체를 등록한 후, 필요할 때 사용한다. Interface 는 객체를 생성할 수 없기 때문에 bean 이 될 수 없다.
+<meta name="description" content="Spring 은 IoC container 에 bean 객체를 생성한 후 그 객체를 등록한 후, 필요할 때 사용한다.
+Interface 는 객체를 생성할 수 없기 때문에 bean 이 될 수 없다.
 그렇다면 Abstract Class 는 어떨까? 아래 코드를 보면 일단 bean 으로 등록할 수 없다.
-@RestController class Controller( val abstractService: AbstractService, ) { @GetMapping(&#34;/abstract&#34;) fun getAbstract() = abstractService.abstractFunction() } @Service abstract class AbstractService { fun abstractFunction() = &#34;&#34; } 아래와 같은 메시지가 뜨면서 애플리케이션이 멈춘다.">
+@RestController
+class Controller(
+    val abstractService: AbstractService,
+) {
+    @GetMapping(&#34;/abstract&#34;)
+    fun getAbstract() = abstractService.abstractFunction()
+}
+
+@Service
+abstract class AbstractService {
+    fun abstractFunction() = &#34;&#34;
+}
+아래와 같은 메시지가 뜨면서 애플리케이션이 멈춘다.
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of constructor in com.demo.controller.Controller required a bean of type &#39;com.demo.service.AbstractService&#39; that could not be found.
+왜 그럴까? 필자에게 하나의 가설이 있었다. Abstract Class 의 메서드 역시 abstract method 다. Child Class 가 어떻게 구현하느냐에 따라 달라지기 때문에 Abstract Class 는 bean 으로 등록할 수 없다. 그렇다면, Abstract Class 의 모든 메서드가 final method 라면 bean 으로 등록할 수 있을까? 그래서 아래와 같이 구현을 한 후 애플리케이션을 run 했다.">
 <meta name="author" content="">
 <link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/abstract-class/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
@@ -21,6 +41,7 @@
 <link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/posts/abstract-class/">
 <noscript>
     <style>
         #theme-toggle,
@@ -38,7 +59,7 @@
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -57,20 +78,44 @@
         }
 
     </style>
-</noscript><meta property="og:title" content="Abstract Class" />
-<meta property="og:description" content="Spring 은 IoC container 에 bean 객체를 생성한 후 그 객체를 등록한 후, 필요할 때 사용한다. Interface 는 객체를 생성할 수 없기 때문에 bean 이 될 수 없다.
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/abstract-class/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="Abstract Class">
+  <meta property="og:description" content="Spring 은 IoC container 에 bean 객체를 생성한 후 그 객체를 등록한 후, 필요할 때 사용한다. Interface 는 객체를 생성할 수 없기 때문에 bean 이 될 수 없다.
 그렇다면 Abstract Class 는 어떨까? 아래 코드를 보면 일단 bean 으로 등록할 수 없다.
-@RestController class Controller( val abstractService: AbstractService, ) { @GetMapping(&#34;/abstract&#34;) fun getAbstract() = abstractService.abstractFunction() } @Service abstract class AbstractService { fun abstractFunction() = &#34;&#34; } 아래와 같은 메시지가 뜨면서 애플리케이션이 멈춘다." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/abstract-class/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2022-03-16T00:16:44+09:00" />
-<meta property="article:modified_time" content="2022-03-16T00:16:44+09:00" />
+@RestController class Controller( val abstractService: AbstractService, ) { @GetMapping(&#34;/abstract&#34;) fun getAbstract() = abstractService.abstractFunction() } @Service abstract class AbstractService { fun abstractFunction() = &#34;&#34; } 아래와 같은 메시지가 뜨면서 애플리케이션이 멈춘다.
+*************************** APPLICATION FAILED TO START *************************** Description: Parameter 0 of constructor in com.demo.controller.Controller required a bean of type &#39;com.demo.service.AbstractService&#39; that could not be found. 왜 그럴까? 필자에게 하나의 가설이 있었다. Abstract Class 의 메서드 역시 abstract method 다. Child Class 가 어떻게 구현하느냐에 따라 달라지기 때문에 Abstract Class 는 bean 으로 등록할 수 없다. 그렇다면, Abstract Class 의 모든 메서드가 final method 라면 bean 으로 등록할 수 있을까? 그래서 아래와 같이 구현을 한 후 애플리케이션을 run 했다.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2022-03-16T00:16:44+09:00">
+    <meta property="article:modified_time" content="2022-03-16T00:16:44+09:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Abstract Class">
+<meta name="twitter:description" content="Spring 은 IoC container 에 bean 객체를 생성한 후 그 객체를 등록한 후, 필요할 때 사용한다.
+Interface 는 객체를 생성할 수 없기 때문에 bean 이 될 수 없다.
+그렇다면 Abstract Class 는 어떨까? 아래 코드를 보면 일단 bean 으로 등록할 수 없다.
+@RestController
+class Controller(
+    val abstractService: AbstractService,
+) {
+    @GetMapping(&#34;/abstract&#34;)
+    fun getAbstract() = abstractService.abstractFunction()
+}
 
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Abstract Class"/>
-<meta name="twitter:description" content="Spring 은 IoC container 에 bean 객체를 생성한 후 그 객체를 등록한 후, 필요할 때 사용한다. Interface 는 객체를 생성할 수 없기 때문에 bean 이 될 수 없다.
-그렇다면 Abstract Class 는 어떨까? 아래 코드를 보면 일단 bean 으로 등록할 수 없다.
-@RestController class Controller( val abstractService: AbstractService, ) { @GetMapping(&#34;/abstract&#34;) fun getAbstract() = abstractService.abstractFunction() } @Service abstract class AbstractService { fun abstractFunction() = &#34;&#34; } 아래와 같은 메시지가 뜨면서 애플리케이션이 멈춘다."/>
+@Service
+abstract class AbstractService {
+    fun abstractFunction() = &#34;&#34;
+}
+아래와 같은 메시지가 뜨면서 애플리케이션이 멈춘다.
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of constructor in com.demo.controller.Controller required a bean of type &#39;com.demo.service.AbstractService&#39; that could not be found.
+왜 그럴까? 필자에게 하나의 가설이 있었다. Abstract Class 의 메서드 역시 abstract method 다. Child Class 가 어떻게 구현하느냐에 따라 달라지기 때문에 Abstract Class 는 bean 으로 등록할 수 없다. 그렇다면, Abstract Class 의 모든 메서드가 final method 라면 bean 으로 등록할 수 있을까? 그래서 아래와 같이 구현을 한 후 애플리케이션을 run 했다.">
 
 
 <script type="application/ld+json">
@@ -99,7 +144,7 @@
   "@type": "BlogPosting",
   "headline": "Abstract Class",
   "name": "Abstract Class",
-  "description": "Spring 은 IoC container 에 bean 객체를 생성한 후 그 객체를 등록한 후, 필요할 때 사용한다. Interface 는 객체를 생성할 수 없기 때문에 bean 이 될 수 없다.\n그렇다면 Abstract Class 는 어떨까? 아래 코드를 보면 일단 bean 으로 등록할 수 없다.\n@RestController class Controller( val abstractService: AbstractService, ) { @GetMapping(\u0026#34;/abstract\u0026#34;) fun getAbstract() = abstractService.abstractFunction() } @Service abstract class AbstractService { fun abstractFunction() = \u0026#34;\u0026#34; } 아래와 같은 메시지가 뜨면서 애플리케이션이 멈춘다.",
+  "description": "Spring 은 IoC container 에 bean 객체를 생성한 후 그 객체를 등록한 후, 필요할 때 사용한다. Interface 는 객체를 생성할 수 없기 때문에 bean 이 될 수 없다.\n그렇다면 Abstract Class 는 어떨까? 아래 코드를 보면 일단 bean 으로 등록할 수 없다.\n@RestController class Controller( val abstractService: AbstractService, ) { @GetMapping(\u0026#34;/abstract\u0026#34;) fun getAbstract() = abstractService.abstractFunction() } @Service abstract class AbstractService { fun abstractFunction() = \u0026#34;\u0026#34; } 아래와 같은 메시지가 뜨면서 애플리케이션이 멈춘다.\n*************************** APPLICATION FAILED TO START *************************** Description: Parameter 0 of constructor in com.demo.controller.Controller required a bean of type \u0026#39;com.demo.service.AbstractService\u0026#39; that could not be found. 왜 그럴까? 필자에게 하나의 가설이 있었다. Abstract Class 의 메서드 역시 abstract method 다. Child Class 가 어떻게 구현하느냐에 따라 달라지기 때문에 Abstract Class 는 bean 으로 등록할 수 없다. 그렇다면, Abstract Class 의 모든 메서드가 final method 라면 bean 으로 등록할 수 있을까? 그래서 아래와 같이 구현을 한 후 애플리케이션을 run 했다.\n",
   "keywords": [
     
   ],
@@ -172,7 +217,7 @@
 <article class="post-single">
   <header class="post-header">
     
-    <h1 class="post-title">
+    <h1 class="post-title entry-hint-parent">
       Abstract Class
     </h1>
     <div class="post-meta"><span title='2022-03-16 00:16:44 +0900 KST'>March 16, 2022</span>
@@ -260,7 +305,8 @@ Interface 는 객체를 생성할 수 없기 때문에 bean 이 될 수 없다.<
     </main>
     
 <footer class="footer">
-    <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &

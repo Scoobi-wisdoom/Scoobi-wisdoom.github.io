@@ -8,13 +8,15 @@
 <title>JPA: 단뱡향 @ManyToOne만 써라 | wisdoom</title>
 <meta name="keywords" content="">
 <meta name="description" content="자극적인 제목 미안하다. 물론 장단점이 있을 수 있다. 하지만 글의 결론부터 말하자면, 단방향 (unidirectional) @OneToMany보다는 양방향 (bidirectional) @OneToMany가 좋고, 양방향 @OneToMany보다는 단방향 @ManyToOne이 좋다.
-@OneToMany를 사용한다면 무조건 양방향이 좋다. Spring Boot Persistence Best Practices 책의 저자는 @OneToMany가 단방향으로 설정됐을 때 얼마나 안 좋은지를 서술한다.
-JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이 생긴다. 그렇기 때문에 단방향으로 설정하는 경우가 있다.
-하지만 @OneToMany는 단방향을 선택하면 안 된다. 비효율적인 쿼리가 발생하기 때문이다. 여기서는 실험을 통해 이를 확인한다.">
+@OneToMany를 사용한다면 무조건 양방향이 좋다.
+Spring Boot Persistence Best Practices 책의 저자는 @OneToMany가 단방향으로 설정됐을 때 얼마나 안 좋은지를 서술한다.
+JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이 생긴다.
+그렇기 때문에 단방향으로 설정하는 경우가 있다.
+하지만 @OneToMany는 단방향을 선택하면 안 된다. 비효율적인 쿼리가 발생하기 때문이다.
+여기서는 실험을 통해 이를 확인한다. Spring Boot Persistence Best Practices 책의 예제를 재구성해 실험했다.">
 <meta name="author" content="">
 <link rel="canonical" href="https://Scoobi-wisdoom.github.io/posts/jpa-direction-of-onetomany/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://Scoobi-wisdoom.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://Scoobi-wisdoom.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://Scoobi-wisdoom.github.io/favicon-32x32.png">
@@ -22,6 +24,7 @@ JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이
 <link rel="mask-icon" href="https://Scoobi-wisdoom.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://Scoobi-wisdoom.github.io/posts/jpa-direction-of-onetomany/">
 <noscript>
     <style>
         #theme-toggle,
@@ -39,7 +42,7 @@ JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -58,22 +61,27 @@ JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이
         }
 
     </style>
-</noscript><meta property="og:title" content="JPA: 단뱡향 @ManyToOne만 써라" />
-<meta property="og:description" content="자극적인 제목 미안하다. 물론 장단점이 있을 수 있다. 하지만 글의 결론부터 말하자면, 단방향 (unidirectional) @OneToMany보다는 양방향 (bidirectional) @OneToMany가 좋고, 양방향 @OneToMany보다는 단방향 @ManyToOne이 좋다.
+</noscript><meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/jpa-direction-of-onetomany/">
+  <meta property="og:site_name" content="wisdoom">
+  <meta property="og:title" content="JPA: 단뱡향 @ManyToOne만 써라">
+  <meta property="og:description" content="자극적인 제목 미안하다. 물론 장단점이 있을 수 있다. 하지만 글의 결론부터 말하자면, 단방향 (unidirectional) @OneToMany보다는 양방향 (bidirectional) @OneToMany가 좋고, 양방향 @OneToMany보다는 단방향 @ManyToOne이 좋다.
 @OneToMany를 사용한다면 무조건 양방향이 좋다. Spring Boot Persistence Best Practices 책의 저자는 @OneToMany가 단방향으로 설정됐을 때 얼마나 안 좋은지를 서술한다.
 JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이 생긴다. 그렇기 때문에 단방향으로 설정하는 경우가 있다.
-하지만 @OneToMany는 단방향을 선택하면 안 된다. 비효율적인 쿼리가 발생하기 때문이다. 여기서는 실험을 통해 이를 확인한다." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://Scoobi-wisdoom.github.io/posts/jpa-direction-of-onetomany/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2023-03-19T21:29:21+09:00" />
-<meta property="article:modified_time" content="2023-03-19T21:29:21+09:00" />
-
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="JPA: 단뱡향 @ManyToOne만 써라"/>
+하지만 @OneToMany는 단방향을 선택하면 안 된다. 비효율적인 쿼리가 발생하기 때문이다. 여기서는 실험을 통해 이를 확인한다. Spring Boot Persistence Best Practices 책의 예제를 재구성해 실험했다.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2023-03-19T21:29:21+09:00">
+    <meta property="article:modified_time" content="2023-03-19T21:29:21+09:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JPA: 단뱡향 @ManyToOne만 써라">
 <meta name="twitter:description" content="자극적인 제목 미안하다. 물론 장단점이 있을 수 있다. 하지만 글의 결론부터 말하자면, 단방향 (unidirectional) @OneToMany보다는 양방향 (bidirectional) @OneToMany가 좋고, 양방향 @OneToMany보다는 단방향 @ManyToOne이 좋다.
-@OneToMany를 사용한다면 무조건 양방향이 좋다. Spring Boot Persistence Best Practices 책의 저자는 @OneToMany가 단방향으로 설정됐을 때 얼마나 안 좋은지를 서술한다.
-JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이 생긴다. 그렇기 때문에 단방향으로 설정하는 경우가 있다.
-하지만 @OneToMany는 단방향을 선택하면 안 된다. 비효율적인 쿼리가 발생하기 때문이다. 여기서는 실험을 통해 이를 확인한다."/>
+@OneToMany를 사용한다면 무조건 양방향이 좋다.
+Spring Boot Persistence Best Practices 책의 저자는 @OneToMany가 단방향으로 설정됐을 때 얼마나 안 좋은지를 서술한다.
+JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이 생긴다.
+그렇기 때문에 단방향으로 설정하는 경우가 있다.
+하지만 @OneToMany는 단방향을 선택하면 안 된다. 비효율적인 쿼리가 발생하기 때문이다.
+여기서는 실험을 통해 이를 확인한다. Spring Boot Persistence Best Practices 책의 예제를 재구성해 실험했다.">
 
 
 <script type="application/ld+json">
@@ -102,7 +110,7 @@ JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이
   "@type": "BlogPosting",
   "headline": "JPA: 단뱡향 @ManyToOne만 써라",
   "name": "JPA: 단뱡향 @ManyToOne만 써라",
-  "description": "자극적인 제목 미안하다. 물론 장단점이 있을 수 있다. 하지만 글의 결론부터 말하자면, 단방향 (unidirectional) @OneToMany보다는 양방향 (bidirectional) @OneToMany가 좋고, 양방향 @OneToMany보다는 단방향 @ManyToOne이 좋다.\n@OneToMany를 사용한다면 무조건 양방향이 좋다. Spring Boot Persistence Best Practices 책의 저자는 @OneToMany가 단방향으로 설정됐을 때 얼마나 안 좋은지를 서술한다.\nJPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이 생긴다. 그렇기 때문에 단방향으로 설정하는 경우가 있다.\n하지만 @OneToMany는 단방향을 선택하면 안 된다. 비효율적인 쿼리가 발생하기 때문이다. 여기서는 실험을 통해 이를 확인한다.",
+  "description": "자극적인 제목 미안하다. 물론 장단점이 있을 수 있다. 하지만 글의 결론부터 말하자면, 단방향 (unidirectional) @OneToMany보다는 양방향 (bidirectional) @OneToMany가 좋고, 양방향 @OneToMany보다는 단방향 @ManyToOne이 좋다.\n@OneToMany를 사용한다면 무조건 양방향이 좋다. Spring Boot Persistence Best Practices 책의 저자는 @OneToMany가 단방향으로 설정됐을 때 얼마나 안 좋은지를 서술한다.\nJPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이 생긴다. 그렇기 때문에 단방향으로 설정하는 경우가 있다.\n하지만 @OneToMany는 단방향을 선택하면 안 된다. 비효율적인 쿼리가 발생하기 때문이다. 여기서는 실험을 통해 이를 확인한다. Spring Boot Persistence Best Practices 책의 예제를 재구성해 실험했다.\n",
   "keywords": [
     
   ],
@@ -175,7 +183,7 @@ JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이
 <article class="post-single">
   <header class="post-header">
     
-    <h1 class="post-title">
+    <h1 class="post-title entry-hint-parent">
       JPA: 단뱡향 @ManyToOne만 써라
     </h1>
     <div class="post-meta"><span title='2023-03-19 21:29:21 +0900 KST'>March 19, 2023</span>
@@ -450,7 +458,8 @@ JPA 에서 엔티티 관계를 양방향으로 설정할 경우 귀찮은 일이
     </main>
     
 <footer class="footer">
-    <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span>
+        <span>&copy; 2024 <a href="https://Scoobi-wisdoom.github.io/">wisdoom</a></span> · 
+
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
